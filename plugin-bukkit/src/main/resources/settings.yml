@@ -1,0 +1,42 @@
+primary-currency: "dollar"
+primary-locale: "en_US"
+
+currencies:
+  - currency: "dollar"
+    id: 1
+    enabled: true
+    starting-balance: 50
+    symbol: "$"
+    locale:
+      - id: "en_US"
+        display-name: "Dollar"
+        decimal-char: "."
+        amount-format: "#,##0.00"
+        presentation-format: "%symbol%%amount-format%"
+    conversions:
+      - conversion: "token"
+        rate: 0.01
+
+  - currency: "token"
+    id: 2
+    enabled: true
+    starting-balance: 0
+    symbol: "T"
+    locale:
+      - id: "en_US"
+        display-name: "Dollar"
+        word-format:
+          singular: "Token"
+          plural: "Tokens"
+        decimal-char: "."
+        amount-format: "#,##0.##"
+        presentation-format: "%amount-format% %word-format%"
+    conversions:
+      - conversion: "dollar"
+        rate: 0.01
+
+metadata:
+  file-version: 1
+  original:
+    file-version: 1
+    plugin-version: "${project.version}"

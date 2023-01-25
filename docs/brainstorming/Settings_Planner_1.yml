@@ -1,0 +1,48 @@
+currencies:
+  - id: "dollar"
+    locale:
+      - id: "en_US"
+        name: "Dollar"
+        starting-balance: 50.00
+        formatting:
+          decimal: "."
+          amount: "#,##0.00"
+          final: "$%amount%"
+    conversions:
+      "token": 100.00  # Converting tokens  -> dollars = 100x (1 token  = 100 dollars)
+      "nugget": 0.5    # Converting nuggets -> dollars = 0.5x (1 nugget = 0.5 dollars)
+
+  - id: "token"
+    locale:
+      - id: "en_US"
+        name: "Token"
+        precision: 4
+        starting-balance: 0.00
+        formatting:
+          word:
+            singular: "Token"
+            plural: "Tokens"
+          decimal: ""
+          amount: "#,##0"
+          final: "%amount% %word%"
+        conversions:
+          "dollar": 25.0   # Converting dollars -> tokens = 25x (25 dollars = 1 token)
+
+  - id: "nugget"
+    locale:
+      - id: "en_US"
+        name: "Nugget"
+        precision: 4
+        starting-balance: 0.00
+        formatting:
+          word:
+            singular: "Nugget"
+            plural: "Nuggets"
+          decimal: "."
+          amount: "#,##0.00"
+          final: "%amount% %word%"
+        conversions:
+          "dollar": auto   # Polyconomy will infer a reversed conversion rate specified in the dollars currency 
+
+primary-currency: "dollar"
+primary-locale: "en_US"

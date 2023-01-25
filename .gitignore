@@ -1,0 +1,17 @@
+### Local development files
+
+local/
+
+### Maven
+
+target/
+
+### IntelliJ
+
+.idea/
+*.iml
+
+### macOS
+
+.DS_Store
+._.git
