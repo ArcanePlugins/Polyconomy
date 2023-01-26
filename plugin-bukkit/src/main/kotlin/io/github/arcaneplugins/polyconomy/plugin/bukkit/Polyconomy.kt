@@ -1,8 +1,18 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyStopwatch
 import org.bukkit.plugin.java.JavaPlugin
 
-@Suppress("unused")
+/**
+Main class
+
+Note - we are unable to declare this as an `object` type, since it is instantiated by Bukkit.
+ */
 class Polyconomy : JavaPlugin() {
 
     companion object {
@@ -11,17 +21,49 @@ class Polyconomy : JavaPlugin() {
     }
 
     override fun onLoad() {
+        val stopwatch = PolyStopwatch()
+
         instance = this
 
-        logger.info("Plugin initialized.")
+        Log.i("Plugin initialized (took ${stopwatch.stop()}).")
     }
 
     override fun onEnable() {
-        logger.info("Plugin enabled.")
+        val stopwatch = PolyStopwatch()
+
+        ConfigManager.load()
+        ListenerManager.registerAll()
+        MetricsManager.register()
+
+        Log.i("Plugin enabled (took ${stopwatch.stop()}).")
     }
 
     override fun onDisable() {
-        logger.info("Plugin disabled.")
+        val stopwatch = PolyStopwatch()
+
+        HookManager.unregisterAll()
+
+        Log.i("Plugin disabled (took ${stopwatch.stop()}).")
+    }
+
+    /**
+     * Performs a 'soft reload'; only the configuration and storage systems are reloaded.
+     */
+    fun reload() {
+        Log.i("Reloading Polyconomy v${description.version}")
+        val stopwatch = PolyStopwatch()
+
+        try {
+            HookManager.unregisterAll()
+            ConfigManager.load()
+            HookManager.registerAll()
+        } catch(ex: Exception) {
+            Log.s("""Error occurred while reloading Polyconomy v${description.version} (Is it up to date?)""")
+            ex.printStackTrace()
+            throw ex
+        }
+
+        Log.i("Plugin reloaded (took ${stopwatch.stop()}).")
     }
 
 }

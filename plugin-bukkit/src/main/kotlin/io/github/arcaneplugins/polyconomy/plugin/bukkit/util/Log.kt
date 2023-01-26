@@ -22,7 +22,7 @@ object Log {
     }
 
     fun d(dCat: DebugCategory, msgSup: Supplier<Any>) {
-        if(dCat == DebugCategory.BROADCAST_TO_OPS)
+        if(dCat == DebugCategory.DEBUG_BROADCAST_OPS)
             throw IllegalArgumentException("Debug category '${dCat}' is not loggable.")
 
         if(!DebugManager.isCategoryEnabled(dCat)) return
@@ -31,7 +31,7 @@ object Log {
 
         Polyconomy.instance!!.logger.info(output)
 
-        if(DebugManager.isCategoryEnabled(DebugCategory.BROADCAST_TO_OPS)) {
+        if(DebugManager.isCategoryEnabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
             Bukkit.getOnlinePlayers()
                 .filter { it.isOp }
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }

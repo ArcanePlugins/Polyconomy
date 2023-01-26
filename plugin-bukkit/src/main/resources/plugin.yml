@@ -1,7 +1,44 @@
+#  _
+# |_) _  |     _  _   _   _   _ _
+# |  (_) | \/ (_ (_) | | (_) | | | \/
+#          /                       /
+
+# THIS IS NOT A CONFIG FILE. `plugin.yml` is an internal file which is read by the Bukkit plugin
+# loader. Do not modify this file unless you know what you are doing, you can easily break things.
+
+# We're keeping this at 1.13 purely to disable Bukkit's legacy support system from firing.
+# Old Minecraft versions such as 1.13 are not supported, nor is compatibility guaranteed for them.
+# However, raising the api-version would prevent Polyconomy from running on those unsupported
+# servers without any specific technical limitation providing a reason to.
 api-version: "1.13"
-authors: ["lokka30"]
+
+# "ArcanePlugins" followed by each maintainer of Polyconomy.
+authors: ["ArcanePlugins", "lokka30"]
+
 description: "The Ultimate Virtual Economy Service Provider"
+
 main: "io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy"
+
 name: "Polyconomy"
+
+# Soft/optional third-party plugins which are directly integrated with by Polyconomy
+softdepend:
+
+  # Treasury soft-dependency: Treasury is the recommended economy API that administrators should
+  # use in combination with Polyconomy to unlock all of its features, in contrast to the Vault
+  # hook, which is considered 'legacy'. Polyconomy has a Treasury hook, utilising a few of its APIs
+  # (Economy, Services, Events).
+  - "Treasury"
+
+  # Vault soft-dependency: Vault is an alternative economy API which most servers use. It can be ran
+  # in parallel with Treasury, although they serve different purposes. The Vault Economy API is not
+  # expansive enough to cover a significant amount of Polyconomy's features. It also requires all
+  # economy interactions to be done synchronously (on the main thread), which can lock up the server
+  # if the administrator has a slow database solution and/or an inefficient economy service provider
+  # plugin. Polyconomy has a Vault hook, utilising its Economy API only.
+  - "Vault"
+
+# Handled via Maven filtration.
 version: "${project.version}"
+
 website: "https://github.com/ArcanePlugins/Polyconomy/"

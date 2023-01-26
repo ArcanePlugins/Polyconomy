@@ -1,9 +1,10 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOKS
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.EconomyApiHook
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOK_TREASURY
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.account.AccountAccessorImpl
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
@@ -15,12 +16,20 @@ import me.lokka30.treasury.api.economy.EconomyProvider
 import me.lokka30.treasury.api.economy.account.AccountData
 import me.lokka30.treasury.api.economy.account.accessor.AccountAccessor
 import me.lokka30.treasury.api.economy.currency.Currency
+import org.bukkit.Bukkit
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-class TreasuryHook : Hook("Treasury"), EconomyApiHook, EconomyProvider {
+object TreasuryHook : Hook(
+    id = "Treasury",
+    type = HookType.ECONOMY_API
+), EconomyProvider {
 
-    override fun registerService() {
+    override fun canRegister(): Boolean {
+        return !registered && Bukkit.getPluginManager().isPluginEnabled("Treasury")
+    }
+
+    override fun register() {
         ServiceRegistry.INSTANCE.registerService(
             EconomyProvider::class.java,
             this,
@@ -29,8 +38,8 @@ class TreasuryHook : Hook("Treasury"), EconomyApiHook, EconomyProvider {
         )
     }
 
-    override fun unregisterService() {
-        Log.d(HOOKS) { "Unregistering Treasury Service." }
+    override fun unregister() {
+        Log.d(HOOK_TREASURY) { "Unregistering Treasury service." }
 
         var service: Service<EconomyProvider>? = null
         for(otherService in ServiceRegistry.INSTANCE.allServicesFor(EconomyProvider::class.java)) {
@@ -40,14 +49,13 @@ class TreasuryHook : Hook("Treasury"), EconomyApiHook, EconomyProvider {
         }
 
         if(service == null) {
-            Log.i("Skipped unregistration of Treasury " +
-                    "service as the service is not registered.")
+            Log.d(HOOK_TREASURY) { "Can't unregister service: is already unregistered." }
             return
         }
 
         ServiceRegistry.INSTANCE.unregister(EconomyProvider::class.java, service)
 
-        Log.d(HOOKS) { "Unregistered Treasury Service." }
+        Log.d(HOOK_TREASURY) { "Unregistered Treasury service successfully." }
     }
 
     override fun accountAccessor(): AccountAccessor {
@@ -85,4 +93,5 @@ class TreasuryHook : Hook("Treasury"), EconomyApiHook, EconomyProvider {
     override fun unregisterCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
         TODO("Not yet implemented")
     }
+
 }

@@ -57,6 +57,18 @@
     </dependency>
     <dependency>
       <groupId>org.spongepowered</groupId>
+      <artifactId>configurate-yaml</artifactId>
+      <version>4.1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spongepowered</groupId>
+      <artifactId>configurate-gson</artifactId>
+      <version>4.1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spongepowered</groupId>
       <artifactId>configurate-extra-kotlin</artifactId>
       <version>4.1.2</version>
       <scope>compile</scope>
@@ -66,6 +78,7 @@
       <groupId>me.lokka30</groupId>
       <artifactId>treasury-api</artifactId>
       <version>2.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
@@ -150,6 +163,10 @@
             <relocation>
               <pattern>kotlin</pattern>
               <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlin</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>org.spongepowered.configurate</pattern>
+              <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.configurate</shadedPattern>
             </relocation>
           </relocations>
           <filters>
