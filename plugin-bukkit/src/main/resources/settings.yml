@@ -3,7 +3,7 @@ primary-locale: "en_US"
 
 currencies:
   - currency: "dollar"
-    id: 1
+    db-id: 1
     enabled: true
     starting-balance: 50
     symbol: "$"
@@ -13,12 +13,9 @@ currencies:
         decimal-char: "."
         amount-format: "#,##0.00"
         presentation-format: "%symbol%%amount-format%"
-    conversions:
-      - conversion: "token"
-        rate: 0.01
 
   - currency: "token"
-    id: 2
+    db-id: 2
     enabled: true
     starting-balance: 0
     symbol: "T"
@@ -31,9 +28,18 @@ currencies:
         decimal-char: "."
         amount-format: "#,##0.##"
         presentation-format: "%amount-format% %word-format%"
-    conversions:
-      - conversion: "dollar"
-        rate: 0.01
+
+conversions:
+  - conversion: "dollar"
+    to: "token"
+    rate: 0.01
+
+  - conversion: "token"
+    to: "dollar"
+    rate: 100
+
+storage:
+  implementation: "Yaml"
 
 metadata:
   file-version: 1
