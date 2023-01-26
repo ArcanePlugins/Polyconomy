@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.data.storage
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
 
 /*
 This object uses Caffeine to improve performance and memory consumption of storing database details.

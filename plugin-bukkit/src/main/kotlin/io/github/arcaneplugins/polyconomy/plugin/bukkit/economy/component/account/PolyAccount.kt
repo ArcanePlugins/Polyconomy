@@ -1,8 +1,8 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.data.component.account
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.data.component.account.permission.PolyAccountPermission
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.data.component.currency.PolyCurrency
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.data.component.transaction.PolyTransaction
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.permission.PolyAccountPermission
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
 import java.math.BigDecimal

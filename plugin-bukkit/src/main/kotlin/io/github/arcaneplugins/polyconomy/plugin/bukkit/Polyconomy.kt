@@ -49,12 +49,17 @@ class Polyconomy : JavaPlugin() {
     /**
      * Performs a 'soft reload'; only the configuration and storage systems are reloaded.
      */
+    //TODO use
+    @Suppress("unused")
     fun reload() {
         Log.i("Reloading Polyconomy v${description.version}")
         val stopwatch = PolyStopwatch()
 
         try {
+            /* soft-disabling */
             HookManager.unregisterAll()
+
+            /* re-loading */
             ConfigManager.load()
             HookManager.registerAll()
         } catch(ex: Exception) {

@@ -2,6 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.config
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.messages.MessagesCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 
 object ConfigManager {
@@ -12,6 +14,9 @@ object ConfigManager {
     )
 
     fun load() {
+        if(StorageManager.connected())
+            StorageManager.disconnect()
+
         try {
             configs.forEach(Config::load)
         } catch(ex: Exception) {
@@ -21,5 +26,8 @@ object ConfigManager {
                     "validate all of your YAML config files.")
             throw ex
         }
+
+        EconomyManager.load()
+        StorageManager.connect()
     }
 }

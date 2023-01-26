@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.data.component.currency
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency
 
 import java.math.BigDecimal
 

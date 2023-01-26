@@ -14,4 +14,16 @@ enum class DebugCategory {
      */
     DEBUG_BROADCAST_OPS,
 
+    /**
+     * Reports activity in
+     * [io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local.YamlStorageHandler].
+     */
+    STORAGE_YAML,
+
+    /**
+     * Reports activity in
+     * [io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager]
+     */
+    STORAGE_MANAGER,
+
 }
