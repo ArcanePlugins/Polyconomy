@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.accou
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.permission.PolyAccountPermission
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyResponse
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
 import java.math.BigDecimal
 import java.time.temporal.Temporal
@@ -42,7 +42,7 @@ sealed class PolyAccount(
         player: UUID
     ): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>>
 
-    abstract fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Set<Map.Entry<PolyAccountPermission, PolyTriState>>>>>
+    abstract fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Map<PolyAccountPermission, PolyTriState>>>>
 
     abstract fun hasPermissions(
         player: UUID,

@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.curre
 import java.math.BigDecimal
 
 class PolyCurrencyConversion(
-    from: PolyCurrency,
-    to: PolyCurrency,
-    rate: BigDecimal
+    val from: PolyCurrency,
+    val to: PolyCurrency,
+    val rate: BigDecimal
 )

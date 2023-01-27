@@ -26,4 +26,15 @@ enum class DebugCategory {
      */
     STORAGE_MANAGER,
 
+    /**
+     * Reports activity in
+     * [io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager]
+     */
+    ECONOMY_MANAGER,
+
+    /**
+     * Enables all debug categories
+     */
+    DEBUG_ALL,
+
 }

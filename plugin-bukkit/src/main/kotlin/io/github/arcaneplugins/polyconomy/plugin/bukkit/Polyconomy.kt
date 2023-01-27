@@ -33,6 +33,7 @@ class Polyconomy : JavaPlugin() {
 
         ConfigManager.load()
         ListenerManager.registerAll()
+        HookManager.registerAll()
         MetricsManager.register()
 
         Log.i("Plugin enabled (took ${stopwatch.stop()}).")

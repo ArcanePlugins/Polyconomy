@@ -5,20 +5,20 @@ import java.text.DecimalFormat
 import java.util.*
 
 class PolyCurrency(
-    id: String,
-    dbId: Int,
-    enabled: Boolean,
-    startingBalance: BigDecimal,
-    symbol: String,
-    locales: LinkedHashSet<CurrencyLocale>
+    val id: String,
+    val dbId: Int,
+    val enabled: Boolean,
+    val startingBalance: BigDecimal,
+    val symbol: String,
+    val locales: MutableList<CurrencyLocale>
 ) {
     class CurrencyLocale(
-        id: Locale,
-        displayName: String,
-        wordFormatSingular: String?,
-        wordFormatPlural: String?,
-        decimalChar: String,
-        amountFormat: DecimalFormat,
-        presentationFormat: String
+        val id: Locale,
+        val displayName: String,
+        val wordFormatSingular: String?,
+        val wordFormatPlural: String?,
+        val decimalChar: String,
+        val amountFormat: DecimalFormat,
+        val presentationFormat: String
     )
 }

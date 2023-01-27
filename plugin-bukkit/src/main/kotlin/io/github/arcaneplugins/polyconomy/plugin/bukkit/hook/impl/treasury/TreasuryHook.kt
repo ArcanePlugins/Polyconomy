@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture
 object TreasuryHook : Hook(
     id = "Treasury",
     type = HookType.ECONOMY_API
-), EconomyProvider {
+) {
 
     override fun canRegister(): Boolean {
         return !registered && Bukkit.getPluginManager().isPluginEnabled("Treasury")
@@ -32,7 +32,7 @@ object TreasuryHook : Hook(
     override fun register() {
         ServiceRegistry.INSTANCE.registerService(
             EconomyProvider::class.java,
-            this,
+            PolyTreasuryEconomyProvider,
             Polyconomy.instance!!.description.name,
             ServicePriority.NORMAL
         )
@@ -58,40 +58,42 @@ object TreasuryHook : Hook(
         Log.d(HOOK_TREASURY) { "Unregistered Treasury service successfully." }
     }
 
-    override fun accountAccessor(): AccountAccessor {
-        return AccountAccessorImpl
-    }
+    object PolyTreasuryEconomyProvider : EconomyProvider {
+        override fun accountAccessor(): AccountAccessor {
+            return AccountAccessorImpl
+        }
 
-    override fun hasAccount(accountData: AccountData): CompletableFuture<Response<TriState>> {
-        TODO("Not yet implemented")
-    }
+        override fun hasAccount(accountData: AccountData): CompletableFuture<Response<TriState>> {
+            TODO("Not yet implemented")
+        }
 
-    override fun retrievePlayerAccountIds(): CompletableFuture<Response<MutableCollection<UUID>>> {
-        TODO("Not yet implemented")
-    }
+        override fun retrievePlayerAccountIds(): CompletableFuture<Response<MutableCollection<UUID>>> {
+            TODO("Not yet implemented")
+        }
 
-    override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<MutableCollection<NamespacedKey>>> {
-        TODO("Not yet implemented")
-    }
+        override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<MutableCollection<NamespacedKey>>> {
+            TODO("Not yet implemented")
+        }
 
-    override fun getPrimaryCurrency(): Currency {
-        TODO("Not yet implemented")
-    }
+        override fun getPrimaryCurrency(): Currency {
+            TODO("Not yet implemented")
+        }
 
-    override fun findCurrency(identifier: String): Optional<Currency> {
-        TODO("Not yet implemented")
-    }
+        override fun findCurrency(identifier: String): Optional<Currency> {
+            TODO("Not yet implemented")
+        }
 
-    override fun getCurrencies(): MutableSet<Currency> {
-        TODO("Not yet implemented")
-    }
+        override fun getCurrencies(): MutableSet<Currency> {
+            TODO("Not yet implemented")
+        }
 
-    override fun registerCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
-        TODO("Not yet implemented")
-    }
+        override fun registerCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
+            TODO("Not yet implemented")
+        }
 
-    override fun unregisterCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
-        TODO("Not yet implemented")
+        override fun unregisterCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
+            TODO("Not yet implemented")
+        }
     }
 
 }

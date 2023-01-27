@@ -26,7 +26,7 @@ currencies:
     symbol: "T"
     locale:
       - id: "en_US"
-        display-name: "Dollar"
+        display-name: "Token"
         word-format:
           singular: "Token"
           plural: "Tokens"
@@ -35,11 +35,11 @@ currencies:
         presentation-format: "%amount-format% %word-format%"
 
 conversions:
-  - conversion: "dollar"
+  - from: "dollar"
     to: "token"
     rate: 0.01
 
-  - conversion: "token"
+  - from: "token"
     to: "dollar"
     rate: 100
 

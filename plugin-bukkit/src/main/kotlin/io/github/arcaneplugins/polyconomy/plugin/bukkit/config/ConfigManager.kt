@@ -9,16 +9,21 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 object ConfigManager {
 
     val configs: LinkedHashSet<Config> = linkedSetOf(
-        MessagesCfg,
         SettingsCfg,
+        MessagesCfg,
     )
 
     fun load() {
+        Log.i("Loading configs.")
+
         if(StorageManager.connected())
             StorageManager.disconnect()
 
         try {
-            configs.forEach(Config::load)
+            configs.forEach { config ->
+                Log.i("Loading config '${config.relativePath}'.")
+                config.load()
+            }
         } catch(ex: Exception) {
             Log.s("Unable to load configs. You have most likely created an accidental " +
                     "syntax error, such as a stray apostrophe or misaligned indentation. Prior " +

@@ -20,4 +20,8 @@ object VaultHook : Hook(
     override fun unregister() {
         TODO("Not yet implemented")
     }
+
+    object PolyVaultEconomyProvider {
+        //TODO
+    }
 }
