@@ -2,12 +2,18 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.PolyNonPlayerAccount
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.PolyPlayerAccount
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrencyConversion
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
+import org.bukkit.NamespacedKey
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 object EconomyManager {
 
@@ -108,7 +114,7 @@ object EconomyManager {
     }
 
     private fun loadPrimaryCurrency() {
-        primaryCurrency = getCurrencyByIdNonNull(
+        primaryCurrency = findCurrencyByIdNonNull(
             SettingsCfg
                 .rootNode!!
                 .node("primary-currency")
@@ -134,12 +140,12 @@ object EconomyManager {
             .forEach { conversionNode ->
                 conversions.add(
                     PolyCurrencyConversion(
-                        from = getCurrencyByIdNonNull(
+                        from = findCurrencyByIdNonNull(
                             conversionNode
                                 .node("from")
                                 .string!!
                         ),
-                        to = getCurrencyByIdNonNull(
+                        to = findCurrencyByIdNonNull(
                             conversionNode
                                 .node("to")
                                 .string!!
@@ -163,12 +169,12 @@ object EconomyManager {
         )
     }
 
-    fun getCurrencyById(id: String): PolyCurrency? {
+    fun findCurrencyById(id: String): PolyCurrency? {
         return currencies.firstOrNull { it.id.equals(id, true) }
     }
 
-    fun getCurrencyByIdNonNull(id: String): PolyCurrency {
-        val currency: PolyCurrency? = getCurrencyById(id)
+    fun findCurrencyByIdNonNull(id: String): PolyCurrency {
+        val currency: PolyCurrency? = findCurrencyById(id)
 
         if(currency != null)
             return currency
@@ -179,6 +185,18 @@ Unable to retrieve currency by ID '${id}', as there is no such currency with tha
 Check for any spelling mistakes in your Settings config.
             """
         )
+    }
+
+    fun findPlayerAccount(
+        player: UUID
+    ): CompletableFuture<PolyResponse<PolyPlayerAccount>> {
+        return StorageManager.currentHandler!!.findPlayerAccount(player)
+    }
+
+    fun findNonPlayerAccount(
+        id: NamespacedKey
+    ): CompletableFuture<PolyResponse<PolyNonPlayerAccount>> {
+        return StorageManager.currentHandler!!.findNonPlayerAccount(id)
     }
 
     @Suppress("unused")

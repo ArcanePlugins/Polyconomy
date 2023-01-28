@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.initiator
 
 import java.util.*
 
@@ -8,11 +8,6 @@ abstract class PolyTransactionInitiator<T>(
 ) {
 
     companion object {
-        object ServerInitiator : PolyTransactionInitiator<String>(
-            data = "Server",
-            type = Type.SERVER
-        )
-
         class PlayerInitiator(
             player: UUID
         ) : PolyTransactionInitiator<UUID>(
@@ -26,11 +21,11 @@ abstract class PolyTransactionInitiator<T>(
             data = plugin,
             type = Type.PLUGIN
         )
-    }
 
-    enum class Type {
-        SERVER,
-        PLAYER,
-        PLUGIN
+        enum class Type {
+            SERVER,
+            PLAYER,
+            PLUGIN
+        }
     }
 }

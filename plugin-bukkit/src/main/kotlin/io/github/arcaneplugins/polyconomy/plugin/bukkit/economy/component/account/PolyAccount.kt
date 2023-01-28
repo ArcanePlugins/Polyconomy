@@ -2,30 +2,32 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.accou
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.permission.PolyAccountPermission
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
 import java.math.BigDecimal
-import java.time.temporal.Temporal
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-sealed class PolyAccount(
-    var name: String? = null
-) {
+sealed class PolyAccount() {
+
+    abstract fun name(): String?
 
     abstract fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>>
 
     abstract fun doTransaction(transaction: PolyTransaction): CompletableFuture<PolyResponse<BigDecimal>>
 
-    abstract fun delete(): CompletableFuture<PolyResponse<PolyTriState>>
+    fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
+        TODO("Not implemented")
+    }
 
     abstract fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>>
 
     abstract fun retrieveTransactionHistory(
         transactionCount: Int,
-        from: Temporal,
-        to: Temporal
+        from: Instant,
+        to: Instant
     ): CompletableFuture<PolyResponse<Collection<PolyTransaction>>>
 
     abstract fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>>

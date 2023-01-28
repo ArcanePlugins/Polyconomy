@@ -4,10 +4,11 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.accoun
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
 import org.bukkit.NamespacedKey
 import java.math.BigDecimal
-import java.time.temporal.Temporal
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -15,36 +16,47 @@ class PolyNonPlayerAccount(
     val id: NamespacedKey
 ) : PolyAccount() {
 
-    override fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>> {
-        TODO("Not yet implemented")
+    override fun name(): String? {
+        return StorageManager.currentHandler!!.retrieveName(this)
     }
 
-    override fun doTransaction(transaction: PolyTransaction): CompletableFuture<PolyResponse<BigDecimal>> {
-        TODO("Not yet implemented")
+    override fun retrieveBalance(
+        currency: PolyCurrency
+    ): CompletableFuture<PolyResponse<BigDecimal>> {
+        return StorageManager.currentHandler!!.retrieveBalance(this, currency)
     }
 
-    override fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not yet implemented")
+    override fun doTransaction(
+        transaction: PolyTransaction
+    ): CompletableFuture<PolyResponse<BigDecimal>> {
+        return StorageManager.currentHandler!!.doTransaction(this, transaction)
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveHeldCurrencies(this)
     }
 
     override fun retrieveTransactionHistory(
         transactionCount: Int,
-        from: Temporal,
-        to: Temporal
+        from: Instant,
+        to: Instant
     ): CompletableFuture<PolyResponse<Collection<PolyTransaction>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveTransactionHistory(
+            this,
+            transactionCount,
+            from,
+            to
+        )
     }
 
     override fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveMemberIds(this)
     }
 
-    override fun isMember(player: UUID): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not yet implemented")
+    override fun isMember(
+        player: UUID
+    ): CompletableFuture<PolyResponse<PolyTriState>> {
+        return StorageManager.currentHandler!!.isMember(this, player)
     }
 
     override fun setPermissions(
@@ -52,21 +64,28 @@ class PolyNonPlayerAccount(
         permissionValue: PolyTriState,
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.setPermissions(
+            this,
+            player,
+            permissionValue,
+            *permissions
+        )
     }
 
-    override fun retrievePermissions(player: UUID): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>> {
-        TODO("Not yet implemented")
+    override fun retrievePermissions(
+        player: UUID
+    ): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>> {
+        return StorageManager.currentHandler!!.retrievePermissions(this, player)
     }
 
     override fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Map<PolyAccountPermission, PolyTriState>>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrievePermissionsMap(this)
     }
 
     override fun hasPermissions(
         player: UUID,
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.hasPermissions(this, player, *permissions)
     }
 }

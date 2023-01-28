@@ -5,9 +5,10 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.curren
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyStandardResponseError
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
 import java.math.BigDecimal
-import java.time.temporal.Temporal
+import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
@@ -22,34 +23,39 @@ class PolyPlayerAccount(
         )
     )
 
+    override fun name(): String? {
+        return StorageManager.currentHandler!!.retrieveName(this)
+    }
+
     override fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveBalance(this, currency)
     }
 
     override fun doTransaction(transaction: PolyTransaction): CompletableFuture<PolyResponse<BigDecimal>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.doTransaction(this, transaction)
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveHeldCurrencies(this)
     }
 
     override fun retrieveTransactionHistory(
         transactionCount: Int,
-        from: Temporal,
-        to: Temporal
+        from: Instant,
+        to: Instant
     ): CompletableFuture<PolyResponse<Collection<PolyTransaction>>> {
-        TODO("Not yet implemented")
+        return StorageManager.currentHandler!!.retrieveTransactionHistory(
+            this,
+            transactionCount,
+            from,
+            to
+        )
     }
 
     override fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrieveMemberIds: ${name}",
+                name = "retrieveMemberIds: ${name()}",
                 result = Collections.singleton(player),
                 error = null
             )
@@ -59,7 +65,7 @@ class PolyPlayerAccount(
     override fun isMember(player: UUID): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "isMember: ${name}",
+                name = "isMember: ${name()}",
                 result = PolyTriState.fromBool(player == this.player),
                 error = null
             )
@@ -73,7 +79,7 @@ class PolyPlayerAccount(
     ): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "setPermissions: ${name}",
+                name = "setPermissions: ${name()}",
                 result = null,
                 error = PolyStandardResponseError.PLAYER_ACCOUNT_PERMISSION_MODIFICATION_NOT_SUPPORTED
             )
@@ -83,7 +89,7 @@ class PolyPlayerAccount(
     override fun retrievePermissions(player: UUID): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrievePermissions: ${name}",
+                name = "retrievePermissions: ${name()}",
                 result = let {
                     if(player == this.player) PolyAccountPermission.allPermissions else mapOf()
                 },
@@ -95,7 +101,7 @@ class PolyPlayerAccount(
     override fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Map<PolyAccountPermission, PolyTriState>>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrievePermisionsMap: ${name}",
+                name = "retrievePermisionsMap: ${name()}",
                 result = allPermissions,
                 error = null
             )
@@ -108,7 +114,7 @@ class PolyPlayerAccount(
     ): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "hasPermissions: ${name}",
+                name = "hasPermissions: ${name()}",
                 result = PolyTriState.fromBool(player == this.player),
                 error = null
             )

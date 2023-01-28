@@ -3,6 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyStopwatch
@@ -16,7 +17,7 @@ Note - we are unable to declare this as an `object` type, since it is instantiat
 class Polyconomy : JavaPlugin() {
 
     companion object {
-        var instance: Polyconomy? = null
+        lateinit var instance: Polyconomy
             private set
     }
 
@@ -43,6 +44,7 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         HookManager.unregisterAll()
+        ConcurrentManager.shutdown()
 
         Log.i("Plugin disabled (took ${stopwatch.stop()}).")
     }
