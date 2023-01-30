@@ -13,9 +13,9 @@ abstract class Config(
     val relativePath: Path
 ) {
 
-    private var loader: YamlConfigurationLoader? = null
+    private lateinit var loader: YamlConfigurationLoader
 
-    var rootNode: CommentedConfigurationNode? = null
+    lateinit var rootNode: CommentedConfigurationNode
 
     abstract fun load()
 
@@ -27,17 +27,19 @@ abstract class Config(
      */
     protected fun read() {
         createIfNotExists()
+
         loader = YamlConfigurationLoader.builder()
             .path(absolutePath())
             .build()
-        rootNode = loader!!.load()
+
+        rootNode = loader.load()
     }
 
     /**
      * Write current root node object to the disk.
      */
     fun save() {
-        loader!!.save(rootNode)
+        loader.save(rootNode)
     }
 
     /**
@@ -45,12 +47,12 @@ abstract class Config(
      */
     private fun createIfNotExists() {
         if(absolutePath().exists()) return
-        Polyconomy.instance!!.saveResource(relativePath.toString(), false)
+        Polyconomy.instance.saveResource(relativePath.toString(), false)
     }
 
     fun absolutePath(): Path {
         return Path(
-            """${Polyconomy.instance!!.dataFolder.absolutePath}${File.separator}${relativePath}"""
+            "${Polyconomy.instance.dataFolder.absolutePath}${File.separator}${relativePath}"
         )
     }
 

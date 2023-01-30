@@ -2,18 +2,12 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.PolyNonPlayerAccount
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.PolyPlayerAccount
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrencyConversion
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
-import org.bukkit.NamespacedKey
 import java.math.BigDecimal
 import java.text.DecimalFormat
 import java.util.*
-import java.util.concurrent.CompletableFuture
 
 object EconomyManager {
 
@@ -185,18 +179,6 @@ Unable to retrieve currency by ID '${id}', as there is no such currency with tha
 Check for any spelling mistakes in your Settings config.
             """
         )
-    }
-
-    fun findPlayerAccount(
-        player: UUID
-    ): CompletableFuture<PolyResponse<PolyPlayerAccount>> {
-        return StorageManager.currentHandler!!.findPlayerAccount(player)
-    }
-
-    fun findNonPlayerAccount(
-        id: NamespacedKey
-    ): CompletableFuture<PolyResponse<PolyNonPlayerAccount>> {
-        return StorageManager.currentHandler!!.findNonPlayerAccount(id)
     }
 
     @Suppress("unused")

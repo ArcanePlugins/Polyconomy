@@ -46,6 +46,10 @@ conversions:
 storage:
   implementation: "Yaml"
 
+advanced:
+  minimum-balance: 0
+  signed-balances: true
+
 metadata:
   file-version: 1
   original:

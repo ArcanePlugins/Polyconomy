@@ -1,8 +1,8 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local.YamlStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_MANAGER
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local.YamlStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 
 object StorageManager {
@@ -27,7 +27,7 @@ object StorageManager {
 
         // figure out what storage handler ID they want to connect with
         val id: String? = SettingsCfg
-            .rootNode!!
+            .rootNode
             .node("storage", "implementation")
             .string
 

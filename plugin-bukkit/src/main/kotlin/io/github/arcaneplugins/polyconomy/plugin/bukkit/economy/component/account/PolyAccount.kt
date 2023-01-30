@@ -12,15 +12,17 @@ import java.util.concurrent.CompletableFuture
 
 sealed class PolyAccount() {
 
-    abstract fun name(): String?
+    abstract fun name(): CompletableFuture<PolyResponse<String?>>
 
-    abstract fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>>
+    abstract fun retrieveBalance(
+        currency: PolyCurrency
+    ): CompletableFuture<PolyResponse<BigDecimal>>
 
-    abstract fun doTransaction(transaction: PolyTransaction): CompletableFuture<PolyResponse<BigDecimal>>
+    abstract fun doTransaction(
+        transaction: PolyTransaction
+    ): CompletableFuture<PolyResponse<BigDecimal>>
 
-    fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
-        TODO("Not implemented")
-    }
+    abstract fun delete(): CompletableFuture<PolyResponse<PolyTriState>>
 
     abstract fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>>
 
@@ -32,7 +34,9 @@ sealed class PolyAccount() {
 
     abstract fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>>
 
-    abstract fun isMember(player: UUID): CompletableFuture<PolyResponse<PolyTriState>>
+    abstract fun isMember(
+        player: UUID
+    ): CompletableFuture<PolyResponse<PolyTriState>>
 
     abstract fun setPermissions(
         player: UUID,

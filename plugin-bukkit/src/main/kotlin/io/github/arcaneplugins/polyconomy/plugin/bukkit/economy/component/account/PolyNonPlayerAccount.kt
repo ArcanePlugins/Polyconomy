@@ -16,7 +16,7 @@ class PolyNonPlayerAccount(
     val id: NamespacedKey
 ) : PolyAccount() {
 
-    override fun name(): String? {
+    override fun name(): CompletableFuture<PolyResponse<String?>> {
         return StorageManager.currentHandler!!.retrieveName(this)
     }
 
@@ -30,6 +30,10 @@ class PolyNonPlayerAccount(
         transaction: PolyTransaction
     ): CompletableFuture<PolyResponse<BigDecimal>> {
         return StorageManager.currentHandler!!.doTransaction(this, transaction)
+    }
+
+    override fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
+        return StorageManager.currentHandler!!.deleteAccount(this)
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>> {

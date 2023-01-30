@@ -131,12 +131,4 @@ abstract class StorageHandler(
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>>
 
-    abstract fun findPlayerAccount(
-        player: UUID
-    ): CompletableFuture<PolyResponse<PolyPlayerAccount>>
-
-    abstract fun findNonPlayerAccount(
-        id: NamespacedKey
-    ): CompletableFuture<PolyResponse<PolyNonPlayerAccount>>
-
 }

@@ -10,7 +10,7 @@ class PolyTransaction(
     val currencyId: String,
     val initiator: PolyTransactionInitiator<out Any>,
     val timestamp: Instant?,
-    val transactionType: PolyTransactionType,
+    val type: PolyTransactionType,
     val reason: String?,
     val amount: BigDecimal,
     val importance: PolyTransactionImportance,

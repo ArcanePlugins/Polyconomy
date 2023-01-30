@@ -6,10 +6,21 @@ import java.util.concurrent.TimeUnit
 
 object ConcurrentManager {
 
-    val storageSystemExecSvc: ExecutorService = Executors.newSingleThreadExecutor()
+    lateinit var storageSystemExecSvc: ExecutorService
+        private set
 
+    /**
+     * Performs a start-up for the concurrency management system.
+     */
+    fun startup() {
+        storageSystemExecSvc = Executors.newSingleThreadExecutor()
+    }
+
+    /**
+     * Performs a shut-down for the concurrency management system.
+     */
     fun shutdown() {
-        storageSystemExecSvc.awaitTermination(30, TimeUnit.SECONDS)
+        storageSystemExecSvc.awaitTermination(15, TimeUnit.SECONDS)
     }
 
 }
