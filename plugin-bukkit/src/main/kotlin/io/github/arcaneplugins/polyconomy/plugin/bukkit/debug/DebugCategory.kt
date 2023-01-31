@@ -66,4 +66,11 @@ enum class DebugCategory {
      */
     HOOK_MANAGER,
 
+    /**
+     * A generic category for testing purposes
+     *
+     * @since v0.1.0
+     */
+    DEBUG_TEST
+
 }

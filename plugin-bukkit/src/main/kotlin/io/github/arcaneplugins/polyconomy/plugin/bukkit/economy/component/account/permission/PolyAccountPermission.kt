@@ -19,7 +19,7 @@ enum class PolyAccountPermission {
         val allPermissions: Map<PolyAccountPermission, PolyTriState> = let {
             val map: MutableMap<PolyAccountPermission, PolyTriState> = mutableMapOf()
             PolyAccountPermission.values().forEach { map[it] = PolyTriState.TRUE }
-            map // returned
+            return@let map
         }
     }
 

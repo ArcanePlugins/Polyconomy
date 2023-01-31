@@ -131,4 +131,8 @@ abstract class StorageHandler(
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>>
 
+    abstract fun getOrGrantCurrencyDbId(
+        currencyId: String
+    ): Int
+
 }

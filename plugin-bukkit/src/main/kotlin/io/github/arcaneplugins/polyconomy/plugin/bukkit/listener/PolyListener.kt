@@ -21,7 +21,7 @@ abstract class PolyListener(
             throw IllegalStateException("${this::class.simpleName} is already registered.")
 
         try {
-            Bukkit.getPluginManager().registerEvents(this, Polyconomy.instance!!)
+            Bukkit.getPluginManager().registerEvents(this, Polyconomy.instance)
             registered = true
         } catch(ex: Exception) {
             if(imperative) throw ex

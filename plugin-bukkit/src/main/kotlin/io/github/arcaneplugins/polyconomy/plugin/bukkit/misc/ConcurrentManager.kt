@@ -6,22 +6,27 @@ import java.util.concurrent.TimeUnit
 
 object ConcurrentManager {
 
-    lateinit var singleThreadExecSvc: ExecutorService
+    lateinit var execSvc: ExecutorService
         private set
 
     /**
      * Performs a start-up for the concurrency management system.
      */
     fun startup() {
-        singleThreadExecSvc = Executors.newSingleThreadExecutor()
+        execSvc = Executors.newFixedThreadPool(10)
+        //execSvc = Executors.newCachedThreadPool()
     }
 
     /**
      * Performs a shut-down for the concurrency management system.
      */
     fun shutdown() {
-        singleThreadExecSvc.shutdown()
-        singleThreadExecSvc.awaitTermination(30, TimeUnit.SECONDS)
+        listOf(
+            execSvc
+        ).forEach {
+            it.shutdown()
+            it.awaitTermination(5, TimeUnit.SECONDS)
+        }
     }
 
 }

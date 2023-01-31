@@ -2,8 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyConfiguredCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrencyConversion
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import java.math.BigDecimal
 import java.text.DecimalFormat
@@ -19,13 +19,10 @@ object EconomyManager {
 
     val currencies: MutableList<PolyCurrency> = mutableListOf()
 
-    val conversions: MutableList<PolyCurrencyConversion> = mutableListOf()
-
     fun load() {
         loadPrimaryLocale()
         loadCurrencies()
         loadPrimaryCurrency()
-        loadConversions()
     }
 
     private fun loadCurrencies() {
@@ -34,20 +31,15 @@ object EconomyManager {
             .rootNode
             .node("currencies")
             .childrenList()
+            .filter { currencyNode -> currencyNode.node("enabled").getBoolean(true) }
             .forEach { currencyNode ->
+                Log.d(ECONOMY_MANAGER) { "Parsing currency node @ ${currencyNode.path()}" }
+
                 currencies.add(
-                    PolyCurrency(
+                    PolyConfiguredCurrency(
                         id = currencyNode
                             .node("currency")
                             .string!!,
-
-                        dbId = currencyNode
-                            .node("db-id")
-                            .int,
-
-                        enabled = currencyNode
-                            .node("enabled")
-                            .boolean,
 
                         startingBalance = BigDecimal(
                             currencyNode
@@ -55,53 +47,61 @@ object EconomyManager {
                                 .double
                         ),
 
-                        locales = let {
-                            val locales: MutableList<PolyCurrency.CurrencyLocale> = mutableListOf()
+                        symbol = currencyNode.node("symbol").string!!,
+
+                        exchangeRate = BigDecimal(
+                            currencyNode.node("exchange-rate").getDouble(0.0)
+                        ),
+
+                        amountFormat = DecimalFormat(
+                            currencyNode
+                                .node("amount-format")
+                                .getString("#,##0.00")
+                        ),
+
+                        decimal = let {
+                            val map: MutableMap<Locale, String> = mutableMapOf()
 
                             currencyNode
-                                .node("locale")
+                                .node("decimal")
                                 .childrenList()
-                                .forEach { localeNode ->
-                                    locales.add(
-                                        PolyCurrency.CurrencyLocale(
-                                            id = Locale(
-                                                localeNode
-                                                    .node("id")
-                                                    .string!!
-                                            ),
-
-                                            displayName = localeNode
-                                                .node("display-name")
-                                                .string!!,
-
-                                            decimalChar = localeNode
-                                                .node("decimal-char")
-                                                .getString("."),
-
-                                            amountFormat = DecimalFormat(
-                                                localeNode
-                                                    .node("amount-format")
-                                                    .getString("#,##0.00")
-                                            ),
-
-                                            presentationFormat = localeNode
-                                                .node("presentation-format")
-                                                .getString("%symbol%%amount-format%"),
-
-                                            wordFormatSingular = localeNode
-                                                .node("word-format", "singular")
-                                                .string,
-
-                                            wordFormatPlural = localeNode
-                                                .node("word-format", "plural")
-                                                .string
-                                        )
+                                .forEach { localeDecimalNode ->
+                                    val locale = Locale(
+                                        localeDecimalNode
+                                            .node("locale")
+                                            .string!!
                                     )
+
+                                    val character: String = localeDecimalNode
+                                        .node("character")
+                                        .string!!
+
+                                    Log.d(ECONOMY_MANAGER) {
+                                        """
+                                        localeDecimalNode parsed:   { Locale: '${locale}'; Character: '${character}' }
+                                        """.trimIndent()
+                                    }
+
+                                    map[locale] = character
                                 }
 
-                            locales // returned
+                            if(!map.containsKey(primaryLocaleId))
+                                map[primaryLocaleId] = "."
+
+                            return@let map
                         },
-                        symbol = currencyNode.node("symbol").string!!
+
+                        displayNameSingular = currencyNode
+                            .node("display-name-singular")
+                            .string!!,
+
+                        displayNamePlural = currencyNode
+                            .node("display-name-plural")
+                            .string!!,
+
+                        presentationFormat = currencyNode
+                            .node("presentation-format")
+                            .getString("%amount% %display-name%")
                     )
                 )
             }
@@ -114,44 +114,6 @@ object EconomyManager {
                 .node("primary-currency")
                 .string!!
         )
-
-        if(!primaryCurrency.enabled) {
-            throw IllegalStateException(
-                """
-                The primary currency you have configured (currently with ID '${primaryCurrency.id}') must be enabled, but you have disabled it.
-                """.trimIndent()
-            )
-        }
-    }
-
-    private fun loadConversions() {
-        conversions.clear()
-
-        SettingsCfg
-            .rootNode
-            .node("conversions")
-            .childrenList()
-            .forEach { conversionNode ->
-                conversions.add(
-                    PolyCurrencyConversion(
-                        from = findCurrencyByIdNonNull(
-                            conversionNode
-                                .node("from")
-                                .string!!
-                        ),
-                        to = findCurrencyByIdNonNull(
-                            conversionNode
-                                .node("to")
-                                .string!!
-                        ),
-                        rate = BigDecimal(
-                            conversionNode
-                                .node("rate")
-                                .double
-                        )
-                    )
-                )
-            }
     }
 
     private fun loadPrimaryLocale() {
@@ -179,57 +141,6 @@ Unable to retrieve currency by ID '${id}', as there is no such currency with tha
 Check for any spelling mistakes in your Settings config.
             """
         )
-    }
-
-    @Suppress("unused")
-    private fun testDebugPrintout() {
-        Log.d(ECONOMY_MANAGER) {
-            val out: StringBuilder = StringBuilder(
-                """
-Primary Currency: '${primaryCurrency.id}'.
-Primary Locale: displayName: '${primaryLocaleId.displayName}'; toString: '${primaryLocaleId}'.
-
-Currencies:"""
-            )
-
-            currencies.forEach { currency ->
-                out.append(
-                    """
-  •-• ID: ${currency.id}
-    • Database ID: ${currency.dbId}
-    • Enabled: ${currency.enabled}
-    • Starting Balance: ${currency.startingBalance}
-    • Symbol: ${currency.symbol}
-    • Locales:"""
-                )
-
-                currency.locales.forEach { locale ->
-                    out.append(
-                        """
-        •-• ID: ${locale.id}
-          • Display Name: ${locale.displayName}
-          • Word Format Singular: ${locale.wordFormatSingular}
-          • Word Format Plural: ${locale.wordFormatPlural}
-          • Decimal Char: ${locale.decimalChar}
-          • Amount Format: ${locale.amountFormat}
-          • Presentation Format: ${locale.presentationFormat}"""
-                    )
-                }
-            }
-
-            out.append("\nConversions:")
-
-            conversions.forEach { conversion ->
-                out.append(
-                    """
-  •-• From: ${conversion.from.id}
-    • To: ${conversion.to.id}
-    • Rate: ${conversion.rate.toDouble()}x"""
-                )
-            }
-
-            out.toString() // returned
-        }
     }
 
 }

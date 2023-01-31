@@ -31,7 +31,12 @@ object DebugManager {
 
         if(enabledCategories.contains(DebugCategory.DEBUG_ALL)) {
             Log.d(DEBUG_MANAGER) { "'DEBUG_ALL' category detected: adding remaining categories." }
-            enabledCategories.addAll(DebugCategory.values())
+            enabledCategories.addAll(
+                DebugCategory.values().filter {
+                    // We don't want special flags to be added by debug_all
+                    !it.name.startsWith("DEBUG")
+                }
+            )
         }
 
         if(!enabledCategories.isEmpty()) {

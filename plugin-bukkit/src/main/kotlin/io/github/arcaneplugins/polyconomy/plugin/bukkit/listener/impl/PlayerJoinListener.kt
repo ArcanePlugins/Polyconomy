@@ -10,7 +10,6 @@ object PlayerJoinListener : PolyListener(
 
     @EventHandler
     fun handleEvent(event: PlayerJoinEvent) {
-        // TODO: If the player doesn't have an economy account, then create one.
         // TODO: Handle any caching required for the player.
     }
 

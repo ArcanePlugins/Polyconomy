@@ -8,40 +8,28 @@ primary-locale: "en_US"
 
 currencies:
   - currency: "dollar"
-    db-id: 1
     enabled: true
     starting-balance: 50
     symbol: "$"
-    locale:
-      - id: "en_US"
-        display-name: "Dollar"
-        decimal-char: "."
-        amount-format: "#,##0.00"
-        presentation-format: "%symbol%%amount-format%"
+    display-name-singular: "Dollar"
+    display-name-plural: "Dollars"
+    amount-format: "#,##0.00"
+    presentation-format: "%symbol%%amount%"
+    exchange-rate: 1
+    decimal:
+      - "en_US": "."
 
   - currency: "token"
-    db-id: 2
     enabled: true
     starting-balance: 0
     symbol: "T"
-    locale:
-      - id: "en_US"
-        display-name: "Token"
-        word-format:
-          singular: "Token"
-          plural: "Tokens"
-        decimal-char: "."
-        amount-format: "#,##0.##"
-        presentation-format: "%amount-format% %word-format%"
-
-conversions:
-  - from: "dollar"
-    to: "token"
-    rate: 0.01
-
-  - from: "token"
-    to: "dollar"
-    rate: 100
+    display-name-singular: "Token"
+    display-name-plural: "Tokens"
+    amount-format: "#,##0.00"
+    presentation-format: "%amount% %display-name%"
+    exchange-rate: 100
+    decimal:
+      - "en_US": "."
 
 storage:
   implementation: "Yaml"

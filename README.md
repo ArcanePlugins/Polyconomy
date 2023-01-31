@@ -61,7 +61,7 @@ Polyconomy is fully compatible and supported with a [variety of server and proxy
 
 You'll feel 'at home' with familiar commands like `/bal`, `/pay`, `/baltop`, `/eco`, and so on. You and your players won't have to learn unnecessarily renamed commands. And where you are confused about anything, there's [excellent documentation]() and volunteer support helpers on our [Discord guild]() who are happy to help.
 
-Polyconomy is libre software, licensed under [GNU AGPL v3](license.md), which serves and protects your freedoms, unlike proprietary software which takes them away. Polyconomy is a community project; you are strongly encouraged to discuss and partake in the development of the plugin - embrace the open-source spirit!
+Polyconomy is libre software, licensed under [GNU AGPL v3](LICENSE.md), which serves and protects your freedoms, unlike proprietary software which takes them away. Polyconomy is a community project; you are strongly encouraged to discuss and partake in the development of the plugin - embrace the open-source spirit!
 
 ## Installation
 

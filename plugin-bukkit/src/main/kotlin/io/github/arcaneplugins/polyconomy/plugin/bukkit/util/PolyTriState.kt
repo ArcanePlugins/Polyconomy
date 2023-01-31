@@ -4,27 +4,28 @@ import me.lokka30.treasury.api.common.misc.TriState
 
 enum class PolyTriState(
     @Suppress("MemberVisibilityCanBePrivate")
-    val asBoolean: Boolean?,
-    val toTreasury: TriState
+    val asBoolean: Boolean?
 ) {
     TRUE(
-        asBoolean = true,
-        toTreasury = TriState.TRUE
+        asBoolean = true
     ),
 
     FALSE(
-        asBoolean = false,
-        toTreasury = TriState.FALSE
+        asBoolean = false
     ),
 
     UNSPECIFIED(
-        asBoolean = null,
-        toTreasury = TriState.UNSPECIFIED
+        asBoolean = null
     );
 
 
+    @Suppress("unused")
     fun asFalsyBoolean(): Boolean {
         return asBoolean ?: false
+    }
+
+    fun toTreasury(): TriState {
+        return TriState.valueOf(name)
     }
 
     companion object {

@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy.Companion.instance
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
@@ -51,6 +52,7 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         instance = this
+        CommandManager.load_onLoad()
 
         Log.i("Plugin initialized (took ${stopwatch.stop()}).")
     }
@@ -69,6 +71,7 @@ class Polyconomy : JavaPlugin() {
         StorageManager.connect()
         ListenerManager.registerAll()
         HookManager.registerAll()
+        CommandManager.load_onEnable()
         MetricsManager.register()
 
         Log.i("Plugin enabled (took ${stopwatch.stop()}).")
@@ -82,6 +85,7 @@ class Polyconomy : JavaPlugin() {
     override fun onDisable() {
         val stopwatch = PolyStopwatch()
 
+        CommandManager.unload_onDisable()
         HookManager.unregisterAll()
         ConcurrentManager.shutdown()
         StorageManager.disconnect()
@@ -117,6 +121,7 @@ class Polyconomy : JavaPlugin() {
             EconomyManager.load()
             StorageManager.connect()
             HookManager.registerAll()
+            CommandManager.reload()
         } catch(ex: Exception) {
             Log.s("""Error occurred while reloading Polyconomy v${description.version} (Is it up to date?)""")
             ex.printStackTrace()

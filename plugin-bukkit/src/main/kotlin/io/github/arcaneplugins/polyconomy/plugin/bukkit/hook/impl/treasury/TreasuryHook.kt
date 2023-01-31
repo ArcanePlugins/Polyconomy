@@ -9,7 +9,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageM
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.account.AccountAccessorImpl
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.singleThreadExecSvc
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.execSvc
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyNamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
@@ -95,24 +95,24 @@ object TreasuryHook : Hook(
                         .join()
                 }
 
-                if(polyResponse.error == null) {
-                    return@supplyAsync Response.success(polyResponse.result!!.toTreasury)
+                if(polyResponse.successful()) {
+                    return@supplyAsync Response.success(polyResponse.result!!.toTreasury())
                 } else {
-                    return@supplyAsync Response.failure(polyResponse.error.toTreasury())
+                    return@supplyAsync Response.failure(polyResponse.error!!.toTreasury())
                 }
-            }, singleThreadExecSvc)
+            }, execSvc)
         }
 
         override fun retrievePlayerAccountIds(): CompletableFuture<Response<Collection<UUID>>> {
             return CompletableFuture.supplyAsync({
                 TODO("Not yet implemented")
-            }, singleThreadExecSvc)
+            }, execSvc)
         }
 
         override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<Collection<NamespacedKey>>> {
             return CompletableFuture.supplyAsync({
                 TODO("Not yet implemented")
-            }, singleThreadExecSvc)
+            }, execSvc)
         }
 
         override fun getPrimaryCurrency(): Currency {
@@ -158,7 +158,7 @@ object TreasuryHook : Hook(
                 } catch(ex: Exception) {
                     Response.failure { ex.message!! }
                 }
-            }, singleThreadExecSvc)
+            }, execSvc)
         }
 
         override fun unregisterCurrency(
@@ -175,7 +175,7 @@ object TreasuryHook : Hook(
                 } catch(ex: Exception) {
                     Response.failure { ex.message!! }
                 }
-            }, singleThreadExecSvc)
+            }, execSvc)
         }
     }
 

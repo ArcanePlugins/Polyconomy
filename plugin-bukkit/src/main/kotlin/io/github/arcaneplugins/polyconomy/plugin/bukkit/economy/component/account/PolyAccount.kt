@@ -10,7 +10,7 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-sealed class PolyAccount() {
+sealed class PolyAccount {
 
     abstract fun name(): CompletableFuture<PolyResponse<String?>>
 

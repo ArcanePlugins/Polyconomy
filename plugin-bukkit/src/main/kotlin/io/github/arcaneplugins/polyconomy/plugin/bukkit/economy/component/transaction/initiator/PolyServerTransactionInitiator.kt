@@ -2,5 +2,5 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.trans
 
 object PolyServerTransactionInitiator : PolyTransactionInitiator<String>(
     data = "Server",
-    type = PolyTransactionInitiator.Companion.Type.SERVER
+    type = Companion.Type.SERVER
 )

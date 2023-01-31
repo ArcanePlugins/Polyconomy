@@ -11,6 +11,6 @@ centralised cache, and if not, unfortunately they should disable the cache compl
 object InternalCache {
     //TODO Caffeine cache system
 
-    var enabled: Boolean = true
+    var enabled: Boolean = false
         private set
 }

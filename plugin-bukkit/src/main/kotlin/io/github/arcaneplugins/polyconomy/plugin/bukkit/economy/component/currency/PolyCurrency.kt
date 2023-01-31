@@ -6,50 +6,61 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageM
 import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.currency.Currency
 import java.math.BigDecimal
-import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-class PolyCurrency(
+abstract class PolyCurrency(
     val id: String,
-    val dbId: Int,
-    val enabled: Boolean,
-    val startingBalance: BigDecimal,
     val symbol: String,
-    val locales: MutableList<CurrencyLocale>
+    val exchangeRate: BigDecimal,
+    val displayNameSingular: String,
+    val displayNamePlural: String,
+    val decimal: Map<Locale, String>
 ) {
     companion object {
-        fun fromTreasury(treasuryCurrency: Currency): PolyCurrency {
-            TODO("Not yet implemented; stoppingIdeFromComplaining=${treasuryCurrency}")
+        fun fromTreasury(
+            treasuryCurrency: Currency
+        ): PolyCurrency {
+            return object : PolyCurrency(
+                id = treasuryCurrency.identifier,
+
+                // TODO discussing adjusting the decimal getter with Ivan, see relevant method below
+                decimal = mapOf(
+                    Pair(
+                        EconomyManager.primaryLocaleId,
+                        "${treasuryCurrency.decimal}"
+                    )
+                ),
+
+                displayNamePlural = treasuryCurrency.displayNamePlural,
+                displayNameSingular = treasuryCurrency.displayNameSingular,
+                exchangeRate = treasuryCurrency.conversionRate,
+                symbol = treasuryCurrency.symbol
+            ) {
+                override fun startingBalance(
+                    player: UUID?
+                ): BigDecimal {
+                    return treasuryCurrency.getStartingBalance(player)
+                }
+
+                override fun format(
+                    amount: BigDecimal,
+                    locale: Locale?
+                ): String {
+                    return treasuryCurrency.format(amount, locale)
+                }
+            }
         }
     }
 
-    class CurrencyLocale(
-        val id: Locale,
-        val displayName: String,
-        val wordFormatSingular: String?,
-        val wordFormatPlural: String?,
-        val decimalChar: String,
-        val amountFormat: DecimalFormat,
-        val presentationFormat: String
-    ) {
-        fun format(
-            amount: BigDecimal
-        ): String {
-            TODO("Not implemented; amountToStopIdeFromComplaining=${amount}")
-        }
-    }
+    abstract fun startingBalance(
+        player: UUID?
+    ): BigDecimal
 
-    fun getFavourableLocale(): CurrencyLocale {
-        val primaryLocale: CurrencyLocale? = locales.firstOrNull { locale ->
-            locale.id == EconomyManager.primaryLocaleId
-        }
-
-        if(primaryLocale != null)
-            return primaryLocale
-
-        return locales.first()
-    }
+    abstract fun format(
+        amount: BigDecimal,
+        locale: Locale?
+    ): String
 
     fun toTreasury(): Currency {
         return object : Currency {
@@ -68,18 +79,18 @@ class PolyCurrency(
                 - Accept a Locale parameter, since the decimal character is not the same with all
                   locales.
 
-                https://discord.com/channels/752310043214479462/921225503531204658/1069559814939742258
+                https://github.com/ArcanePlugins/Treasury/issues/246
              */
             override fun getDecimal(): Char {
-                return this@PolyCurrency.getFavourableLocale().decimalChar[0]
+                return this@PolyCurrency.decimal.getValue(EconomyManager.primaryLocaleId).first()
             }
 
             override fun getDisplayNameSingular(): String {
-                return this@PolyCurrency.getFavourableLocale().wordFormatSingular!!
+                return this@PolyCurrency.displayNameSingular
             }
 
             override fun getDisplayNamePlural(): String {
-                return this@PolyCurrency.getFavourableLocale().wordFormatPlural!!
+                return this@PolyCurrency.displayNamePlural
             }
 
             override fun getPrecision(): Int {
@@ -91,12 +102,12 @@ class PolyCurrency(
             }
 
             override fun getConversionRate(): BigDecimal {
-                TODO("Overhaul the conversion rates in polyconomy to match treasury's universal conversion rate system.")
+                return this@PolyCurrency.exchangeRate
             }
 
             /*
             TODO: Discussing the removal of this method from Treasury with Ivan
-            https://discord.com/channels/752310043214479462/921225503531204658/1069561660462874664
+            https://github.com/ArcanePlugins/Treasury/issues/246
              */
             override fun supportsNegativeBalances(): Boolean {
                 return SettingsCfg
@@ -105,38 +116,48 @@ class PolyCurrency(
                     .getBoolean(true)
             }
 
+            /*
+            TODO: Discussing the removal of this method from Treasury with Ivan
+            https://github.com/ArcanePlugins/Treasury/issues/246
+             */
             override fun parse(
                 formatted: String
             ): CompletableFuture<Response<BigDecimal>> {
-                TODO("Discussing with Ivan: https://discord.com/channels/752310043214479462/921225503531204658/1069566468301271080")
+                return CompletableFuture.completedFuture(
+                    Response.failure {
+                        """
+                        Polyconomy does not support currency amount parsing, as it may be removed by Treasury in the near future.
+                        """
+                    }
+                )
             }
 
             override fun getStartingBalance(
                 playerID: UUID?
             ): BigDecimal {
-                return this@PolyCurrency.startingBalance
+                return this@PolyCurrency.startingBalance(playerID)
             }
 
             override fun format(
                 amount: BigDecimal,
                 localeId: Locale?
             ): String {
-                val polyLocale: CurrencyLocale = if(
-                    localeId == null ||
-                    locales.none { locale -> locale.id == localeId }
-                ) {
-                    getFavourableLocale()
-                } else {
-                    locales.first { locale -> locale.id == localeId }
-                }
-
-                return polyLocale.format(amount)
+                return this@PolyCurrency.format(amount, localeId)
             }
 
             override fun format(amount: BigDecimal, locale: Locale?, precision: Int): String {
-                TODO("Not yet implemented")
+                // Polyconomy does not support custom precision. Redirect to the other method.
+                return format(amount, locale)
             }
 
         }
+    }
+
+    fun dbId(): Int {
+        return StorageManager.currentHandler!!.getOrGrantCurrencyDbId(id)
+    }
+
+    fun dbIdStr(): String {
+        return dbId().toString()
     }
 }
