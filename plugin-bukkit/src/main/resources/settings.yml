@@ -47,6 +47,7 @@ storage:
   implementation: "Yaml"
 
 advanced:
+  important-plugin-recommendations: false
   minimum-balance: 0
   signed-balances: true
 

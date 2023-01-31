@@ -1,5 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response
 
+import me.lokka30.treasury.api.common.response.FailureReason
+
 interface PolyResponseError {
 
     companion object {
@@ -18,6 +20,10 @@ interface PolyResponseError {
                     ${ex.stackTraceToString()}
                     """.trimIndent()
                 }
+
+                override fun toTreasury(): FailureReason {
+                    return FailureReason { desc() }
+                }
             }
         }
     }
@@ -25,5 +31,7 @@ interface PolyResponseError {
     fun id(): String
 
     fun desc(): String
+
+    fun toTreasury(): FailureReason
 
 }

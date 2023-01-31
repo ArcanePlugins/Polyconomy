@@ -12,11 +12,6 @@ enum class PolyStandardResponseError(
         toTreasury = EconomyFailureReason.PLAYER_ACCOUNT_PERMISSION_MODIFICATION_NOT_SUPPORTED
     ),
 
-    NEGATIVE_BALANCES_NOT_ALLOWED(
-        desc = "Negative balances are not enabled on this server",
-        toTreasury = null // TODO add to treasury
-    ),
-
     NEGATIVE_AMOUNT_SPECIFIED(
         desc = "Negative amounts are not allowed in deposit or withdrawal amounts",
         toTreasury = EconomyFailureReason.NEGATIVE_AMOUNT_SPECIFIED

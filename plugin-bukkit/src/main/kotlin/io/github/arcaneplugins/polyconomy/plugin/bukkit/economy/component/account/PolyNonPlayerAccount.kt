@@ -5,15 +5,15 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.curren
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyNamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
-import org.bukkit.NamespacedKey
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class PolyNonPlayerAccount(
-    val id: NamespacedKey
+    val id: PolyNamespacedKey
 ) : PolyAccount() {
 
     override fun name(): CompletableFuture<PolyResponse<String?>> {

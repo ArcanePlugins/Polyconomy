@@ -5,37 +5,74 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import java.util.function.Supplier
+import java.util.logging.Logger
 
 object Log {
 
+    /**
+     * Logs the given message with [Logger.info].
+     *
+     * **Warning:** Logging is not available prior to [Polyconomy.onLoad] being called.
+     */
     fun i(msg: Any) {
-        Polyconomy.instance!!.logger.info(msg.toString())
+        logger().info(msg.toString())
     }
 
+    /**
+     * Logs the given message with [Logger.warning].
+     *
+     * **Warning:** Logging is not available prior to [Polyconomy.onLoad] being called.
+     */
     fun w(msg: Any) {
-        Polyconomy.instance!!.logger.warning(msg.toString())
+        logger().warning(msg.toString())
     }
 
+    /**
+     * Logs the given message with [Logger.severe].
+     *
+     * **Warning:** Logging is not available prior to [Polyconomy.onLoad] being called.
+     */
     fun s(msg: Any) {
-        Polyconomy.instance!!.logger.severe(msg.toString())
+        logger().severe(msg.toString())
     }
 
+    /**
+     * Logs the given message if the given [DebugCategory] is enabled.
+     *
+     * **Warning:** Logging is not available prior to [Polyconomy.onLoad] being called.
+     *
+     * **Note:** Under normal circumstances, this method will not log any debug categories until
+     * the DebugHandler has loaded the enabled categories from the Settings config. You can
+     * forcefully allow debug logs to happen at any point after [Polyconomy.onLoad] is called
+     * by programatically modifying [DebugManager.enabledCategories].
+     *
+     * @param dCat   Debug category associated with the message being supplied
+     * @param msgSup Supplier of the message which will be accessed if the category is enabled
+     */
     fun d(dCat: DebugCategory, msgSup: Supplier<Any>) {
-        if(dCat == DebugCategory.DEBUG_BROADCAST_OPS)
-            throw IllegalArgumentException("Debug category '${dCat}' is not loggable.")
-
         if(!DebugManager.isCategoryEnabled(dCat)) return
 
-        val output = "[LM Debug : ${dCat}] ${msgSup.get()}"
+        val output = "[DEBUG: ${dCat}] ${msgSup.get()}"
 
-        Polyconomy.instance!!.logger.info(output)
+        logger().info(output)
 
         if(DebugManager.isCategoryEnabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
             Bukkit.getOnlinePlayers()
-                .filter { it.isOp }
+                .filter(Player::isOp)
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }
         }
+    }
+
+    /**
+     * Retrieves the [Logger] instance from [Polyconomy]. The [Logger] instance is only available
+     * after [Polyconomy.onLoad] is called. The behaviour of accessing the logger after
+     * [Polyconomy.onDisable] is called (until [Polyconomy.onLoad] is potentially called) is
+     * **undefined**.
+     */
+    private fun logger(): Logger {
+        return Polyconomy.instance.logger
     }
 
 }

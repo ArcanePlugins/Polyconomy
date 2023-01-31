@@ -83,8 +83,8 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         HookManager.unregisterAll()
-        StorageManager.disconnect()
         ConcurrentManager.shutdown()
+        StorageManager.disconnect()
 
         Log.i("Plugin disabled (took ${stopwatch.stop()}).")
     }

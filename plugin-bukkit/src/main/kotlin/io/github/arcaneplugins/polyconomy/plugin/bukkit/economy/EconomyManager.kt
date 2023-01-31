@@ -11,10 +11,10 @@ import java.util.*
 
 object EconomyManager {
 
-    var primaryCurrency: PolyCurrency? = null
+    lateinit var primaryCurrency: PolyCurrency
         private set
 
-    var primaryLocale: Locale? = null
+    lateinit var primaryLocaleId: Locale
         private set
 
     val currencies: MutableList<PolyCurrency> = mutableListOf()
@@ -31,7 +31,7 @@ object EconomyManager {
     private fun loadCurrencies() {
         currencies.clear()
         SettingsCfg
-            .rootNode!!
+            .rootNode
             .node("currencies")
             .childrenList()
             .forEach { currencyNode ->
@@ -110,15 +110,15 @@ object EconomyManager {
     private fun loadPrimaryCurrency() {
         primaryCurrency = findCurrencyByIdNonNull(
             SettingsCfg
-                .rootNode!!
+                .rootNode
                 .node("primary-currency")
                 .string!!
         )
 
-        if(!primaryCurrency!!.enabled) {
+        if(!primaryCurrency.enabled) {
             throw IllegalStateException(
                 """
-                The primary currency you have configured (currently with ID '${primaryCurrency!!.id}') must be enabled, but you have disabled it.
+                The primary currency you have configured (currently with ID '${primaryCurrency.id}') must be enabled, but you have disabled it.
                 """.trimIndent()
             )
         }
@@ -128,7 +128,7 @@ object EconomyManager {
         conversions.clear()
 
         SettingsCfg
-            .rootNode!!
+            .rootNode
             .node("conversions")
             .childrenList()
             .forEach { conversionNode ->
@@ -155,9 +155,9 @@ object EconomyManager {
     }
 
     private fun loadPrimaryLocale() {
-        primaryLocale = Locale(
+        primaryLocaleId = Locale(
             SettingsCfg
-                .rootNode!!
+                .rootNode
                 .node("primary-locale")
                 .getString("en_US")
         )
@@ -186,8 +186,8 @@ Check for any spelling mistakes in your Settings config.
         Log.d(ECONOMY_MANAGER) {
             val out: StringBuilder = StringBuilder(
                 """
-Primary Currency: '${primaryCurrency!!.id}'.
-Primary Locale: displayName: '${primaryLocale!!.displayName}'; toString: '${primaryLocale!!}'.
+Primary Currency: '${primaryCurrency.id}'.
+Primary Locale: displayName: '${primaryLocaleId.displayName}'; toString: '${primaryLocaleId}'.
 
 Currencies:"""
             )

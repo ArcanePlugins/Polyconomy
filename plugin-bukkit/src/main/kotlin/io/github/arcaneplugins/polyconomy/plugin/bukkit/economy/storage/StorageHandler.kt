@@ -6,8 +6,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.accoun
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyNamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
-import org.bukkit.NamespacedKey
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
@@ -29,7 +29,7 @@ abstract class StorageHandler(
     ): CompletableFuture<PolyResponse<PolyTriState>>
 
     abstract fun hasNonPlayerAccount(
-        id: NamespacedKey
+        id: PolyNamespacedKey
     ): CompletableFuture<PolyResponse<PolyTriState>>
 
     abstract fun retrieveName(
