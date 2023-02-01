@@ -71,6 +71,12 @@ enum class DebugCategory {
      *
      * @since v0.1.0
      */
-    DEBUG_TEST
+    DEBUG_TEST,
+
+    ;
+
+    fun enabled(): Boolean {
+        return DebugManager.isCategoryEnabled(this)
+    }
 
 }

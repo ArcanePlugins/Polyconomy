@@ -1,5 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.misc
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -13,8 +14,7 @@ object ConcurrentManager {
      * Performs a start-up for the concurrency management system.
      */
     fun startup() {
-        execSvc = Executors.newFixedThreadPool(10)
-        //execSvc = Executors.newCachedThreadPool()
+        execSvc = Executors.newSingleThreadExecutor()
     }
 
     /**
@@ -25,7 +25,10 @@ object ConcurrentManager {
             execSvc
         ).forEach {
             it.shutdown()
-            it.awaitTermination(5, TimeUnit.SECONDS)
+            it.awaitTermination(
+                if(DebugCategory.DEBUG_TEST.enabled()) 5 else 30,
+                TimeUnit.SECONDS
+            )
         }
     }
 

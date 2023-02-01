@@ -17,27 +17,27 @@ class PolyNonPlayerAccount(
 ) : PolyAccount() {
 
     override fun name(): CompletableFuture<PolyResponse<String?>> {
-        return StorageManager.currentHandler!!.retrieveName(this)
+        return StorageManager.currentHandler!!.retrieveNameAsync(this)
     }
 
     override fun retrieveBalance(
         currency: PolyCurrency
     ): CompletableFuture<PolyResponse<BigDecimal>> {
-        return StorageManager.currentHandler!!.retrieveBalance(this, currency)
+        return StorageManager.currentHandler!!.retrieveBalanceAsync(this, currency)
     }
 
     override fun doTransaction(
         transaction: PolyTransaction
     ): CompletableFuture<PolyResponse<BigDecimal>> {
-        return StorageManager.currentHandler!!.doTransaction(this, transaction)
+        return StorageManager.currentHandler!!.doTransactionAsync(this, transaction)
     }
 
     override fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
-        return StorageManager.currentHandler!!.deleteAccount(this)
+        return StorageManager.currentHandler!!.deleteAccountAsync(this)
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>> {
-        return StorageManager.currentHandler!!.retrieveHeldCurrencies(this)
+        return StorageManager.currentHandler!!.retrieveHeldCurrenciesAsync(this)
     }
 
     override fun retrieveTransactionHistory(
@@ -45,7 +45,7 @@ class PolyNonPlayerAccount(
         from: Instant,
         to: Instant
     ): CompletableFuture<PolyResponse<Collection<PolyTransaction>>> {
-        return StorageManager.currentHandler!!.retrieveTransactionHistory(
+        return StorageManager.currentHandler!!.retrieveTransactionHistoryAsync(
             this,
             transactionCount,
             from,
@@ -54,13 +54,13 @@ class PolyNonPlayerAccount(
     }
 
     override fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>> {
-        return StorageManager.currentHandler!!.retrieveMemberIds(this)
+        return StorageManager.currentHandler!!.retrieveMemberIdsAsync(this)
     }
 
     override fun isMember(
         player: UUID
     ): CompletableFuture<PolyResponse<PolyTriState>> {
-        return StorageManager.currentHandler!!.isMember(this, player)
+        return StorageManager.currentHandler!!.isMemberAsync(this, player)
     }
 
     override fun setPermissions(
@@ -68,7 +68,7 @@ class PolyNonPlayerAccount(
         permissionValue: PolyTriState,
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>> {
-        return StorageManager.currentHandler!!.setPermissions(
+        return StorageManager.currentHandler!!.setPermissionsAsync(
             this,
             player,
             permissionValue,
@@ -79,17 +79,17 @@ class PolyNonPlayerAccount(
     override fun retrievePermissions(
         player: UUID
     ): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>> {
-        return StorageManager.currentHandler!!.retrievePermissions(this, player)
+        return StorageManager.currentHandler!!.retrievePermissionsAsync(this, player)
     }
 
     override fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Map<PolyAccountPermission, PolyTriState>>>> {
-        return StorageManager.currentHandler!!.retrievePermissionsMap(this)
+        return StorageManager.currentHandler!!.retrievePermissionsMapAsync(this)
     }
 
     override fun hasPermissions(
         player: UUID,
         vararg permissions: PolyAccountPermission
     ): CompletableFuture<PolyResponse<PolyTriState>> {
-        return StorageManager.currentHandler!!.hasPermissions(this, player, *permissions)
+        return StorageManager.currentHandler!!.hasPermissionsAsync(this, player, *permissions)
     }
 }

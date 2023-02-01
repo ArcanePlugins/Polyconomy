@@ -80,14 +80,14 @@ object TreasuryHook : Hook(
                 val polyResponse: PolyResponse<PolyTriState> = if(accountData.isPlayerAccount) {
                     StorageManager
                         .currentHandler!!
-                        .hasPlayerAccount(
+                        .hasPlayerAccountAsync(
                             accountData.playerIdentifier.get()
                         )
                         .join()
                 } else {
                     StorageManager
                         .currentHandler!!
-                        .hasNonPlayerAccount(
+                        .hasNonPlayerAccountAsync(
                             PolyNamespacedKey.fromTreasury(
                                 accountData.nonPlayerIdentifier.get()
                             )

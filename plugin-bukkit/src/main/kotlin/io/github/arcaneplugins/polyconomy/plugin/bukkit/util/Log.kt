@@ -52,13 +52,13 @@ object Log {
      * @param msgSup Supplier of the message which will be accessed if the category is enabled
      */
     fun d(dCat: DebugCategory, msgSup: Supplier<Any>) {
-        if(!DebugManager.isCategoryEnabled(dCat)) return
+        if(!dCat.enabled()) return
 
         val output = "[DEBUG: ${dCat}] ${msgSup.get()}"
 
         logger().info(output)
 
-        if(DebugManager.isCategoryEnabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
+        if(DebugCategory.DEBUG_BROADCAST_OPS.enabled()) {
             Bukkit.getOnlinePlayers()
                 .filter(Player::isOp)
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }

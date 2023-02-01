@@ -154,7 +154,7 @@ abstract class PolyCurrency(
     }
 
     fun dbId(): Int {
-        return StorageManager.currentHandler!!.getOrGrantCurrencyDbId(id)
+        return StorageManager.currentHandler!!.getOrGrantCurrencyDbIdSync(id)
     }
 
     fun dbIdStr(): String {

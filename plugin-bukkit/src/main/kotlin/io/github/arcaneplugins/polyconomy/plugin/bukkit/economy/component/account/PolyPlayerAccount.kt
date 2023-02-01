@@ -24,23 +24,23 @@ class PolyPlayerAccount(
     )
 
     override fun name(): CompletableFuture<PolyResponse<String?>> {
-        return StorageManager.currentHandler!!.retrieveName(this)
+        return StorageManager.currentHandler!!.retrieveNameAsync(this)
     }
 
     override fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>> {
-        return StorageManager.currentHandler!!.retrieveBalance(this, currency)
+        return StorageManager.currentHandler!!.retrieveBalanceAsync(this, currency)
     }
 
     override fun doTransaction(transaction: PolyTransaction): CompletableFuture<PolyResponse<BigDecimal>> {
-        return StorageManager.currentHandler!!.doTransaction(this, transaction)
+        return StorageManager.currentHandler!!.doTransactionAsync(this, transaction)
     }
 
     override fun delete(): CompletableFuture<PolyResponse<PolyTriState>> {
-        return StorageManager.currentHandler!!.deleteAccount(this)
+        return StorageManager.currentHandler!!.deleteAccountAsync(this)
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<PolyResponse<Collection<String>>> {
-        return StorageManager.currentHandler!!.retrieveHeldCurrencies(this)
+        return StorageManager.currentHandler!!.retrieveHeldCurrenciesAsync(this)
     }
 
     override fun retrieveTransactionHistory(
@@ -48,7 +48,7 @@ class PolyPlayerAccount(
         from: Instant,
         to: Instant
     ): CompletableFuture<PolyResponse<Collection<PolyTransaction>>> {
-        return StorageManager.currentHandler!!.retrieveTransactionHistory(
+        return StorageManager.currentHandler!!.retrieveTransactionHistoryAsync(
             this,
             transactionCount,
             from,
