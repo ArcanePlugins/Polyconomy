@@ -8,6 +8,7 @@ abstract class PolyTransactionInitiator<T>(
 ) {
 
     companion object {
+        @Suppress("unused") //TODO use
         class PlayerInitiator(
             player: UUID
         ) : PolyTransactionInitiator<UUID>(
@@ -15,6 +16,7 @@ abstract class PolyTransactionInitiator<T>(
             type = Type.PLAYER
         )
 
+        @Suppress("unused") //TODO use
         class PluginInitiator(
             plugin: String
         ) : PolyTransactionInitiator<String>(

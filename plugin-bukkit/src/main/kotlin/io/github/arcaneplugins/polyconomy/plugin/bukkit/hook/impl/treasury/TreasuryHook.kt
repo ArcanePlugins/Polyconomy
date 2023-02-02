@@ -23,7 +23,6 @@ import me.lokka30.treasury.api.economy.EconomyProvider
 import me.lokka30.treasury.api.economy.account.AccountData
 import me.lokka30.treasury.api.economy.account.accessor.AccountAccessor
 import me.lokka30.treasury.api.economy.currency.Currency
-import me.lokka30.treasury.api.economy.response.EconomyFailureReason
 import org.bukkit.Bukkit
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -80,19 +79,17 @@ object TreasuryHook : Hook(
                 val polyResponse: PolyResponse<PolyTriState> = if(accountData.isPlayerAccount) {
                     StorageManager
                         .currentHandler!!
-                        .hasPlayerAccountAsync(
+                        .hasPlayerAccountSync(
                             accountData.playerIdentifier.get()
                         )
-                        .join()
                 } else {
                     StorageManager
                         .currentHandler!!
-                        .hasNonPlayerAccountAsync(
+                        .hasNonPlayerAccountSync(
                             PolyNamespacedKey.fromTreasury(
                                 accountData.nonPlayerIdentifier.get()
                             )
                         )
-                        .join()
                 }
 
                 if(polyResponse.successful()) {
@@ -105,12 +102,20 @@ object TreasuryHook : Hook(
 
         override fun retrievePlayerAccountIds(): CompletableFuture<Response<Collection<UUID>>> {
             return CompletableFuture.supplyAsync({
-                TODO("Not yet implemented")
+                /*
+                TODO
+                    - Add an implementation to StorageHandler
+                 */
+                TODO("Not yet implemented.")
             }, execSvc)
         }
 
         override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<Collection<NamespacedKey>>> {
             return CompletableFuture.supplyAsync({
+                /*
+                TODO
+                    - Add an implementation to StorageHandler
+                 */
                 TODO("Not yet implemented")
             }, execSvc)
         }
@@ -145,9 +150,9 @@ object TreasuryHook : Hook(
                             ignoreCase = true
                         )
                 }) {
-                    return@supplyAsync Response.failure(
-                        EconomyFailureReason.CURRENCY_ALREADY_REGISTERED
-                    )
+                    return@supplyAsync Response.failure {
+                        "Currency ID '${treasuryCurrency.identifier}' is already registered."
+                    }
                 }
 
                 return@supplyAsync try {

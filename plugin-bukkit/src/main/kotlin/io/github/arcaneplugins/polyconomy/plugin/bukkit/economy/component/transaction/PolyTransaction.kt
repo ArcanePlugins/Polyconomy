@@ -5,6 +5,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transa
 import java.math.BigDecimal
 import java.time.Instant
 
+@Suppress("unused") //TODO use
 class PolyTransaction(
     val account: PolyAccount,
     val currencyId: String,

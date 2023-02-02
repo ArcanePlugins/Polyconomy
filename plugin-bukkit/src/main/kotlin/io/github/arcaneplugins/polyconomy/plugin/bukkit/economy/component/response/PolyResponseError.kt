@@ -26,6 +26,25 @@ interface PolyResponseError {
                 }
             }
         }
+
+        fun fromTreasury(
+            treasuryFr: FailureReason
+        ): PolyResponseError {
+            return object : PolyResponseError {
+                override fun id(): String {
+                    return "Treasury Response"
+                }
+
+                override fun desc(): String {
+                    return treasuryFr.description
+                }
+
+                override fun toTreasury(): FailureReason {
+                    return treasuryFr
+                }
+
+            }
+        }
     }
 
     fun id(): String

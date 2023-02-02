@@ -52,7 +52,7 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         instance = this
-        CommandManager.load_onLoad()
+        CommandManager.loadOnload()
 
         Log.i("Plugin initialized (took ${stopwatch.stop()}).")
     }
@@ -71,7 +71,7 @@ class Polyconomy : JavaPlugin() {
         StorageManager.connect()
         ListenerManager.registerAll()
         HookManager.registerAll()
-        CommandManager.load_onEnable()
+        CommandManager.loadOnEnable()
         MetricsManager.register()
 
         Log.i("Plugin enabled (took ${stopwatch.stop()}).")
@@ -85,7 +85,7 @@ class Polyconomy : JavaPlugin() {
     override fun onDisable() {
         val stopwatch = PolyStopwatch()
 
-        CommandManager.unload_onDisable()
+        CommandManager.unloadOnDisable()
         HookManager.unregisterAll()
         ConcurrentManager.shutdown()
         StorageManager.disconnect()

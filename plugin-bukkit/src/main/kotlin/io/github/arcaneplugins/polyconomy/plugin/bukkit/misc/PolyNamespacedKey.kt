@@ -15,6 +15,7 @@ data class PolyNamespacedKey(
             )
         }
 
+        @Suppress("unused") //TODO use
         fun toTreasury(polyType: PolyNamespacedKey): NamespacedKey {
             return NamespacedKey.of(
                 polyType.namespace,

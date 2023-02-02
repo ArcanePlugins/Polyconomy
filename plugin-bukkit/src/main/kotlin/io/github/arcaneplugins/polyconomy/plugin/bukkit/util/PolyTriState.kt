@@ -3,7 +3,6 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.util
 import me.lokka30.treasury.api.common.misc.TriState
 
 enum class PolyTriState(
-    @Suppress("MemberVisibilityCanBePrivate")
     val asBoolean: Boolean?
 ) {
     TRUE(

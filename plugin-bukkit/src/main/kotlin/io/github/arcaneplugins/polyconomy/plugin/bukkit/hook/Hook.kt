@@ -2,7 +2,9 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook
 
 abstract class Hook(
     val id: String,
-    val type: HookType
+
+    @Suppress("unused")
+    val type: HookType //TODO use
 ) {
 
     var registered: Boolean = false

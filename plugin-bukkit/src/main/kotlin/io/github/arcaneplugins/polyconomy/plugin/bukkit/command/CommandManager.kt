@@ -4,15 +4,15 @@ object CommandManager {
 
     //TODO
 
-    fun load_onLoad() {
+    fun loadOnload() {
         //TODO
     }
 
-    fun load_onEnable() {
+    fun loadOnEnable() {
         //TODO
     }
 
-    fun unload_onDisable() {
+    fun unloadOnDisable() {
         //TODO
     }
 

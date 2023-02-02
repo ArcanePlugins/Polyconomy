@@ -26,6 +26,7 @@ abstract class StorageHandler(
 
     abstract fun disconnect()
 
+    @Suppress("unused") //TODO use
     fun hasPlayerAccountAsync(
         player: UUID
     ): CompletableFuture<PolyResponse<PolyTriState>> {
@@ -49,6 +50,7 @@ abstract class StorageHandler(
         player: UUID
     ): PolyResponse<PolyTriState>
 
+    @Suppress("unused") //TODO use
     fun hasNonPlayerAccountAsync(
         id: PolyNamespacedKey
     ): CompletableFuture<PolyResponse<PolyTriState>> {
@@ -118,6 +120,7 @@ abstract class StorageHandler(
         account: PolyNonPlayerAccount
     ): PolyResponse<String?>
 
+    @Suppress("unused") //TODO use
     fun renameAsync(
         account: PolyPlayerAccount,
         name: String?
@@ -143,6 +146,7 @@ abstract class StorageHandler(
         name: String?
     ): PolyResponse<PolyTriState>
 
+    @Suppress("unused") //TODO use
     fun renameAsync(
         account: PolyNonPlayerAccount,
         name: String?

@@ -1,9 +1,12 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.account.PolyAccount
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import me.lokka30.treasury.api.common.response.Response
+import me.lokka30.treasury.api.economy.account.Account
 import me.lokka30.treasury.api.economy.currency.Currency
 import java.math.BigDecimal
 import java.util.*
@@ -15,7 +18,7 @@ abstract class PolyCurrency(
     val exchangeRate: BigDecimal,
     val displayNameSingular: String,
     val displayNamePlural: String,
-    val decimal: Map<Locale, String>
+    val decimalMap: Map<Locale, Char>
 ) {
     companion object {
         fun fromTreasury(
@@ -23,24 +26,16 @@ abstract class PolyCurrency(
         ): PolyCurrency {
             return object : PolyCurrency(
                 id = treasuryCurrency.identifier,
-
-                // TODO discussing adjusting the decimal getter with Ivan, see relevant method below
-                decimal = mapOf(
-                    Pair(
-                        EconomyManager.primaryLocaleId,
-                        "${treasuryCurrency.decimal}"
-                    )
-                ),
-
+                decimalMap = treasuryCurrency.localeDecimalMap,
                 displayNamePlural = treasuryCurrency.displayNamePlural,
                 displayNameSingular = treasuryCurrency.displayNameSingular,
                 exchangeRate = treasuryCurrency.conversionRate,
                 symbol = treasuryCurrency.symbol
             ) {
                 override fun startingBalance(
-                    player: UUID?
+                    account: PolyAccount?
                 ): BigDecimal {
-                    return treasuryCurrency.getStartingBalance(player)
+                    return BigDecimal.ZERO
                 }
 
                 override fun format(
@@ -49,18 +44,62 @@ abstract class PolyCurrency(
                 ): String {
                     return treasuryCurrency.format(amount, locale)
                 }
+
+                override fun parseSync(
+                    formatted: String
+                ): PolyResponse<BigDecimal> {
+                    return PolyResponse.fromTreasury(treasuryCurrency.parse(formatted).join())
+                }
             }
         }
     }
 
     abstract fun startingBalance(
-        player: UUID?
+        account: PolyAccount?
     ): BigDecimal
 
     abstract fun format(
         amount: BigDecimal,
         locale: Locale?
     ): String
+
+    abstract fun parseSync(
+        formatted: String
+    ): PolyResponse<BigDecimal>
+
+    //TODO Use
+    @Suppress("unused")
+    fun parseAsync(
+        formatted: String
+    ): CompletableFuture<PolyResponse<BigDecimal>> {
+        return CompletableFuture.supplyAsync(
+            {
+                parseSync(formatted)
+            },
+            ConcurrentManager.execSvc
+        )
+    }
+
+    fun dbId(): Int {
+        return StorageManager.currentHandler!!.getOrGrantCurrencyDbIdSync(id)
+    }
+
+    fun dbIdStr(): String {
+        return dbId().toString()
+    }
+
+    fun decimal(
+        locale: Locale?
+    ): Char {
+        return if(locale == null || !decimalMap.containsKey(locale)) {
+            decimalMap.getOrDefault(
+                EconomyManager.primaryLocaleId,
+                '.'
+            )
+        } else {
+            decimalMap.getValue(locale)
+        }
+    }
 
     fun toTreasury(): Currency {
         return object : Currency {
@@ -72,17 +111,12 @@ abstract class PolyCurrency(
                 return this@PolyCurrency.symbol
             }
 
-            /*
-            TODO:
-                Discussing the adjustment of this method with Ivan.
-                - Make the return type a String.
-                - Accept a Locale parameter, since the decimal character is not the same with all
-                  locales.
+            override fun getDecimal(locale: Locale?): Char {
+               return this@PolyCurrency.decimal(locale)
+            }
 
-                https://github.com/ArcanePlugins/Treasury/issues/246
-             */
-            override fun getDecimal(): Char {
-                return this@PolyCurrency.decimal.getValue(EconomyManager.primaryLocaleId).first()
+            override fun getLocaleDecimalMap(): Map<Locale, Char> {
+                return this@PolyCurrency.decimalMap
             }
 
             override fun getDisplayNameSingular(): String {
@@ -101,41 +135,21 @@ abstract class PolyCurrency(
                 return this@PolyCurrency == EconomyManager.primaryCurrency
             }
 
+            override fun getStartingBalance(account: Account): BigDecimal {
+                return this@PolyCurrency.startingBalance(PolyAccount.fromTreasury(account))
+            }
+
             override fun getConversionRate(): BigDecimal {
                 return this@PolyCurrency.exchangeRate
             }
 
-            /*
-            TODO: Discussing the removal of this method from Treasury with Ivan
-            https://github.com/ArcanePlugins/Treasury/issues/246
-             */
-            override fun supportsNegativeBalances(): Boolean {
-                return SettingsCfg
-                    .rootNode
-                    .node("advanced", "signed-balances")
-                    .getBoolean(true)
-            }
-
-            /*
-            TODO: Discussing the removal of this method from Treasury with Ivan
-            https://github.com/ArcanePlugins/Treasury/issues/246
-             */
             override fun parse(
                 formatted: String
             ): CompletableFuture<Response<BigDecimal>> {
-                return CompletableFuture.completedFuture(
-                    Response.failure {
-                        """
-                        Polyconomy does not support currency amount parsing, as it may be removed by Treasury in the near future.
-                        """
-                    }
+                return CompletableFuture.supplyAsync(
+                    { this@PolyCurrency.parseSync(formatted).toTreasury() },
+                    ConcurrentManager.execSvc
                 )
-            }
-
-            override fun getStartingBalance(
-                playerID: UUID?
-            ): BigDecimal {
-                return this@PolyCurrency.startingBalance(playerID)
             }
 
             override fun format(
@@ -151,13 +165,5 @@ abstract class PolyCurrency(
             }
 
         }
-    }
-
-    fun dbId(): Int {
-        return StorageManager.currentHandler!!.getOrGrantCurrencyDbIdSync(id)
-    }
-
-    fun dbIdStr(): String {
-        return dbId().toString()
     }
 }

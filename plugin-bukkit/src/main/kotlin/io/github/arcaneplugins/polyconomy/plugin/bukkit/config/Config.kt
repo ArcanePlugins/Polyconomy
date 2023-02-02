@@ -38,6 +38,7 @@ abstract class Config(
     /**
      * Write current root node object to the disk.
      */
+    @Suppress("unused") //TODO use
     fun save() {
         loader.save(rootNode)
     }

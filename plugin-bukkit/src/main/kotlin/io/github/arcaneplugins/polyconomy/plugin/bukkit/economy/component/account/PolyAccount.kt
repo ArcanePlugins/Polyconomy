@@ -4,13 +4,44 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.accoun
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.currency.PolyCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.response.PolyResponse
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.component.transaction.PolyTransaction
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyNamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyTriState
+import me.lokka30.treasury.api.economy.account.Account
+import me.lokka30.treasury.api.economy.account.NonPlayerAccount
+import me.lokka30.treasury.api.economy.account.PlayerAccount
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-sealed class PolyAccount {
+abstract class PolyAccount {
+
+    companion object {
+        fun fromTreasury(
+            treasuryAccount: Account
+        ): PolyAccount {
+            return when (treasuryAccount) {
+                is PlayerAccount -> {
+                    PolyPlayerAccount(
+                        player = treasuryAccount.uniqueId
+                    )
+                }
+
+                is NonPlayerAccount -> {
+                    PolyNonPlayerAccount(
+                        id = PolyNamespacedKey.fromTreasury(treasuryAccount.identifier)
+                    )
+                }
+
+                else -> {
+                    throw IllegalStateException(
+                        "Expected PlayerAccount or NonPlayerAccount, got " +
+                                "'${treasuryAccount::class.simpleName}'"
+                    )
+                }
+            }
+        }
+    }
 
     abstract fun name(): CompletableFuture<PolyResponse<String?>>
 

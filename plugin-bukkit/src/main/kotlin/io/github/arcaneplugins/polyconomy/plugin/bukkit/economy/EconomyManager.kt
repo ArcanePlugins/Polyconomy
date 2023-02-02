@@ -60,7 +60,7 @@ object EconomyManager {
                         ),
 
                         decimal = let {
-                            val map: MutableMap<Locale, String> = mutableMapOf()
+                            val map: MutableMap<Locale, Char> = mutableMapOf()
 
                             currencyNode
                                 .node("decimal")
@@ -72,9 +72,10 @@ object EconomyManager {
                                             .string!!
                                     )
 
-                                    val character: String = localeDecimalNode
+                                    val character: Char = localeDecimalNode
                                         .node("character")
                                         .string!!
+                                        .first()
 
                                     Log.d(ECONOMY_MANAGER) {
                                         """
@@ -86,7 +87,7 @@ object EconomyManager {
                                 }
 
                             if(!map.containsKey(primaryLocaleId))
-                                map[primaryLocaleId] = "."
+                                map[primaryLocaleId] = '.'
 
                             return@let map
                         },

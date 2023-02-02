@@ -21,6 +21,7 @@ object VaultHook : Hook(
         TODO("Not yet implemented")
     }
 
+    @Suppress("unused") //TODO use
     object PolyVaultEconomyProvider {
         //TODO
     }
