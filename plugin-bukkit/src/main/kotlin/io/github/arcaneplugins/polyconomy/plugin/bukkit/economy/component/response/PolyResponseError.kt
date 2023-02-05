@@ -53,4 +53,8 @@ interface PolyResponseError {
 
     fun toTreasury(): FailureReason
 
+    fun throwEx() {
+        throw RuntimeException(desc())
+    }
+
 }

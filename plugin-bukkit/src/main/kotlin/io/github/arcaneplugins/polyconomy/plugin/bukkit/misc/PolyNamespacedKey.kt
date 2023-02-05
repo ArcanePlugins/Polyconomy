@@ -14,17 +14,14 @@ data class PolyNamespacedKey(
                 treasuryType.key
             )
         }
+    }
 
-        @Suppress("unused") //TODO use
-        fun toTreasury(polyType: PolyNamespacedKey): NamespacedKey {
-            return NamespacedKey.of(
-                polyType.namespace,
-                polyType.key
-            )
-        }
+    fun toTreasury(): NamespacedKey {
+        return NamespacedKey.of(namespace, key)
     }
 
     override fun toString(): String {
         return "${namespace}:${key}"
     }
+
 }

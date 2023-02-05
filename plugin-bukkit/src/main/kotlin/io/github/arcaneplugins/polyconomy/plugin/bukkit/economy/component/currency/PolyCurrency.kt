@@ -46,9 +46,10 @@ abstract class PolyCurrency(
                 }
 
                 override fun parseSync(
-                    formatted: String
+                    formatted: String,
+                    locale: Locale?
                 ): PolyResponse<BigDecimal> {
-                    return PolyResponse.fromTreasury(treasuryCurrency.parse(formatted).join())
+                    return PolyResponse.fromTreasury(treasuryCurrency.parse(formatted, locale).join())
                 }
             }
         }
@@ -64,17 +65,19 @@ abstract class PolyCurrency(
     ): String
 
     abstract fun parseSync(
-        formatted: String
+        formatted: String,
+        locale: Locale?
     ): PolyResponse<BigDecimal>
 
     //TODO Use
     @Suppress("unused")
     fun parseAsync(
-        formatted: String
+        formatted: String,
+        locale: Locale?
     ): CompletableFuture<PolyResponse<BigDecimal>> {
         return CompletableFuture.supplyAsync(
             {
-                parseSync(formatted)
+                parseSync(formatted, locale)
             },
             ConcurrentManager.execSvc
         )
@@ -144,10 +147,11 @@ abstract class PolyCurrency(
             }
 
             override fun parse(
-                formatted: String
+                formatted: String,
+                locale: Locale?
             ): CompletableFuture<Response<BigDecimal>> {
                 return CompletableFuture.supplyAsync(
-                    { this@PolyCurrency.parseSync(formatted).toTreasury() },
+                    { this@PolyCurrency.parseSync(formatted, locale).toTreasury() },
                     ConcurrentManager.execSvc
                 )
             }

@@ -23,8 +23,20 @@ class PolyPlayerAccount(
         )
     )
 
-    override fun name(): CompletableFuture<PolyResponse<String?>> {
+    override fun retrieveNameAsync(): CompletableFuture<PolyResponse<String?>> {
         return StorageManager.currentHandler!!.retrieveNameAsync(this)
+    }
+
+    override fun retrieveNameSync(): PolyResponse<String?> {
+        return StorageManager.currentHandler!!.retrieveNameSync(this)
+    }
+
+    override fun renameAsync(name: String?): CompletableFuture<PolyResponse<PolyTriState>> {
+        return StorageManager.currentHandler!!.renameAsync(this, name)
+    }
+
+    override fun renameSync(name: String?): PolyResponse<PolyTriState> {
+        return StorageManager.currentHandler!!.renameSync(this, name)
     }
 
     override fun retrieveBalance(currency: PolyCurrency): CompletableFuture<PolyResponse<BigDecimal>> {
@@ -59,7 +71,7 @@ class PolyPlayerAccount(
     override fun retrieveMemberIds(): CompletableFuture<PolyResponse<Collection<UUID>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrieveMemberIds: ${name()}",
+                name = "retrieveMemberIds: ${retrieveNameAsync()}",
                 result = Collections.singleton(player),
                 error = null
             )
@@ -69,7 +81,7 @@ class PolyPlayerAccount(
     override fun isMember(player: UUID): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "isMember: ${name()}",
+                name = "isMember: ${retrieveNameAsync()}",
                 result = PolyTriState.fromBool(player == this.player),
                 error = null
             )
@@ -83,7 +95,7 @@ class PolyPlayerAccount(
     ): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "setPermissions: ${name()}",
+                name = "setPermissions: ${retrieveNameAsync()}",
                 result = null,
                 error = PolyStandardResponseError.PLAYER_ACCOUNT_PERMISSION_MODIFICATION_NOT_SUPPORTED
             )
@@ -93,7 +105,7 @@ class PolyPlayerAccount(
     override fun retrievePermissions(player: UUID): CompletableFuture<PolyResponse<Map<PolyAccountPermission, PolyTriState>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrievePermissions: ${name()}",
+                name = "retrievePermissions: ${retrieveNameAsync()}",
                 result = let {
                     if(player == this.player) PolyAccountPermission.allPermissions else mapOf()
                 },
@@ -105,7 +117,7 @@ class PolyPlayerAccount(
     override fun retrievePermissionsMap(): CompletableFuture<PolyResponse<Map<UUID, Map<PolyAccountPermission, PolyTriState>>>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "retrievePermisionsMap: ${name()}",
+                name = "retrievePermisionsMap: ${retrieveNameAsync()}",
                 result = allPermissions,
                 error = null
             )
@@ -118,7 +130,7 @@ class PolyPlayerAccount(
     ): CompletableFuture<PolyResponse<PolyTriState>> {
         return CompletableFuture.completedFuture(
             PolyResponse(
-                name = "hasPermissions: ${name()}",
+                name = "hasPermissions: ${retrieveNameAsync()}",
                 result = PolyTriState.fromBool(player == this.player),
                 error = null
             )

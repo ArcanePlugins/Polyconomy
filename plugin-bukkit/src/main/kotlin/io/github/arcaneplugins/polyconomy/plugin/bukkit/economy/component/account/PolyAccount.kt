@@ -43,7 +43,17 @@ abstract class PolyAccount {
         }
     }
 
-    abstract fun name(): CompletableFuture<PolyResponse<String?>>
+    abstract fun retrieveNameAsync(): CompletableFuture<PolyResponse<String?>>
+
+    abstract fun retrieveNameSync(): PolyResponse<String?>
+
+    abstract fun renameAsync(
+        name: String?
+    ): CompletableFuture<PolyResponse<PolyTriState>>
+
+    abstract fun renameSync(
+        name: String?
+    ): PolyResponse<PolyTriState>
 
     abstract fun retrieveBalance(
         currency: PolyCurrency

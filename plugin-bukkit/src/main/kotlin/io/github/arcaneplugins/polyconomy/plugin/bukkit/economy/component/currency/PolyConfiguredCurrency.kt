@@ -26,12 +26,6 @@ class PolyConfiguredCurrency(
     decimal
 ) {
 
-    companion object {
-        val parserRegex: Regex = Regex(
-            pattern = "[^\\\\d.]+"
-        )
-    }
-
     override fun startingBalance(
         account: PolyAccount?
     ): BigDecimal {
@@ -61,14 +55,20 @@ class PolyConfiguredCurrency(
             )
     }
 
-    override fun parseSync(formatted: String): PolyResponse<BigDecimal> {
+    override fun parseSync(
+        formatted: String,
+        locale: Locale?
+    ): PolyResponse<BigDecimal> {
         val responseName = "parseSync; formatted=${formatted}; id=${id}"
 
         return try {
             PolyResponse(
                 name = responseName,
                 result = BigDecimal(
-                    formatted.replace(parserRegex, "")
+                    formatted.replace(
+                        regex = Regex("[^\\d${decimal(locale)}]+"),
+                        replacement = ""
+                    )
                 ),
                 error = null
             )

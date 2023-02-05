@@ -584,4 +584,8 @@ abstract class StorageHandler(
         currencyId: String
     ): Int
 
+    abstract fun retrievePlayerAccountIdsSync(): PolyResponse<Collection<UUID>>
+
+    abstract fun retrieveNonPlayerAccountIdsSync(): PolyResponse<Collection<PolyNamespacedKey>>
+
 }

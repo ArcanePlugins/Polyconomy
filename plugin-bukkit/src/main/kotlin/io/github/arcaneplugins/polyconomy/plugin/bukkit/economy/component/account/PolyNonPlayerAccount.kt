@@ -16,8 +16,24 @@ class PolyNonPlayerAccount(
     val id: PolyNamespacedKey
 ) : PolyAccount() {
 
-    override fun name(): CompletableFuture<PolyResponse<String?>> {
+    override fun retrieveNameAsync(): CompletableFuture<PolyResponse<String?>> {
         return StorageManager.currentHandler!!.retrieveNameAsync(this)
+    }
+
+    override fun retrieveNameSync(): PolyResponse<String?> {
+        return StorageManager.currentHandler!!.retrieveNameSync(this)
+    }
+
+    override fun renameAsync(
+        name: String?
+    ): CompletableFuture<PolyResponse<PolyTriState>> {
+        return StorageManager.currentHandler!!.renameAsync(this, name)
+    }
+
+    override fun renameSync(
+        name: String?
+    ): PolyResponse<PolyTriState> {
+        return StorageManager.currentHandler!!.renameSync(this, name)
     }
 
     override fun retrieveBalance(
@@ -92,4 +108,5 @@ class PolyNonPlayerAccount(
     ): CompletableFuture<PolyResponse<PolyTriState>> {
         return StorageManager.currentHandler!!.hasPermissionsAsync(this, player, *permissions)
     }
+
 }

@@ -102,21 +102,29 @@ object TreasuryHook : Hook(
 
         override fun retrievePlayerAccountIds(): CompletableFuture<Response<Collection<UUID>>> {
             return CompletableFuture.supplyAsync({
-                /*
-                TODO
-                    - Add an implementation to StorageHandler
-                 */
-                TODO("Not yet implemented.")
+                StorageManager.currentHandler!!.retrievePlayerAccountIdsSync().toTreasury()
             }, execSvc)
         }
 
         override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<Collection<NamespacedKey>>> {
             return CompletableFuture.supplyAsync({
-                /*
-                TODO
-                    - Add an implementation to StorageHandler
-                 */
-                TODO("Not yet implemented")
+                val polyResponse = StorageManager
+                    .currentHandler!!
+                    .retrieveNonPlayerAccountIdsSync()
+
+                return@supplyAsync if(polyResponse.result != null) {
+                    Response.success(
+                        polyResponse
+                            .result
+                            .stream()
+                            .map(PolyNamespacedKey::toTreasury)
+                            .collect(Collectors.toList())
+                    )
+                } else if(polyResponse.error != null) {
+                    Response.failure { polyResponse.error.desc() }
+                } else {
+                    throw IllegalStateException("PolyResponse state unknown")
+                }
             }, execSvc)
         }
 
