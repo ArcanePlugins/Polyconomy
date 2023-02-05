@@ -23,13 +23,13 @@ object EconomyManager : EconomyProvider {
 
     const val PRECISION = 4
 
-    lateinit var primaryCurrency: Currency
+    lateinit var primCurrency: Currency
         private set
 
-    lateinit var primaryLocaleId: Locale
+    lateinit var primLocale: Locale
         private set
 
-    val currencies: MutableList<Currency> = mutableListOf()
+    val registeredCurrencies = linkedSetOf<Currency>()
 
     fun load() {
         loadPrimaryLocale()
@@ -38,7 +38,7 @@ object EconomyManager : EconomyProvider {
     }
 
     private fun loadCurrencies() {
-        currencies.clear()
+        registeredCurrencies.clear()
 
         SettingsCfg
             .rootNode
@@ -48,7 +48,7 @@ object EconomyManager : EconomyProvider {
             .forEach { currencyNode ->
                 Log.d(ECONOMY_MANAGER) { "Parsing currency node @ ${currencyNode.path()}" }
 
-                currencies.add(
+                registeredCurrencies.add(
                     object : Currency {
                         val parserRegex = Regex(
                             pattern = "[^\\\\d.]+"
@@ -81,8 +81,8 @@ object EconomyManager : EconomyProvider {
                                     map[locale] = character
                                 }
 
-                            if(!map.containsKey(primaryLocaleId))
-                                map[primaryLocaleId] = '.'
+                            if(!map.containsKey(primLocale))
+                                map[primLocale] = '.'
 
                             return@let map
                         }
@@ -104,7 +104,7 @@ object EconomyManager : EconomyProvider {
                         override fun getDecimal(locale: Locale?): Char {
                             return if(locale == null || !decimalLocaleMap.containsKey(locale)) {
                                 decimalLocaleMap.getOrDefault(
-                                    primaryLocaleId,
+                                    primLocale,
                                     '.'
                                 )
                             } else {
@@ -133,7 +133,7 @@ object EconomyManager : EconomyProvider {
                         }
 
                         override fun isPrimary(): Boolean {
-                            return this == primaryCurrency
+                            return this == primCurrency
                         }
 
                         override fun getStartingBalance(account: Account): BigDecimal {
@@ -206,7 +206,7 @@ object EconomyManager : EconomyProvider {
     }
 
     private fun loadPrimaryCurrency() {
-        primaryCurrency = findCurrencyNonNull(
+        primCurrency = findCurrencyNonNull(
             SettingsCfg
                 .rootNode
                 .node("primary-currency")
@@ -215,7 +215,7 @@ object EconomyManager : EconomyProvider {
     }
 
     private fun loadPrimaryLocale() {
-        primaryLocaleId = Locale(
+        primLocale = Locale(
             SettingsCfg
                 .rootNode
                 .node("primary-locale")
@@ -263,12 +263,12 @@ object EconomyManager : EconomyProvider {
     }
 
     override fun getPrimaryCurrency(): Currency {
-        return primaryCurrency
+        return primCurrency
     }
 
     override fun findCurrency(identifier: String): Optional<Currency> {
         return Optional.ofNullable(
-            currencies.firstOrNull { it.identifier.equals(identifier, true) }
+            registeredCurrencies.firstOrNull { it.identifier.equals(identifier, true) }
         )
     }
 
@@ -287,14 +287,14 @@ object EconomyManager : EconomyProvider {
     }
 
     override fun getCurrencies(): Set<Currency> {
-        return currencies.toSet()
+        return registeredCurrencies
     }
 
     override fun registerCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
         return CompletableFuture.supplyAsync(
             {
                 try {
-                    if(currencies
+                    if(registeredCurrencies
                         .any { it.identifier.equals(currency.identifier, true) }
                     ) {
                         return@supplyAsync Response.failure {
@@ -304,7 +304,7 @@ object EconomyManager : EconomyProvider {
                         }
                     }
 
-                    currencies.add(currency)
+                    registeredCurrencies.add(currency)
 
                     return@supplyAsync Response.success(TriState.TRUE)
                 } catch (ex: Exception) {
@@ -319,10 +319,10 @@ object EconomyManager : EconomyProvider {
         return CompletableFuture.supplyAsync(
             {
                 try {
-                    if(!currencies.contains(currency))
+                    if(!registeredCurrencies.contains(currency))
                         return@supplyAsync Response.success(TriState.UNSPECIFIED)
 
-                    currencies.remove(currency)
+                    registeredCurrencies.remove(currency)
 
                     return@supplyAsync Response.success(TriState.TRUE)
                 } catch(ex: Exception) {

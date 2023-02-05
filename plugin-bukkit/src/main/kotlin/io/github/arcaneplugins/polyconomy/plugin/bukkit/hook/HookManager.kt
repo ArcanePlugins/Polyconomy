@@ -50,19 +50,27 @@ object HookManager {
         Log.d(HOOK_MANAGER) { "Enforcing hard dependencies..." }
 
         val missing = listOf("Treasury")
-            .filter { Bukkit.getPluginManager().getPlugin(it) == null }
+            .filter { !Bukkit.getPluginManager().isPluginEnabled(it) }
 
         if(missing.isEmpty()) {
             Log.d(HOOK_MANAGER) { "All hard dependencies are present." }
-            throw TerminateLoadException()
+            return
         }
 
         Log.s(
             """
-            You have not read Polyconomy's documentation and installed the following plugin dependencies:
+            
+            You have not followed Polyconomy's installation instructions!
+            You are missing the following plugin dependencies:
+            
             ${missing.joinToString(separator = "\n", prefix = " ✘ ")}
+            
+            Polyconomy will not be able to load until you resolve this issue.
+            Install the missing plugin(s) and then restart your server.
             """.trimIndent()
         )
+
+        throw TerminateLoadException()
     }
 
 }

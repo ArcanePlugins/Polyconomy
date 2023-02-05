@@ -55,11 +55,22 @@ class Polyconomy : JavaPlugin() {
         instance = this
 
         try {
-            HookManager.ensureHardDependencies()
             CommandManager.loadOnLoad()
-        } catch(ex: TerminateLoadException) {
-            isEnabled = false
-            return
+        } catch(ex: Exception) {
+            Log.s(
+                """
+                
+                An error occurred whilst attempting to load Polyconomy.
+                
+                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
+                
+                If you are unable to resolve this error yourself, feel free to ask our support team for help.
+                Discord: https://discord.gg/HqZwdcJ
+                
+                A stack trace will be printed below to aid advanced users in resolving this issue:
+                """.trimIndent()
+            )
+            throw ex
         }
 
         Log.i("Plugin initialized (took ${stopwatch.stop()}).")
@@ -74,6 +85,7 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         try {
+            HookManager.ensureHardDependencies()
             ConfigManager.load()
             ConcurrentManager.startup()
             EconomyManager.load()
@@ -85,6 +97,21 @@ class Polyconomy : JavaPlugin() {
         } catch(ex: TerminateLoadException) {
             isEnabled = false
             return
+        } catch (ex: Exception) {
+            Log.s(
+                """
+                
+                An error occurred whilst attempting to enable Polyconomy.
+                
+                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
+                
+                If you are unable to resolve this error yourself, feel free to ask our support team for help.
+                Discord: https://discord.gg/HqZwdcJ
+                
+                A stack trace will be printed below to aid advanced users in resolving this issue:
+                """.trimIndent()
+            )
+            throw ex
         }
 
         Log.i("Plugin enabled (took ${stopwatch.stop()}).")

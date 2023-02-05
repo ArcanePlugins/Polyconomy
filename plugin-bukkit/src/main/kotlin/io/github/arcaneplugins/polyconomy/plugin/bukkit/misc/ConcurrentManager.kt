@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit
 
 object ConcurrentManager {
 
-    lateinit var execSvc: ExecutorService
+    var execSvc: ExecutorService? = null
         private set
 
     /**
@@ -24,6 +24,8 @@ object ConcurrentManager {
         listOf(
             execSvc
         ).forEach {
+            if(it == null) return@forEach
+
             it.shutdown()
             it.awaitTermination(
                 if(DebugCategory.DEBUG_TEST.enabled()) 5 else 30,
