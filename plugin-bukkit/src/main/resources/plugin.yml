@@ -21,13 +21,11 @@ main: "io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy"
 
 name: "Polyconomy"
 
-# Soft/optional third-party plugins which are directly integrated with by Polyconomy
 softdepend:
 
-  # Treasury soft-dependency: Treasury is the recommended economy API that administrators should
-  # use in combination with Polyconomy to unlock all of its features, in contrast to the Vault
-  # hook, which is considered 'legacy'. Polyconomy has a Treasury hook, utilising a few of its APIs
-  # (Economy, Services, Events).
+  # Treasury must be installed to run Polyconomy, however, it has been decided that it is better to
+  # not tell Bukkit this (by using 'depend' instead of 'softdepend') because it decides to print
+  # a stack trace in the console if the dependency is not fulfilled (which is not user-friendly).
   - "Treasury"
 
   # Vault soft-dependency: Vault is an alternative economy API which most servers use. It can be ran

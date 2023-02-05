@@ -4,18 +4,22 @@ object CommandManager {
 
     //TODO
 
-    fun loadOnload() {
+    @Suppress("EmptyMethod")
+    fun loadOnLoad() {
         //TODO
     }
 
+    @Suppress("EmptyMethod")
     fun loadOnEnable() {
         //TODO
     }
 
+    @Suppress("EmptyMethod")
     fun unloadOnDisable() {
         //TODO
     }
 
+    @Suppress("EmptyMethod")
     fun reload() {
         //TODO
     }

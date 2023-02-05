@@ -8,6 +8,7 @@ object PlayerQuitListener : PolyListener(
     imperative = true
 ) {
 
+    @Suppress("EmptyMethod")
     @EventHandler
     fun handleEvent(event: PlayerQuitEvent) {
         // TODO: Handle any caching required for the player.

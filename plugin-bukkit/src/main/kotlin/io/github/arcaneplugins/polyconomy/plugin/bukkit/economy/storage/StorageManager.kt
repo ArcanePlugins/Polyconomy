@@ -18,8 +18,6 @@ object StorageManager {
 
     var currentHandler: StorageHandler? = null
 
-    const val precision: Int = 4
-
     fun connect() {
         // make sure we're not already connected
         if(connected())
@@ -68,8 +66,13 @@ object StorageManager {
         currentHandler!!.disconnect()
     }
 
+    @Suppress("BooleanMethodIsAlwaysInverted")
     fun connected(): Boolean {
         return currentHandler != null
+    }
+
+    fun currentHandlerNotNull(): StorageHandler {
+        return currentHandler!!
     }
 
 }

@@ -52,7 +52,7 @@ object Log {
      * @param msgSup Supplier of the message which will be accessed if the category is enabled
      */
     fun d(dCat: DebugCategory, msgSup: Supplier<Any>) {
-        if(!dCat.enabled()) return
+        if(dCat.disabled()) return
 
         val output = "[DEBUG: ${dCat}] ${msgSup.get()}"
 

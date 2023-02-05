@@ -21,7 +21,7 @@ object PlayerJoinListener : PolyListener(
     }
 
     private fun handleDebugTest() {
-        if(!DebugCategory.DEBUG_TEST.enabled()) return
+        if(DebugCategory.DEBUG_TEST.disabled()) return
 
         Log.i("Handling debug method")
 

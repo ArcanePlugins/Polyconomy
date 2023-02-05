@@ -15,7 +15,7 @@ currencies:
     display-name-plural: "Dollars"
     amount-format: "#,##0.00"
     presentation-format: "%symbol%%amount%"
-    exchange-rate: 1
+    conversion-rate: 1
     decimal:
       - "en_US": "."
 
@@ -27,7 +27,7 @@ currencies:
     display-name-plural: "Tokens"
     amount-format: "#,##0.00"
     presentation-format: "%amount% %display-name%"
-    exchange-rate: 100
+    conversion-rate: 100
     decimal:
       - "en_US": "."
 

@@ -11,6 +11,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyStopwatch
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
 import org.bukkit.plugin.java.JavaPlugin
 
 /**
@@ -52,7 +53,14 @@ class Polyconomy : JavaPlugin() {
         val stopwatch = PolyStopwatch()
 
         instance = this
-        CommandManager.loadOnload()
+
+        try {
+            HookManager.ensureHardDependencies()
+            CommandManager.loadOnLoad()
+        } catch(ex: TerminateLoadException) {
+            isEnabled = false
+            return
+        }
 
         Log.i("Plugin initialized (took ${stopwatch.stop()}).")
     }
@@ -65,14 +73,19 @@ class Polyconomy : JavaPlugin() {
     override fun onEnable() {
         val stopwatch = PolyStopwatch()
 
-        ConfigManager.load()
-        ConcurrentManager.startup()
-        EconomyManager.load()
-        StorageManager.connect()
-        ListenerManager.registerAll()
-        HookManager.registerAll()
-        CommandManager.loadOnEnable()
-        MetricsManager.register()
+        try {
+            ConfigManager.load()
+            ConcurrentManager.startup()
+            EconomyManager.load()
+            StorageManager.connect()
+            ListenerManager.registerAll()
+            HookManager.registerAll()
+            CommandManager.loadOnEnable()
+            MetricsManager.register()
+        } catch(ex: TerminateLoadException) {
+            isEnabled = false
+            return
+        }
 
         Log.i("Plugin enabled (took ${stopwatch.stop()}).")
     }
