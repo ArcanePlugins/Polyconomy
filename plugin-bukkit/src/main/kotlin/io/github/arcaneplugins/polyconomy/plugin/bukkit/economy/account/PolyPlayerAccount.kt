@@ -7,6 +7,7 @@ import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.account.PlayerAccount
 import me.lokka30.treasury.api.economy.currency.Currency
 import me.lokka30.treasury.api.economy.transaction.EconomyTransaction
+import me.lokka30.treasury.api.economy.transaction.EconomyTransactionInitiator
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.temporal.Temporal
@@ -16,6 +17,11 @@ import java.util.concurrent.CompletableFuture
 class PolyPlayerAccount(
     val player: UUID
 ) : PlayerAccount {
+
+    val asTransactionInitiator = EconomyTransactionInitiator.createInitiator(
+        EconomyTransactionInitiator.Type.PLAYER,
+        player
+    )
 
     override fun getName(): Optional<String> {
         val response = currentHandlerNotNull()
@@ -89,6 +95,10 @@ class PolyPlayerAccount(
 
     override fun getUniqueId(): UUID {
         return player
+    }
+
+    override fun getAsTransactionInitiator(): EconomyTransactionInitiator<UUID> {
+        return asTransactionInitiator
     }
 
 }
