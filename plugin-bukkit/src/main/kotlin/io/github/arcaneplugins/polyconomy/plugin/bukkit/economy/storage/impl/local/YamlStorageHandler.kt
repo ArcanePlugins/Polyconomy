@@ -36,52 +36,6 @@ import kotlin.io.path.exists
 
 object YamlStorageHandler : StorageHandler("Yaml") {
 
-/*
-=======================
-FILE STRUCTURE EXAMPLE.
-=======================
-
-account:
-    player:
-      "<player: UUID>":
-          name: <String?>
-          balance:
-            "<currency-dbid: Int->String>": <balance: Double>
-          transaction:
-            - currency-dbid: <Int>
-              initiator:
-                type: <PolyTransactionInitiator.Type>
-                data: <String>
-              timestamp: <Long ; epoch milliseconds>
-              type: <PolyTransactionType>
-              reason: <String?>
-              amount: <Double>
-              importance: <PolyTransactionImportance>
-
-
-    non-player:
-        "<id namespace: String>":
-          "<id key: String>":
-            name: <String?>
-            balance: (same as player accounts)
-            transaction: (same as player accounts)
-            member:
-              "player: <UUID>":
-                permission:
-                  "<PolyAccountPermission>": "value: <TriState>"
-
-currency:
-  current-db-id: <last granted currency db id: Int>
-  db-id-map:
-    <currency-id: String>: <currency-db-id: Int>
-
-metadata:
-  file-version: 1
-  original:
-    file-version: 1
-    plugin-version: "${project.version}"
- */
-
     private val relativePath: Path = Path("data${File.separator}data.yml")
 
     private lateinit var loader: YamlConfigurationLoader
@@ -973,25 +927,35 @@ metadata:
         )
     }
 
+    /*
+    TODO
+        This is meant to return a TriState representing if any permission values were
+        changed after calling this method, e.g. if permission A was already false then
+        no change was made.
+        However, this would require unnecessary database operations. Asking Ivan on the
+        ArcanePlugins Discord guild about changing this behaviour:
+        https://discord.com/channels/752310043214479462/921225503531204658/1073047803795865680
+     */
     override fun setPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         permissionValue: TriState,
         vararg permissions: AccountPermission
     ): Response<TriState> {
-        TODO("Not yet implemented")
-    }
+        return try {
+            val permsNode = getAccountNodeSync(account)
+                .node("member", memberPlayer.toString(), "permission")
 
-/* TODO
------- non-player account node -----
-member:
-  "player: <UUID>":
-    permission:
-      "<PolyAccountPermission>": "value: <TriState>"
-*/
+            for(permission in permissions) {
+                permsNode.node(permission.name).set(permissionValue.name)
+            }
 
-    fun test(): String {
-        return "Hey"
+            write()
+
+            Response.success(TriState.TRUE)
+        } catch(ex: Exception) {
+            Response.failure { ex.message ?: "?" }
+        }
     }
 
     override fun retrievePermissionsSync(

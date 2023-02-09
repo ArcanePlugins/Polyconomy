@@ -1,0 +1,41 @@
+# This is a file to visually display the layout of the YAML storage handler's data.yml file.
+
+account:
+  player:
+    <player ; UUID>:
+      name: <String?>
+      balance:
+        <currency-dbid ; Int->String>: <balance ; Double>
+      transaction:
+        - currency-dbid: <Int>
+          initiator:
+            type: <PolyTransactionInitiator.Type>
+            data: <String>
+          timestamp: <Long ; epoch milliseconds>
+          type: <PolyTransactionType>
+          reason: <String?>
+          amount: <Double>
+          importance: <PolyTransactionImportance>
+
+
+  non-player:
+    <id namespace ; String>:
+      <id key ; String>:
+        name: <String?>
+        balance: (same as player accounts)
+        transaction: (same as player accounts)
+        member:
+          player ; <UUID>:
+            permission:
+              <PolyAccountPermission>: value ; <TriState>
+
+currency:
+  current-db-id: <last granted currency db id ; Int>
+  db-id-map:
+    <currency-id ; String>: <currency-db-id ; Int>
+
+metadata:
+  file-version: 1
+  original:
+    file-version: 1
+    plugin-version: "${project.version}"
