@@ -569,6 +569,47 @@ object YamlStorageHandler : StorageHandler("Yaml") {
             Log.d(STORAGE_YAML) { "Setting node to new balance" }
             balanceNode.set(newBalance.toDouble())
 
+            Log.d(STORAGE_YAML) { "Adding transaction to history" }
+
+            val historyNodes = getAccountNodeSync(account).node("transaction")
+            val index = historyNodes.childrenList().size
+            val historyNode = historyNodes.node(index)
+
+            historyNode
+                .node("currency-dbid")
+                .set(getOrGrantCurrencyDbIdSync(currency))
+
+            historyNode
+                .node("initiator", "type")
+                .set(transaction.initiator.type.name)
+
+            historyNode
+                .node("initiator", "data")
+                .set(transaction.initiator.data.toString())
+
+            historyNode
+                .node("timestamp")
+                .set(transaction.timestamp.toEpochMilli())
+
+            historyNode
+                .node("type")
+                .set(transaction.type.name)
+
+            if(transaction.reason.isPresent) {
+                historyNode
+                    .node("reason")
+                    .set(transaction.reason.get())
+            }
+
+            historyNode
+                .node("amount")
+                .set(transaction.amount.toDouble())
+
+            historyNode
+                .node("importance")
+                .set(transaction.importance.name)
+
+
             Log.d(STORAGE_YAML) { "Writing changes to disk" }
             write()
 
@@ -695,6 +736,46 @@ object YamlStorageHandler : StorageHandler("Yaml") {
 
             Log.d(STORAGE_YAML) { "Setting node to new balance" }
             balanceNode.set(newBalance.toDouble())
+
+            Log.d(STORAGE_YAML) { "Adding transaction to history" }
+
+            val historyNodes = getAccountNodeSync(account).node("transaction")
+            val index = historyNodes.childrenList().size
+            val historyNode = historyNodes.node(index)
+
+            historyNode
+                .node("currency-dbid")
+                .set(getOrGrantCurrencyDbIdSync(currency))
+
+            historyNode
+                .node("initiator", "type")
+                .set(transaction.initiator.type.name)
+
+            historyNode
+                .node("initiator", "data")
+                .set(transaction.initiator.data.toString())
+
+            historyNode
+                .node("timestamp")
+                .set(transaction.timestamp.toEpochMilli())
+
+            historyNode
+                .node("type")
+                .set(transaction.type.name)
+
+            if(transaction.reason.isPresent) {
+                historyNode
+                    .node("reason")
+                    .set(transaction.reason.get())
+            }
+
+            historyNode
+                .node("amount")
+                .set(transaction.amount.toDouble())
+
+            historyNode
+                .node("importance")
+                .set(transaction.importance.name)
 
             Log.d(STORAGE_YAML) { "Writing changes to disk" }
             write()
