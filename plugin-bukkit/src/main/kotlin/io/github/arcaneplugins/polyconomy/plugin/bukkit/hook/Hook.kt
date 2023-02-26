@@ -1,5 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook
 
+@Suppress("EmptyMethod")
 abstract class Hook(
     val id: String,
 

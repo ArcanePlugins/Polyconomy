@@ -460,14 +460,14 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 "Finding currency by ID"
             }
 
-            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyID)
+            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
 
             Log.d(STORAGE_YAML) {
                 "Found currency: ${currency.identifier}"
             }
 
-            if(transaction.transactionType != EconomyTransactionType.SET &&
-                transaction.transactionAmount.compareTo(BigDecimal.ZERO) == -1
+            if(transaction.type != EconomyTransactionType.SET &&
+                transaction.amount.compareTo(BigDecimal.ZERO) == -1
             ) {
                 Log.d(STORAGE_YAML) {
                     "error: negative amount cannot be specified when transaction type is not SET."
@@ -504,15 +504,15 @@ object YamlStorageHandler : StorageHandler("Yaml") {
 
             Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
 
-            val newBalance: BigDecimal = when (transaction.transactionType) {
+            val newBalance: BigDecimal = when (transaction.type) {
                 EconomyTransactionType.SET ->
-                    transaction.transactionAmount
+                    transaction.amount
 
                 EconomyTransactionType.DEPOSIT ->
-                    previousBalance.add(transaction.transactionAmount)
+                    previousBalance.add(transaction.amount)
 
                 EconomyTransactionType.WITHDRAWAL ->
-                    previousBalance.subtract(transaction.transactionAmount)
+                    previousBalance.subtract(transaction.amount)
             }
 
             Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
@@ -587,14 +587,14 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 "Finding currency by ID"
             }
 
-            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyID)
+            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
 
             Log.d(STORAGE_YAML) {
                 "Found currency: ${currency.identifier}"
             }
 
-            if(transaction.transactionType != EconomyTransactionType.SET &&
-                transaction.transactionAmount.compareTo(BigDecimal.ZERO) == -1
+            if(transaction.type != EconomyTransactionType.SET &&
+                transaction.amount.compareTo(BigDecimal.ZERO) == -1
             ) {
                 Log.d(STORAGE_YAML) {
                     "error: negative amount cannot be specified when transaction type is not SET."
@@ -631,15 +631,15 @@ object YamlStorageHandler : StorageHandler("Yaml") {
 
             Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
 
-            val newBalance: BigDecimal = when (transaction.transactionType) {
+            val newBalance: BigDecimal = when (transaction.type) {
                 EconomyTransactionType.SET ->
-                    transaction.transactionAmount
+                    transaction.amount
 
                 EconomyTransactionType.DEPOSIT ->
-                    previousBalance.add(transaction.transactionAmount)
+                    previousBalance.add(transaction.amount)
 
                 EconomyTransactionType.WITHDRAWAL ->
-                    previousBalance.subtract(transaction.transactionAmount)
+                    previousBalance.subtract(transaction.amount)
             }
 
             Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
