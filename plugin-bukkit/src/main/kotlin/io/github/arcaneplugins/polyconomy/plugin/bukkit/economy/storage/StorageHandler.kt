@@ -2,7 +2,6 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
 
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
-import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.account.AccountPermission
 import me.lokka30.treasury.api.economy.account.NonPlayerAccount
 import me.lokka30.treasury.api.economy.account.PlayerAccount
@@ -24,114 +23,120 @@ abstract class StorageHandler(
 
     abstract fun hasPlayerAccountSync(
         player: UUID
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun hasNonPlayerAccountSync(
         id: NamespacedKey
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun retrieveNameSync(
         account: PlayerAccount
-    ): Response<Optional<String>>
+    ): Optional<String>
 
     abstract fun retrieveNameSync(
         account: NonPlayerAccount
-    ): Response<Optional<String>>
+    ): Optional<String>
 
     abstract fun setNameSync(
         account: PlayerAccount,
         name: String?
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun setNameSync(
         account: NonPlayerAccount,
         name: String?
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun deleteAccountSync(
         account: PlayerAccount,
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun deleteAccountSync(
         account: NonPlayerAccount,
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun retrieveBalanceSync(
         account: PlayerAccount,
         currency: Currency
-    ): Response<BigDecimal>
+    ): BigDecimal
 
     abstract fun retrieveBalanceSync(
         account: NonPlayerAccount,
         currency: Currency
-    ): Response<BigDecimal>
+    ): BigDecimal
 
     abstract fun doTransactionSync(
         account: PlayerAccount,
         transaction: EconomyTransaction
-    ): Response<BigDecimal>
+    ): BigDecimal
 
     abstract fun doTransactionSync(
         account: NonPlayerAccount,
         transaction: EconomyTransaction
-    ): Response<BigDecimal>
+    ): BigDecimal
 
     abstract fun retrieveHeldCurrenciesSync(
         account: PlayerAccount
-    ): Response<Collection<String>>
+    ): Collection<String>
 
     abstract fun retrieveHeldCurrenciesSync(
         account: NonPlayerAccount
-    ): Response<Collection<String>>
+    ): Collection<String>
 
     abstract fun retrieveTransactionHistorySync(
         account: PlayerAccount,
         transactionCount: Int,
         from: Instant,
         to: Instant
-    ): Response<Collection<EconomyTransaction>>
+    ): Collection<EconomyTransaction>
 
     abstract fun retrieveTransactionHistorySync(
         account: NonPlayerAccount,
         transactionCount: Int,
         from: Instant,
         to: Instant
-    ): Response<Collection<EconomyTransaction>>
+    ): Collection<EconomyTransaction>
 
     abstract fun retrieveMemberIdsSync(
         account: NonPlayerAccount
-    ): Response<Collection<UUID>>
+    ): Collection<UUID>
 
     abstract fun isMemberSync(
         account: NonPlayerAccount,
         memberPlayer: UUID
-    ): Response<TriState>
+    ): Boolean
 
     abstract fun setPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         permissionValue: TriState,
         vararg permissions: AccountPermission
-    ): Response<TriState>
+    ): Boolean
+
+    abstract fun setPermissionsSync(
+        account: NonPlayerAccount,
+        memberPlayer: UUID,
+        permissionsMap: Map<AccountPermission, TriState>
+    ): Boolean
 
 
     abstract fun retrievePermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID
-    ): Response<Map<AccountPermission, TriState>>
+    ): Map<AccountPermission, TriState>
 
     abstract fun retrievePermissionsMapSync(
         account: NonPlayerAccount
-    ): Response<Map<UUID, Map<AccountPermission, TriState>>>
+    ): Map<UUID, Map<AccountPermission, TriState>>
 
     abstract fun hasPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         vararg permissions: AccountPermission
-    ): Response<TriState>
+    ): TriState
 
-    abstract fun retrievePlayerAccountIdsSync(): Response<Collection<UUID>>
+    abstract fun retrievePlayerAccountIdsSync(): Collection<UUID>
 
-    abstract fun retrieveNonPlayerAccountIdsSync(): Response<Collection<NamespacedKey>>
+    abstract fun retrieveNonPlayerAccountIdsSync(): Collection<NamespacedKey>
 
 }

@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
-import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.account.NonPlayerAccount
 import me.lokka30.treasury.api.economy.account.PlayerAccount
 import me.lokka30.treasury.api.economy.account.accessor.AccountAccessor
@@ -21,21 +20,19 @@ object PolyAccountAccessor : AccountAccessor {
     object PlayerAccountAccessorImpl : PlayerAccountAccessor() {
         override fun getOrCreate(
             context: PlayerAccountCreateContext
-        ): CompletableFuture<Response<PlayerAccount>> {
+        ): CompletableFuture<PlayerAccount> {
             return CompletableFuture.completedFuture(
-                Response.success(
-                    PolyPlayerAccount(context.uniqueId)
-                )
+                PolyPlayerAccount(context.uniqueId)
             )
         }
     }
 
     object NonPlayerAccountAccessorImpl : NonPlayerAccountAccessor() {
-        override fun getOrCreate(context: NonPlayerAccountCreateContext): CompletableFuture<Response<NonPlayerAccount>> {
+        override fun getOrCreate(
+            context: NonPlayerAccountCreateContext
+        ): CompletableFuture<NonPlayerAccount> {
             return CompletableFuture.completedFuture(
-                Response.success(
-                    PolyNonPlayerAccount(context.identifier)
-                )
+                PolyNonPlayerAccount(context.identifier)
             )
         }
     }

@@ -2,12 +2,9 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager.currentHandlerNotNull
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.execSvc
-import me.lokka30.treasury.api.common.misc.TriState
-import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.account.PlayerAccount
 import me.lokka30.treasury.api.economy.currency.Currency
 import me.lokka30.treasury.api.economy.transaction.EconomyTransaction
-import me.lokka30.treasury.api.economy.transaction.EconomyTransactionInitiator
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.temporal.Temporal
@@ -18,23 +15,13 @@ class PolyPlayerAccount(
     val player: UUID
 ) : PlayerAccount {
 
-    val asTransactionInitiator = EconomyTransactionInitiator.createInitiator(
-        EconomyTransactionInitiator.Type.PLAYER,
-        player
-    )
-
     override fun getName(): Optional<String> {
-        val response = currentHandlerNotNull()
-            .retrieveNameSync(this)
-
-        if(response.isSuccessful) {
-            return response.result!!
-        } else {
-            throw RuntimeException(response.failureReason!!.description)
-        }
+        return currentHandlerNotNull().retrieveNameSync(this)
     }
 
-    override fun retrieveBalance(currency: Currency): CompletableFuture<Response<BigDecimal>> {
+    override fun retrieveBalance(
+        currency: Currency
+    ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -44,7 +31,9 @@ class PolyPlayerAccount(
         )
     }
 
-    override fun doTransaction(economyTransaction: EconomyTransaction): CompletableFuture<Response<BigDecimal>> {
+    override fun doTransaction(
+        economyTransaction: EconomyTransaction
+    ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -54,7 +43,7 @@ class PolyPlayerAccount(
         )
     }
 
-    override fun deleteAccount(): CompletableFuture<Response<TriState>> {
+    override fun deleteAccount(): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -64,7 +53,7 @@ class PolyPlayerAccount(
         )
     }
 
-    override fun retrieveHeldCurrencies(): CompletableFuture<Response<Collection<String>>> {
+    override fun retrieveHeldCurrencies(): CompletableFuture<Collection<String>> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -78,7 +67,7 @@ class PolyPlayerAccount(
         transactionCount: Int,
         from: Temporal,
         to: Temporal
-    ): CompletableFuture<Response<Collection<EconomyTransaction>>> {
+    ): CompletableFuture<Collection<EconomyTransaction>> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -93,12 +82,8 @@ class PolyPlayerAccount(
         )
     }
 
-    override fun getUniqueId(): UUID {
+    override fun identifier(): UUID {
         return player
-    }
-
-    override fun getAsTransactionInitiator(): EconomyTransactionInitiator<UUID> {
-        return asTransactionInitiator
     }
 
 }

@@ -11,25 +11,31 @@ currencies:
     enabled: true
     starting-balance: 50
     symbol: "$"
-    display-name-singular: "Dollar"
-    display-name-plural: "Dollars"
     amount-format: "#,##0.00"
     presentation-format: "%symbol%%amount%"
     conversion-rate: 1
+    display-name:
+      - locale: "en_US"
+        singular-value: "Dollar"
+        plural-value: "Dollars"
     decimal:
-      - "en_US": "."
+      - locale: "en_US"
+        value: "."
 
   - currency: "token"
     enabled: true
     starting-balance: 0
     symbol: "T"
-    display-name-singular: "Token"
-    display-name-plural: "Tokens"
     amount-format: "#,##0.00"
     presentation-format: "%amount% %display-name%"
     conversion-rate: 100
+    display-name:
+      - locale: "en_US"
+        singular-value: "Token"
+        plural-value: "Tokens"
     decimal:
-      - "en_US": "."
+      - locale: "en_US"
+        value: "."
 
 storage:
   implementation: "Yaml"

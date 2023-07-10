@@ -8,7 +8,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.e
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
-import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.EconomyProvider
 import me.lokka30.treasury.api.economy.account.Account
 import me.lokka30.treasury.api.economy.account.AccountData
@@ -116,16 +115,8 @@ object EconomyManager : EconomyProvider {
                             return decimalLocaleMap
                         }
 
-                        override fun getDisplayNameSingular(): String {
-                            return currencyNode
-                                .node("display-name-singular")
-                                .string!!
-                        }
-
-                        override fun getDisplayNamePlural(): String {
-                            return currencyNode
-                                .node("display-name-plural")
-                                .string!!
+                        override fun getDisplayName(value: BigDecimal, locale: Locale?): String {
+                            TODO("Not yet implemented")
                         }
 
                         override fun getPrecision(): Int {
@@ -152,21 +143,15 @@ object EconomyManager : EconomyProvider {
 
                         override fun parse(
                             formattedAmount: String,
-                            locale: Locale?
-                        ): CompletableFuture<Response<BigDecimal>> {
+                            locale: Locale?,
+                        ): CompletableFuture<BigDecimal> {
                             return CompletableFuture.supplyAsync(
                                 {
-                                    return@supplyAsync try {
-                                        Response.success(
-                                            BigDecimal(
-                                                formattedAmount.replace(
-                                                    parserRegex, ""
-                                                )
-                                            )
+                                    return@supplyAsync BigDecimal(
+                                        formattedAmount.replace(
+                                            parserRegex, ""
                                         )
-                                    } catch (ex: Exception) {
-                                        Response.failure { ex.message!! }
-                                    }
+                                    )
                                 },
                                 execSvc
                             )
@@ -183,13 +168,7 @@ object EconomyManager : EconomyProvider {
                                         .format(amount)
                                         .replace(".", getDecimal(locale).toString())
                                 })
-                                .replace("%display-name%", let { _ ->
-                                    return@let if(amount.compareTo(BigDecimal.ONE) == 1) {
-                                        displayNameSingular
-                                    } else {
-                                        displayNamePlural
-                                    }
-                                })
+                                .replace("%display-name%", getDisplayName(amount, locale))
                         }
 
                         override fun format(
@@ -227,7 +206,7 @@ object EconomyManager : EconomyProvider {
         return PolyAccountAccessor
     }
 
-    override fun hasAccount(accountData: AccountData): CompletableFuture<Response<TriState>> {
+    override fun hasAccount(accountData: AccountData): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync if(accountData.isPlayerAccount) {
@@ -244,19 +223,19 @@ object EconomyManager : EconomyProvider {
         )
     }
 
-    override fun retrievePlayerAccountIds(): CompletableFuture<Response<Collection<UUID>>> {
+    override fun retrievePlayerAccountIds(): CompletableFuture<Collection<UUID>> {
         return CompletableFuture.supplyAsync(
             {
-                StorageManager.currentHandler!!.retrievePlayerAccountIdsSync()
+                return@supplyAsync StorageManager.currentHandler!!.retrievePlayerAccountIdsSync()
             },
             execSvc
         )
     }
 
-    override fun retrieveNonPlayerAccountIds(): CompletableFuture<Response<Collection<NamespacedKey>>> {
+    override fun retrieveNonPlayerAccountIds(): CompletableFuture<Collection<NamespacedKey>> {
         return CompletableFuture.supplyAsync(
             {
-                StorageManager.currentHandler!!.retrieveNonPlayerAccountIdsSync()
+                return@supplyAsync StorageManager.currentHandler!!.retrieveNonPlayerAccountIdsSync()
             },
             execSvc
         )
@@ -268,7 +247,9 @@ object EconomyManager : EconomyProvider {
 
     override fun findCurrency(identifier: String): Optional<Currency> {
         return Optional.ofNullable(
-            registeredCurrencies.firstOrNull { it.identifier.equals(identifier, true) }
+            registeredCurrencies.firstOrNull {
+                it.identifier.equals(identifier, ignoreCase = true)
+            }
         )
     }
 
@@ -280,9 +261,7 @@ object EconomyManager : EconomyProvider {
         }
 
         throw IllegalArgumentException(
-            """
-            Unable to find currency by ID '${identifier}'.
-            """.trimIndent()
+            "Unable to find currency by ID '${identifier}'."
         )
     }
 
@@ -290,44 +269,32 @@ object EconomyManager : EconomyProvider {
         return registeredCurrencies
     }
 
-    override fun registerCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
+    override fun registerCurrency(currency: Currency): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
-                try {
-                    if(registeredCurrencies
-                        .any { it.identifier.equals(currency.identifier, true) }
-                    ) {
-                        return@supplyAsync Response.failure {
-                            """
-                            A currency of the ID '${currency.identifier}' is already registered.
-                            """.trimIndent()
-                        }
-                    }
-
-                    registeredCurrencies.add(currency)
-
-                    return@supplyAsync Response.success(TriState.TRUE)
-                } catch (ex: Exception) {
-                    return@supplyAsync Response.failure { ex.message ?: "?" }
+                if(registeredCurrencies
+                    .any { it.identifier.equals(currency.identifier, true) }
+                ) {
+                    return@supplyAsync TriState.UNSPECIFIED
                 }
+
+                registeredCurrencies.add(currency)
+
+                return@supplyAsync TriState.TRUE
             },
             execSvc
         )
     }
 
-    override fun unregisterCurrency(currency: Currency): CompletableFuture<Response<TriState>> {
+    override fun unregisterCurrency(currency: Currency): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
-                try {
-                    if(!registeredCurrencies.contains(currency))
-                        return@supplyAsync Response.success(TriState.UNSPECIFIED)
+                if(!registeredCurrencies.contains(currency))
+                    return@supplyAsync TriState.UNSPECIFIED
 
-                    registeredCurrencies.remove(currency)
+                registeredCurrencies.remove(currency)
 
-                    return@supplyAsync Response.success(TriState.TRUE)
-                } catch(ex: Exception) {
-                    return@supplyAsync Response.failure { ex.message ?: "?" }
-                }
+                return@supplyAsync TriState.TRUE
             },
             execSvc
         )

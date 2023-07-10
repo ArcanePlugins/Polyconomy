@@ -6,11 +6,12 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STOR
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
+import me.lokka30.treasury.api.common.Cause
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.event.EventBus
 import me.lokka30.treasury.api.common.event.FireCompletion
 import me.lokka30.treasury.api.common.misc.TriState
-import me.lokka30.treasury.api.common.response.Response
+import me.lokka30.treasury.api.common.response.TreasuryException
 import me.lokka30.treasury.api.economy.account.AccountPermission
 import me.lokka30.treasury.api.economy.account.NonPlayerAccount
 import me.lokka30.treasury.api.economy.account.PlayerAccount
@@ -19,7 +20,6 @@ import me.lokka30.treasury.api.economy.events.NonPlayerAccountTransactionEvent
 import me.lokka30.treasury.api.economy.events.PlayerAccountTransactionEvent
 import me.lokka30.treasury.api.economy.transaction.EconomyTransaction
 import me.lokka30.treasury.api.economy.transaction.EconomyTransactionImportance
-import me.lokka30.treasury.api.economy.transaction.EconomyTransactionInitiator
 import me.lokka30.treasury.api.economy.transaction.EconomyTransactionType
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
@@ -82,7 +82,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     private fun getAccountNodeSync(
         account: PlayerAccount
     ): CommentedConfigurationNode {
-        return getAccountNodeSync(account.uniqueId)
+        return getAccountNodeSync(account.identifier())
     }
 
     private fun getAccountNodeSync(
@@ -94,7 +94,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     private fun getAccountNodeSync(
         account: NonPlayerAccount
     ): CommentedConfigurationNode {
-        return getAccountNodeSync(account.identifier)
+        return getAccountNodeSync(account.identifier())
     }
 
     @Suppress("BooleanMethodIsAlwaysInverted")
@@ -209,615 +209,504 @@ object YamlStorageHandler : StorageHandler("Yaml") {
 
     override fun hasPlayerAccountSync(
         player: UUID
-    ): Response<TriState> {
-        return try {
-            Response.success(
-                TriState.fromBoolean(
-                    !getAccountNodeSync(player)
-                        .virtual()
-                )
-            )
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Boolean {
+        return !getAccountNodeSync(player).virtual()
     }
 
     override fun hasNonPlayerAccountSync(
         id: NamespacedKey
-    ): Response<TriState> {
-        return try {
-            Response.success(
-                TriState.fromBoolean(
-                    !getAccountNodeSync(id)
-                        .virtual()
-                )
-            )
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Boolean {
+        return !getAccountNodeSync(id).virtual()
     }
 
     override fun retrieveNameSync(
         account: PlayerAccount
-    ): Response<Optional<String>> {
-        return try {
-            Response.success(
-                Optional.ofNullable(
-                    getAccountNodeSync(account)
-                        .node("name")
-                        .string
-                )
-            )
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Optional<String> {
+        return Optional.ofNullable(
+            getAccountNodeSync(account)
+                .node("name")
+                .string
+        )
     }
 
     override fun retrieveNameSync(
         account: NonPlayerAccount
-    ): Response<Optional<String>> {
-        return try {
-            Response.success(
-                Optional.ofNullable(
-                    getAccountNodeSync(account)
-                        .node("name")
-                        .string
-                )
-            )
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Optional<String> {
+        return Optional.ofNullable(
+            getAccountNodeSync(account)
+                .node("name")
+                .string
+        )
     }
 
     override fun setNameSync(
         account: PlayerAccount,
         name: String?
-    ): Response<TriState> {
-        try {
-            val previousNameResponse = retrieveNameSync(account)
+    ): Boolean {
+        val previousName: Optional<String> = retrieveNameSync(account)
 
-            if(!previousNameResponse.isSuccessful) {
-                return Response.failure { previousNameResponse.failureReason!!.description }
-            }
-
-            val previousName = previousNameResponse.result!!
-
-            if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
-                return Response.success(TriState.UNSPECIFIED)
-            }
-
-            getAccountNodeSync(account)
-                .node("name")
-                .set(name)
-
-            write()
-
-            return Response.success(TriState.TRUE)
-        } catch (ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+        if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
+            return false
         }
+
+        getAccountNodeSync(account)
+            .node("name")
+            .set(name)
+
+        write()
+
+        return true
     }
 
     override fun setNameSync(
         account: NonPlayerAccount,
         name: String?
-    ): Response<TriState> {
-        try {
-            val previousNameResponse = retrieveNameSync(account)
+    ): Boolean {
+        val previousName: Optional<String> = retrieveNameSync(account)
 
-            if(!previousNameResponse.isSuccessful) {
-                return Response.failure { previousNameResponse.failureReason!!.description }
-            }
-
-            val previousName = previousNameResponse.result!!
-
-            if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
-                return Response.success(TriState.UNSPECIFIED)
-            }
-
-            getAccountNodeSync(account)
-                .node("name")
-                .set(name)
-
-            write()
-
-            return Response.success(TriState.TRUE)
-        } catch (ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+        if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
+            return false
         }
+
+        getAccountNodeSync(account)
+            .node("name")
+            .set(name)
+
+        write()
+
+        return true
     }
 
     override fun deleteAccountSync(
         account: PlayerAccount
-    ): Response<TriState> {
-        return try {
-            getAccountNodeSync(account)
-                .set(null)
+    ): Boolean {
+        getAccountNodeSync(account)
+            .set(null)
 
-            write()
+        write()
 
-            Response.success(TriState.TRUE)
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+        return true
     }
 
     override fun deleteAccountSync(
         account: NonPlayerAccount
-    ): Response<TriState> {
-        return try {
-            getAccountNodeSync(account)
-                .set(null)
+    ): Boolean {
+        getAccountNodeSync(account)
+            .set(null)
 
-            write()
+        write()
 
-            Response.success(TriState.TRUE)
-        } catch (ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+        return true
     }
 
     override fun retrieveBalanceSync(
         account: PlayerAccount,
         currency: Currency
-    ): Response<BigDecimal> {
-        try {
-            return Response.success(let {
-                val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
-                Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
+    ): BigDecimal {
+        val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
+        Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
-                if(balanceNode.virtual()) {
-                    Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
+        if(balanceNode.virtual()) {
+            Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
-                    val startingBalance = currency.getStartingBalance(account)
+            val startingBalance = currency.getStartingBalance(account)
 
-                    Log.d(STORAGE_YAML) {
-                        "Starting balance = ~${startingBalance.toDouble()}"
-                    }
+            Log.d(STORAGE_YAML) {
+                "Starting balance = ~${startingBalance.toDouble()}"
+            }
 
-                    doTransactionSync(
-                        account,
-                        EconomyTransaction(
-                            currency.identifier,
-                            EconomyTransactionInitiator.SERVER,
-                            Instant.now(),
-                            EconomyTransactionType.SET,
-                            "Starting balance initiated via balance request",
-                            startingBalance,
-                            EconomyTransactionImportance.HIGH
-                        )
-                    )
+            doTransactionSync(
+                account,
+                EconomyTransaction(
+                    currency.identifier,
+                    Cause.SERVER,
+                    Instant.now(),
+                    EconomyTransactionType.SET,
+                    "Starting balance initiated via balance request",
+                    startingBalance,
+                    EconomyTransactionImportance.HIGH
+                )
+            )
 
-                    Log.d(STORAGE_YAML) {
-                        "Transaction complete for starting balance; returning response"
-                    }
-                }
-
-                Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
-
-                BigDecimal(
-                    balanceNode.double
-                ) // <-- returned
-            })
-        } catch (ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+            Log.d(STORAGE_YAML) {
+                "Transaction complete for starting balance; returning response"
+            }
         }
+
+        Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
+
+        return BigDecimal(balanceNode.double)
     }
 
     override fun retrieveBalanceSync(
         account: NonPlayerAccount,
         currency: Currency
-    ): Response<BigDecimal> {
-        try {
-            return Response.success(let {
-                val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
-                Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
+    ): BigDecimal {
+        val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
+        Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
-                if(balanceNode.virtual()) {
-                    Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
+        if(balanceNode.virtual()) {
+            Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
-                    val startingBalance = currency.getStartingBalance(account)
+            val startingBalance = currency.getStartingBalance(account)
 
-                    Log.d(STORAGE_YAML) {
-                        "Starting balance = ~${startingBalance.toDouble()}"
-                    }
+            Log.d(STORAGE_YAML) {
+                "Starting balance = ~${startingBalance.toDouble()}"
+            }
 
-                    doTransactionSync(
-                        account,
-                        EconomyTransaction(
-                            currency.identifier,
-                            EconomyTransactionInitiator.SERVER,
-                            Instant.now(),
-                            EconomyTransactionType.SET,
-                            "Starting balance initiated via balance request",
-                            startingBalance,
-                            EconomyTransactionImportance.HIGH
-                        )
-                    )
+            doTransactionSync(
+                account,
+                EconomyTransaction(
+                    currency.identifier,
+                    Cause.SERVER,
+                    Instant.now(),
+                    EconomyTransactionType.SET,
+                    "Starting balance initiated via balance request",
+                    startingBalance,
+                    EconomyTransactionImportance.HIGH
+                )
+            )
 
-                    Log.d(STORAGE_YAML) {
-                        "Transaction complete for starting balance; returning response"
-                    }
-                }
-
-                Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
-
-                BigDecimal(
-                    balanceNode.double
-                ) // <-- returned
-            })
-        } catch (ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+            Log.d(STORAGE_YAML) {
+                "Transaction complete for starting balance; returning response"
+            }
         }
+
+        Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
+
+        return BigDecimal(balanceNode.double)
     }
 
     override fun doTransactionSync(
         account: PlayerAccount,
         transaction: EconomyTransaction
-    ): Response<BigDecimal> {
-        try {
-            Log.d(STORAGE_YAML) {
-                "Finding currency by ID"
-            }
-
-            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
-
-            Log.d(STORAGE_YAML) {
-                "Found currency: ${currency.identifier}"
-            }
-
-            if(transaction.type != EconomyTransactionType.SET &&
-                transaction.amount.compareTo(BigDecimal.ZERO) == -1
-            ) {
-                Log.d(STORAGE_YAML) {
-                    "error: negative amount cannot be specified when transaction type is not SET."
-                }
-
-                return Response.failure { "Negative amount specified for the transaction" }
-            }
-
-            val previousBalance: BigDecimal = let {
-                if(!holdsCurrencySync(account, currency)) {
-                    return@let BigDecimal.ZERO
-                }
-
-                Log.d(STORAGE_YAML) { "Sending previous balance response" }
-                val previousBalanceResponse = retrieveBalanceSync(
-                    account,
-                    currency
-                )
-
-                Log.d(STORAGE_YAML) { "Received previous balance response" }
-
-                if(!previousBalanceResponse.isSuccessful) {
-                    Log.d(STORAGE_YAML) {
-                        "previousBalanceResponse was not successful. " +
-                                "error: ${previousBalanceResponse.failureReason!!.description}"
-                    }
-
-                    return Response.failure { previousBalanceResponse.failureReason!!.description }
-                }
-                Log.d(STORAGE_YAML) { "Previous balance response was successful" }
-
-                return@let previousBalanceResponse.result!!
-            }
-
-            Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
-
-            val newBalance: BigDecimal = when (transaction.type) {
-                EconomyTransactionType.SET ->
-                    transaction.amount
-
-                EconomyTransactionType.DEPOSIT ->
-                    previousBalance.add(transaction.amount)
-
-                EconomyTransactionType.WITHDRAWAL ->
-                    previousBalance.subtract(transaction.amount)
-            }
-
-            Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
-
-            val minBalance = BigDecimal(
-                SettingsCfg
-                    .rootNode
-                    .node("advanced", "minimum-balance")
-                    .getDouble(0.0)
-            )
-
-            Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
-
-            if(newBalance.compareTo(minBalance) == -1) {
-                Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
-                return Response.failure {
-                    "Transaction would result in an overdraft"
-                }
-            }
-
-            Log.d(STORAGE_YAML) { "Firing transaction event" }
-            val event: FireCompletion<PlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
-                PlayerAccountTransactionEvent(
-                    transaction,
-                    account
-                )
-            )
-
-            var eventResult: PlayerAccountTransactionEvent? = null
-            val eventThrowables: MutableList<Throwable> = mutableListOf()
-
-            event.whenCompleteBlocking { result, throwables ->
-                eventResult = result
-                eventThrowables.addAll(throwables)
-            }
-
-            if(eventThrowables.isNotEmpty()) {
-                Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
-                throw eventThrowables.first()
-            }
-
-            if(eventResult!!.isCancelled) {
-                return Response.failure { "Transaction event was cancelled" }
-            }
-
-            Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
-
-            Log.d(STORAGE_YAML) { "Fetching balance node" }
-            val balanceNode = getAccountNodeSync(account)
-                .node("balance", getOrGrantCurrencyDbIdSync(currency))
-
-            Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
-
-            Log.d(STORAGE_YAML) { "Setting node to new balance" }
-            balanceNode.set(newBalance.toDouble())
-
-            Log.d(STORAGE_YAML) { "Adding transaction to history" }
-
-            val historyNodes = getAccountNodeSync(account).node("transaction")
-            val index = historyNodes.childrenList().size
-            val historyNode = historyNodes.node(index)
-
-            historyNode
-                .node("currency-dbid")
-                .set(getOrGrantCurrencyDbIdSync(currency))
-
-            historyNode
-                .node("initiator", "type")
-                .set(transaction.initiator.type.name)
-
-            historyNode
-                .node("initiator", "data")
-                .set(transaction.initiator.data.toString())
-
-            historyNode
-                .node("timestamp")
-                .set(transaction.timestamp.toEpochMilli())
-
-            historyNode
-                .node("type")
-                .set(transaction.type.name)
-
-            if(transaction.reason.isPresent) {
-                historyNode
-                    .node("reason")
-                    .set(transaction.reason.get())
-            }
-
-            historyNode
-                .node("amount")
-                .set(transaction.amount.toDouble())
-
-            historyNode
-                .node("importance")
-                .set(transaction.importance.name)
-
-
-            Log.d(STORAGE_YAML) { "Writing changes to disk" }
-            write()
-
-            return Response.success(newBalance)
-        } catch(ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+    ): BigDecimal {
+        Log.d(STORAGE_YAML) {
+            "Finding currency by ID"
         }
+
+        val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
+
+        Log.d(STORAGE_YAML) {
+            "Found currency: ${currency.identifier}"
+        }
+
+        if(transaction.type != EconomyTransactionType.SET &&
+            transaction.amount.compareTo(BigDecimal.ZERO) == -1
+        ) {
+            Log.d(STORAGE_YAML) {
+                "Error: Negative amount cannot be specified when transaction type is not SET."
+            }
+
+            throw TreasuryException {
+                "Transactions must not be actioned with a negative amount unless the transaction type is 'SET'"
+            }
+        }
+
+        val previousBalance: BigDecimal = let {
+            if(!holdsCurrencySync(account, currency)) {
+                return@let BigDecimal.ZERO
+            }
+
+            return@let retrieveBalanceSync(
+                account,
+                currency
+            )
+        }
+
+        Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
+
+        val newBalance: BigDecimal = when (transaction.type) {
+            EconomyTransactionType.SET ->
+                transaction.amount
+
+            EconomyTransactionType.DEPOSIT ->
+                previousBalance.add(transaction.amount)
+
+            EconomyTransactionType.WITHDRAWAL ->
+                previousBalance.subtract(transaction.amount)
+        }
+
+        Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
+
+        val minBalance = BigDecimal(
+            SettingsCfg
+                .rootNode
+                .node("advanced", "minimum-balance")
+                .getDouble(0.0)
+        )
+
+        Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
+
+        if(newBalance.compareTo(minBalance) == -1) {
+            Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
+            throw TreasuryException { "Transaction would result in an overdraft" }
+        }
+
+        Log.d(STORAGE_YAML) { "Firing transaction event" }
+        val event: FireCompletion<PlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
+            PlayerAccountTransactionEvent(
+                transaction,
+                account
+            )
+        )
+
+        val eventThrowables: MutableList<Throwable> = mutableListOf()
+
+        event.whenCompleteBlocking { _, throwables ->
+            eventThrowables.addAll(throwables)
+        }
+
+        if(eventThrowables.isNotEmpty()) {
+            Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
+            throw eventThrowables.first()
+        }
+
+        Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
+
+        Log.d(STORAGE_YAML) { "Fetching balance node" }
+        val balanceNode = getAccountNodeSync(account)
+            .node("balance", getOrGrantCurrencyDbIdSync(currency))
+
+        Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
+
+        Log.d(STORAGE_YAML) { "Setting node to new balance" }
+        balanceNode.set(newBalance.toDouble())
+
+        Log.d(STORAGE_YAML) { "Adding transaction to history" }
+
+        val historyNodes = getAccountNodeSync(account).node("transaction")
+        val index = historyNodes.childrenList().size
+        val historyNode = historyNodes.node(index)
+
+        historyNode
+            .node("currency-dbid")
+            .set(getOrGrantCurrencyDbIdSync(currency))
+
+        historyNode
+            .node("cause", "type")
+            .set(let {
+                if(transaction.cause is Cause.Player) {
+                    return@let "Player"
+                } else if(transaction.cause is Cause.NonPlayer) {
+                    return@let "NonPlayer"
+                } else if(transaction.cause is Cause.Plugin) {
+                    return@let "Plugin"
+                } else if(transaction.cause.equals(Cause.SERVER)) {
+                    return@let "Server"
+                } else {
+                    return@let "Custom"
+                }
+            })
+
+        historyNode
+            .node("cause", "data")
+            .set(transaction.cause.identifier().toString())
+
+        historyNode
+            .node("timestamp")
+            .set(transaction.timestamp.toEpochMilli())
+
+        historyNode
+            .node("type")
+            .set(transaction.type.name)
+
+        if(transaction.reason.isPresent) {
+            historyNode
+                .node("reason")
+                .set(transaction.reason.get())
+        }
+
+        historyNode
+            .node("amount")
+            .set(transaction.amount.toDouble())
+
+        historyNode
+            .node("importance")
+            .set(transaction.importance.name)
+
+
+        Log.d(STORAGE_YAML) { "Writing changes to disk" }
+        write()
+
+        return newBalance
     }
 
     override fun doTransactionSync(
         account: NonPlayerAccount,
         transaction: EconomyTransaction
-    ): Response<BigDecimal> {
-        try {
-            Log.d(STORAGE_YAML) {
-                "Finding currency by ID"
-            }
-
-            val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
-
-            Log.d(STORAGE_YAML) {
-                "Found currency: ${currency.identifier}"
-            }
-
-            if(transaction.type != EconomyTransactionType.SET &&
-                transaction.amount.compareTo(BigDecimal.ZERO) == -1
-            ) {
-                Log.d(STORAGE_YAML) {
-                    "error: negative amount cannot be specified when transaction type is not SET."
-                }
-
-                return Response.failure { "Negative amount specified for the transaction" }
-            }
-
-            val previousBalance: BigDecimal = let {
-                if(!holdsCurrencySync(account, currency)) {
-                    return@let BigDecimal.ZERO
-                }
-
-                Log.d(STORAGE_YAML) { "Sending previous balance response" }
-                val previousBalanceResponse = retrieveBalanceSync(
-                    account,
-                    currency
-                )
-
-                Log.d(STORAGE_YAML) { "Received previous balance response" }
-
-                if(!previousBalanceResponse.isSuccessful) {
-                    Log.d(STORAGE_YAML) {
-                        "previousBalanceResponse was not successful. " +
-                                "error: ${previousBalanceResponse.failureReason!!.description}"
-                    }
-
-                    return Response.failure { previousBalanceResponse.failureReason!!.description }
-                }
-                Log.d(STORAGE_YAML) { "Previous balance response was successful" }
-
-                return@let previousBalanceResponse.result!!
-            }
-
-            Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
-
-            val newBalance: BigDecimal = when (transaction.type) {
-                EconomyTransactionType.SET ->
-                    transaction.amount
-
-                EconomyTransactionType.DEPOSIT ->
-                    previousBalance.add(transaction.amount)
-
-                EconomyTransactionType.WITHDRAWAL ->
-                    previousBalance.subtract(transaction.amount)
-            }
-
-            Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
-
-            val minBalance = BigDecimal(
-                SettingsCfg
-                    .rootNode
-                    .node("advanced", "minimum-balance")
-                    .getDouble(0.0)
-            )
-
-            Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
-
-            if(newBalance.compareTo(minBalance) == -1) {
-                Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
-                return Response.failure {
-                    "Transaction would result in an overdraft"
-                }
-            }
-
-            Log.d(STORAGE_YAML) { "Firing transaction event" }
-            val event: FireCompletion<NonPlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
-                NonPlayerAccountTransactionEvent(
-                    transaction,
-                    account
-                )
-            )
-
-            var eventResult: NonPlayerAccountTransactionEvent? = null
-            val eventThrowables: MutableList<Throwable> = mutableListOf()
-
-            event.whenCompleteBlocking { result, throwables ->
-                eventResult = result
-                eventThrowables.addAll(throwables)
-            }
-
-            if(eventThrowables.isNotEmpty()) {
-                Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
-                throw eventThrowables.first()
-            }
-
-            if(eventResult!!.isCancelled) {
-                return Response.failure { "Transaction event was cancelled" }
-            }
-
-            Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
-
-            Log.d(STORAGE_YAML) { "Fetching balance node" }
-            val balanceNode = getAccountNodeSync(account)
-                .node("balance", getOrGrantCurrencyDbIdSync(currency))
-
-            Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
-
-            Log.d(STORAGE_YAML) { "Setting node to new balance" }
-            balanceNode.set(newBalance.toDouble())
-
-            Log.d(STORAGE_YAML) { "Adding transaction to history" }
-
-            val historyNodes = getAccountNodeSync(account).node("transaction")
-            val index = historyNodes.childrenList().size
-            val historyNode = historyNodes.node(index)
-
-            historyNode
-                .node("currency-dbid")
-                .set(getOrGrantCurrencyDbIdSync(currency))
-
-            historyNode
-                .node("initiator", "type")
-                .set(transaction.initiator.type.name)
-
-            historyNode
-                .node("initiator", "data")
-                .set(transaction.initiator.data.toString())
-
-            historyNode
-                .node("timestamp")
-                .set(transaction.timestamp.toEpochMilli())
-
-            historyNode
-                .node("type")
-                .set(transaction.type.name)
-
-            if(transaction.reason.isPresent) {
-                historyNode
-                    .node("reason")
-                    .set(transaction.reason.get())
-            }
-
-            historyNode
-                .node("amount")
-                .set(transaction.amount.toDouble())
-
-            historyNode
-                .node("importance")
-                .set(transaction.importance.name)
-
-            Log.d(STORAGE_YAML) { "Writing changes to disk" }
-            write()
-
-            return Response.success(newBalance)
-        } catch(ex: Exception) {
-            return Response.failure { ex.message ?: "?" }
+    ): BigDecimal {
+        Log.d(STORAGE_YAML) {
+            "Finding currency by ID"
         }
+
+        val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
+
+        Log.d(STORAGE_YAML) {
+            "Found currency: ${currency.identifier}"
+        }
+
+        if(transaction.type != EconomyTransactionType.SET &&
+            transaction.amount.compareTo(BigDecimal.ZERO) == -1
+        ) {
+            Log.d(STORAGE_YAML) {
+                "Error: Negative amount cannot be specified when transaction type is not SET."
+            }
+
+            throw TreasuryException {
+                "Transactions must not be actioned with a negative amount unless the transaction type is 'SET'"
+            }
+        }
+
+        val previousBalance: BigDecimal = let {
+            if(!holdsCurrencySync(account, currency)) {
+                return@let BigDecimal.ZERO
+            }
+
+            return@let retrieveBalanceSync(
+                account,
+                currency
+            )
+        }
+
+        Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
+
+        val newBalance: BigDecimal = when (transaction.type) {
+            EconomyTransactionType.SET ->
+                transaction.amount
+
+            EconomyTransactionType.DEPOSIT ->
+                previousBalance.add(transaction.amount)
+
+            EconomyTransactionType.WITHDRAWAL ->
+                previousBalance.subtract(transaction.amount)
+        }
+
+        Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
+
+        val minBalance = BigDecimal(
+            SettingsCfg
+                .rootNode
+                .node("advanced", "minimum-balance")
+                .getDouble(0.0)
+        )
+
+        Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
+
+        if(newBalance.compareTo(minBalance) == -1) {
+            Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
+            throw TreasuryException { "Transaction would result in an overdraft" }
+        }
+
+        Log.d(STORAGE_YAML) { "Firing transaction event" }
+        val event: FireCompletion<NonPlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
+            NonPlayerAccountTransactionEvent(
+                transaction,
+                account
+            )
+        )
+
+        val eventThrowables: MutableList<Throwable> = mutableListOf()
+
+        event.whenCompleteBlocking { _, throwables ->
+            eventThrowables.addAll(throwables)
+        }
+
+        if(eventThrowables.isNotEmpty()) {
+            Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
+            throw eventThrowables.first()
+        }
+
+        Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
+
+        Log.d(STORAGE_YAML) { "Fetching balance node" }
+        val balanceNode = getAccountNodeSync(account)
+            .node("balance", getOrGrantCurrencyDbIdSync(currency))
+
+        Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
+
+        Log.d(STORAGE_YAML) { "Setting node to new balance" }
+        balanceNode.set(newBalance.toDouble())
+
+        Log.d(STORAGE_YAML) { "Adding transaction to history" }
+
+        val historyNodes = getAccountNodeSync(account).node("transaction")
+        val index = historyNodes.childrenList().size
+        val historyNode = historyNodes.node(index)
+
+        historyNode
+            .node("currency-dbid")
+            .set(getOrGrantCurrencyDbIdSync(currency))
+
+        historyNode
+            .node("cause", "type")
+            .set(let {
+                if(transaction.cause is Cause.Player) {
+                    return@let "Player"
+                } else if(transaction.cause is Cause.NonPlayer) {
+                    return@let "NonPlayer"
+                } else if(transaction.cause is Cause.Plugin) {
+                    return@let "Plugin"
+                } else if(transaction.cause.identifier() == "Server") {
+                    return@let "Server"
+                } else {
+                    return@let "Custom"
+                }
+            })
+
+        historyNode
+            .node("cause", "data")
+            .set(transaction.cause.identifier().toString())
+
+        historyNode
+            .node("timestamp")
+            .set(transaction.timestamp.toEpochMilli())
+
+        historyNode
+            .node("type")
+            .set(transaction.type.name)
+
+        if(transaction.reason.isPresent) {
+            historyNode
+                .node("reason")
+                .set(transaction.reason.get())
+        }
+
+        historyNode
+            .node("amount")
+            .set(transaction.amount.toDouble())
+
+        historyNode
+            .node("importance")
+            .set(transaction.importance.name)
+
+
+        Log.d(STORAGE_YAML) { "Writing changes to disk" }
+        write()
+
+        return newBalance
     }
 
     override fun retrieveHeldCurrenciesSync(
         account: PlayerAccount
-    ): Response<Collection<String>> {
-        return try {
-            Response.success(
-                EconomyManager
-                    .registeredCurrencies
-                    .stream()
-                    .filter { currency -> holdsCurrencySync(account, currency) }
-                    .map { currency -> currency.identifier }
-                    .collect(Collectors.toList())
-            )
-        } catch(ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Collection<String> {
+        return EconomyManager
+            .registeredCurrencies
+            .stream()
+            .filter { currency -> holdsCurrencySync(account, currency) }
+            .map { currency -> currency.identifier }
+            .collect(Collectors.toList())
     }
 
     override fun retrieveHeldCurrenciesSync(
         account: NonPlayerAccount
-    ): Response<Collection<String>> {
-        return try {
-            Response.success(
-                EconomyManager
-                    .registeredCurrencies
-                    .stream()
-                    .filter { currency -> holdsCurrencySync(account, currency) }
-                    .map { currency -> currency.identifier }
-                    .collect(Collectors.toList())
-            )
-        } catch(ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+    ): Collection<String> {
+        return EconomyManager
+            .registeredCurrencies
+            .stream()
+            .filter { currency -> holdsCurrencySync(account, currency) }
+            .map { currency -> currency.identifier }
+            .collect(Collectors.toList())
     }
 
     override fun retrieveTransactionHistorySync(
@@ -825,77 +714,71 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         transactionCount: Int,
         from: Instant,
         to: Instant
-    ): Response<Collection<EconomyTransaction>> {
-        return try {
-            Response.success(
-                getAccountNodeSync(account)
-                    .node("transaction")
-                    .childrenList()
-                    .map { tNode ->
-                        EconomyTransaction(
-                            // currency id
-                            getCurrencyByDbId(
-                                tNode
-                                    .node("currency-dbid")
-                                    .int
-                            ).identifier,
+    ): Collection<EconomyTransaction> {
+        return getAccountNodeSync(account)
+            .node("transaction")
+            .childrenList()
+            .map { tNode ->
+                EconomyTransaction(
+                    // currency id
+                    getCurrencyByDbId(
+                        tNode
+                            .node("currency-dbid")
+                            .int
+                    ).identifier,
 
-                            // initiator
-                            EconomyTransactionInitiator.createInitiator(
-                                EconomyTransactionInitiator.Type.valueOf(
-                                    tNode
-                                        .node("initiator", "type")
-                                        .string!!
-                                ),
-
-                                tNode
-                                    .node("initiator", "data")
-                                    .get(Any::class.java)
-                            ),
-
-                            // timestamp
-                            Instant.ofEpochMilli(
-                                tNode
-                                    .node("timestamp")
-                                    .long
-                            ),
-
-                            // type
-                            EconomyTransactionType.valueOf(
-                                tNode
-                                    .node("type")
-                                    .string!!
-                            ),
-
-                            // reason
+                    // cause
+                    Cause.create(
+                        Cause.Type.valueOf( // todo
                             tNode
-                                .node("reason")
-                                .string,
+                                .node("cause", "type")
+                                .string!!
+                        ),
 
-                            // amount
-                            BigDecimal(
-                                tNode
-                                    .node("amount")
-                                    .double
-                            ),
+                        tNode
+                            .node("cause", "data")
+                            .get(Any::class.java)
+                    ),
 
-                            // importance
-                            EconomyTransactionImportance.valueOf(
-                                tNode
-                                    .node("importance")
-                                    .string!!
-                            )
-                        )
-                    }
-                    .filterIndexed { index, transaction ->
-                        index < transactionCount &&
-                                transaction.timestamp >= from &&
-                                transaction.timestamp <= to
-                    }
-            )
-        } catch(ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+                    // timestamp
+                    Instant.ofEpochMilli(
+                        tNode
+                            .node("timestamp")
+                            .long
+                    ),
+
+                    // type
+                    EconomyTransactionType.valueOf(
+                        tNode
+                            .node("type")
+                            .string!!
+                    ),
+
+                    // reason
+                    tNode
+                        .node("reason")
+                        .string,
+
+                    // amount
+                    BigDecimal(
+                        tNode
+                            .node("amount")
+                            .double
+                    ),
+
+                    // importance
+                    EconomyTransactionImportance.valueOf(
+                        tNode
+                            .node("importance")
+                            .string!!
+                    )
+                )
+            }
+            .filterIndexed { index, transaction ->
+                index < transactionCount &&
+                        transaction.timestamp >= from &&
+                        transaction.timestamp <= to
+            }
     }
 
     override fun retrieveTransactionHistorySync(
@@ -903,235 +786,206 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         transactionCount: Int,
         from: Instant,
         to: Instant
-    ): Response<Collection<EconomyTransaction>> {
-        return try {
-            Response.success(
-                getAccountNodeSync(account)
-                    .node("transaction")
-                    .childrenList()
-                    .map { tNode ->
-                        EconomyTransaction(
-                            // currency id
-                            getCurrencyByDbId(
-                                tNode
-                                    .node("currency-dbid")
-                                    .int
-                            ).identifier,
+    ): Collection<EconomyTransaction> {
+        return getAccountNodeSync(account)
+            .node("transaction")
+            .childrenList()
+            .map { tNode ->
+                EconomyTransaction(
+                    // currency id
+                    getCurrencyByDbId(
+                        tNode
+                            .node("currency-dbid")
+                            .int
+                    ).identifier,
 
-                            // initiator
-                            EconomyTransactionInitiator.createInitiator(
-                                EconomyTransactionInitiator.Type.valueOf(
-                                    tNode
-                                        .node("initiator", "type")
-                                        .string!!
-                                ),
-
-                                tNode
-                                    .node("initiator", "data")
-                                    .get(Any::class.java)
-                            ),
-
-                            // timestamp
-                            Instant.ofEpochMilli(
-                                tNode
-                                    .node("timestamp")
-                                    .long
-                            ),
-
-                            // type
-                            EconomyTransactionType.valueOf(
-                                tNode
-                                    .node("type")
-                                    .string!!
-                            ),
-
-                            // reason
+                    // cause
+                    Cause.create( // todo
+                        Cause.Type.valueOf(
                             tNode
-                                .node("reason")
-                                .string,
+                                .node("cause", "type")
+                                .string!!
+                        ),
 
-                            // amount
-                            BigDecimal(
-                                tNode
-                                    .node("amount")
-                                    .double
-                            ),
+                        tNode
+                            .node("cause", "data")
+                            .get(Any::class.java)
+                    ),
 
-                            // importance
-                            EconomyTransactionImportance.valueOf(
-                                tNode
-                                    .node("importance")
-                                    .string!!
-                            )
-                        )
-                    }
-                    .filterIndexed { index, transaction ->
-                        index < transactionCount &&
-                                transaction.timestamp >= from &&
-                                transaction.timestamp <= to
-                    }
-            )
-        } catch(ex: Exception) {
-            Response.failure { ex.message ?: "?" }
-        }
+                    // timestamp
+                    Instant.ofEpochMilli(
+                        tNode
+                            .node("timestamp")
+                            .long
+                    ),
+
+                    // type
+                    EconomyTransactionType.valueOf(
+                        tNode
+                            .node("type")
+                            .string!!
+                    ),
+
+                    // reason
+                    tNode
+                        .node("reason")
+                        .string,
+
+                    // amount
+                    BigDecimal(
+                        tNode
+                            .node("amount")
+                            .double
+                    ),
+
+                    // importance
+                    EconomyTransactionImportance.valueOf(
+                        tNode
+                            .node("importance")
+                            .string!!
+                    )
+                )
+            }
+            .filterIndexed { index, transaction ->
+                index < transactionCount &&
+                        transaction.timestamp >= from &&
+                        transaction.timestamp <= to
+            }
     }
 
     override fun retrieveMemberIdsSync(
         account: NonPlayerAccount
-    ): Response<Collection<UUID>> {
-        return Response.success(
-            getAccountNodeSync(account)
-                .node("member")
-                .childrenMap()
-                .keys
-                .map { UUID.fromString((it as String)) }
-        )
+    ): Collection<UUID> {
+        return getAccountNodeSync(account)
+            .node("member")
+            .childrenMap()
+            .keys
+            .map { UUID.fromString((it as String)) }
     }
 
     override fun isMemberSync(
         account: NonPlayerAccount,
         memberPlayer: UUID
-    ): Response<TriState> {
+    ): Boolean {
         val memNode = getAccountNodeSync(account)
             .node("member", memberPlayer.toString())
 
         if(memNode.virtual()) {
-            return Response.success(TriState.FALSE)
+            return false
         }
 
-        return Response.success(
-            TriState.fromBoolean(
-                memNode.node("permission")
-                    .childrenMap()
-                    .any { (_, node) -> node.string!! == TriState.TRUE.name }
-            )
-        )
+        return memNode.node("permission")
+            .childrenMap()
+            .any { (_, node) -> node.string!! == TriState.TRUE.name }
     }
 
-    /*
-    TODO
-        This is meant to return a TriState representing if any permission values were
-        changed after calling this method, e.g. if permission A was already false then
-        no change was made.
-        However, this would require unnecessary database operations. Asking Ivan on the
-        ArcanePlugins Discord guild about changing this behaviour:
-        https://discord.com/channels/752310043214479462/921225503531204658/1073047803795865680
-     */
     override fun setPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         permissionValue: TriState,
         vararg permissions: AccountPermission
-    ): Response<TriState> {
-        return try {
-            val permsNode = getAccountNodeSync(account)
-                .node("member", memberPlayer.toString(), "permission")
+    ): Boolean {
+        val permsNode = getAccountNodeSync(account)
+            .node("member", memberPlayer.toString(), "permission")
 
-            for(permission in permissions) {
-                permsNode.node(permission.name).set(permissionValue.name)
+        var adjustmentMade = false
+
+        for(permission in permissions) {
+            val node = permsNode.node(permission.name)
+
+            if(!node.getString("").equals(permissionValue.name, ignoreCase = true)) {
+                adjustmentMade = true
             }
 
-            write()
-
-            Response.success(TriState.TRUE)
-        } catch(ex: Exception) {
-            Response.failure { ex.message ?: "?" }
+            node.set(permissionValue.name)
         }
+
+        write()
+
+        return adjustmentMade
+    }
+
+    override fun setPermissionsSync(
+        account: NonPlayerAccount,
+        memberPlayer: UUID,
+        permissionsMap: Map<AccountPermission, TriState>,
+    ): Boolean {
+        TODO("Not yet implemented")
     }
 
     override fun retrievePermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID
-    ): Response<Map<AccountPermission, TriState>> {
-        val isMemberResponse = isMemberSync(account, memberPlayer)
-
-        if(isMemberResponse.isSuccessful) {
-            if(isMemberResponse.result!! != TriState.TRUE) {
-                return Response.failure { "Player is not a member of the account" }
+    ): Map<AccountPermission, TriState> {
+        if(!isMemberSync(account, memberPlayer)) {
+            throw TreasuryException {
+                "Player is not a member of the account"
             }
-        } else {
-            return Response.failure { isMemberResponse.failureReason!!.description }
         }
 
-        return Response.success(
-            getAccountNodeSync(account)
-                .node(
-                    "member",
-                    memberPlayer.toString(),
-                    "permission"
-                )
-                .childrenMap()
-                .mapKeys { AccountPermission.valueOf(it.key as String) }
-                .mapValues { TriState.valueOf(it.value.string!!) }
-                .withDefault { TriState.UNSPECIFIED }
-        )
+        return getAccountNodeSync(account)
+            .node(
+                "member",
+                memberPlayer.toString(),
+                "permission"
+            )
+            .childrenMap()
+            .mapKeys { AccountPermission.valueOf(it.key as String) }
+            .mapValues { TriState.valueOf(it.value.string!!) }
+            .withDefault { TriState.UNSPECIFIED }
     }
 
     override fun retrievePermissionsMapSync(
         account: NonPlayerAccount
-    ): Response<Map<UUID, Map<AccountPermission, TriState>>> {
-        val memberIdsResponse = retrieveMemberIdsSync(account)
-
-        if(!memberIdsResponse.isSuccessful) {
-            return Response.failure { memberIdsResponse.failureReason!!.description }
-        }
+    ): Map<UUID, Map<AccountPermission, TriState>> {
+        val members = retrieveMemberIdsSync(account)
 
         val map = mutableMapOf<UUID, Map<AccountPermission, TriState>>()
 
-        val members: Collection<UUID> = memberIdsResponse.result!!
-
         for(member in members) {
-            val permissionsResponse = retrievePermissionsSync(account, member)
-
-            if(!permissionsResponse.isSuccessful) {
-                return Response.failure { permissionsResponse.failureReason!!.description }
-            }
-
-            map[member] = permissionsResponse.result!!
+            map[member] = retrievePermissionsSync(account, member)
         }
 
-        return Response.success(map)
+        return map
     }
 
     override fun hasPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         vararg permissions: AccountPermission
-    ): Response<TriState> {
+    ): TriState {
         if(permissions.isEmpty()) {
-            return Response.failure {
+            throw TreasuryException {
                 "At least one item must be specified in the permissions array."
             }
         }
 
-        return Response.success(
-            TriState.fromBoolean(
-                permissions.all { permission ->
-                    getAccountNodeSync(account)
-                        .node(
-                            "member",
-                            memberPlayer.toString(),
-                            "permission",
-                            permission.name
-                        )
-                        .string!! == TriState.TRUE.name
-                }
-            )
+        // todo: if any are false, return false. if any are unspecified, return that. otherwise return true
+
+        return TriState.fromBoolean(
+            permissions.all { permission ->
+                getAccountNodeSync(account)
+                    .node(
+                        "member",
+                        memberPlayer.toString(),
+                        "permission",
+                        permission.name
+                    )
+                    .string!! == TriState.TRUE.name
+            }
         )
     }
 
 
-    override fun retrievePlayerAccountIdsSync(): Response<Collection<UUID>> {
-        return Response.success(
-            rootNode
-                .node("account", "player")
-                .childrenMap()
-                .keys
-                .map { key -> UUID.fromString(key as String) }
-        )
+    override fun retrievePlayerAccountIdsSync(): Collection<UUID> {
+        return rootNode
+            .node("account", "player")
+            .childrenMap()
+            .keys
+            .map { key -> UUID.fromString(key as String) }
     }
 
-    override fun retrieveNonPlayerAccountIdsSync(): Response<Collection<NamespacedKey>> {
+    override fun retrieveNonPlayerAccountIdsSync(): Collection<NamespacedKey> {
         val ids = mutableListOf<NamespacedKey>()
 
         rootNode
@@ -1143,7 +997,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 }
             }
 
-        return Response.success(ids)
+        return ids
     }
 
 }

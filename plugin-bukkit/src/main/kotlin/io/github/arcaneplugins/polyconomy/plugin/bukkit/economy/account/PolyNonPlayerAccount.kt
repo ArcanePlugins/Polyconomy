@@ -4,7 +4,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageM
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.execSvc
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
-import me.lokka30.treasury.api.common.response.Response
 import me.lokka30.treasury.api.economy.account.AccountPermission
 import me.lokka30.treasury.api.economy.account.NonPlayerAccount
 import me.lokka30.treasury.api.economy.currency.Currency
@@ -16,60 +15,65 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class PolyNonPlayerAccount(
-    val id: NamespacedKey
+    val id: NamespacedKey,
 ) : NonPlayerAccount {
 
     override fun getName(): Optional<String> {
-        val response = currentHandlerNotNull()
-            .retrieveNameSync(this)
-
-        if(response.isSuccessful) {
-            return response.result!!
-        } else {
-            throw RuntimeException(response.failureReason!!.description)
-        }
+        return currentHandlerNotNull().retrieveNameSync(this)
     }
 
-    override fun setName(name: String?): CompletableFuture<Response<TriState>> {
+    override fun setName(
+        name: String?,
+    )
+            : CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull().setNameSync(this, name)
+                return@supplyAsync currentHandlerNotNull()
+                    .setNameSync(this, name)
             },
             execSvc
         )
     }
 
-    override fun retrieveBalance(currency: Currency): CompletableFuture<Response<BigDecimal>> {
+    override fun retrieveBalance(
+        currency: Currency,
+    ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull().retrieveBalanceSync(this, currency)
+                return@supplyAsync currentHandlerNotNull()
+                    .retrieveBalanceSync(this, currency)
             },
             execSvc
         )
     }
 
-    override fun doTransaction(economyTransaction: EconomyTransaction): CompletableFuture<Response<BigDecimal>> {
+    override fun doTransaction(
+        economyTransaction: EconomyTransaction,
+    ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull().doTransactionSync(this, economyTransaction)
+                return@supplyAsync currentHandlerNotNull()
+                    .doTransactionSync(this, economyTransaction)
             },
             execSvc
         )
     }
 
-    override fun deleteAccount(): CompletableFuture<Response<TriState>> {
+    override fun deleteAccount(): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull().deleteAccountSync(this)
+                return@supplyAsync currentHandlerNotNull()
+                    .deleteAccountSync(this)
             },
             execSvc
         )
     }
 
-    override fun retrieveHeldCurrencies(): CompletableFuture<Response<Collection<String>>> {
+    override fun retrieveHeldCurrencies(): CompletableFuture<Collection<String>> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull().retrieveHeldCurrenciesSync(this)
+                return@supplyAsync currentHandlerNotNull()
+                    .retrieveHeldCurrenciesSync(this)
             },
             execSvc
         )
@@ -78,8 +82,8 @@ class PolyNonPlayerAccount(
     override fun retrieveTransactionHistory(
         transactionCount: Int,
         from: Temporal,
-        to: Temporal
-    ): CompletableFuture<Response<Collection<EconomyTransaction>>> {
+        to: Temporal,
+    ): CompletableFuture<Collection<EconomyTransaction>> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -94,7 +98,7 @@ class PolyNonPlayerAccount(
         )
     }
 
-    override fun retrieveMemberIds(): CompletableFuture<Response<Collection<UUID>>> {
+    override fun retrieveMemberIds(): CompletableFuture<Collection<UUID>> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull().retrieveMemberIdsSync(this)
@@ -103,7 +107,7 @@ class PolyNonPlayerAccount(
         )
     }
 
-    override fun isMember(player: UUID): CompletableFuture<Response<TriState>> {
+    override fun isMember(player: UUID): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -113,11 +117,11 @@ class PolyNonPlayerAccount(
         )
     }
 
-    override fun setPermission(
+    override fun setPermissions(
         player: UUID,
         permissionValue: TriState,
-        vararg permissions: AccountPermission
-    ): CompletableFuture<Response<TriState>> {
+        vararg permissions: AccountPermission,
+    ): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -127,9 +131,27 @@ class PolyNonPlayerAccount(
         )
     }
 
+    override fun setPermissions(
+        player: UUID,
+        permissionsMap: Map<AccountPermission, TriState?>,
+    ): CompletableFuture<Boolean> {
+        return CompletableFuture.supplyAsync(
+            {
+                @Suppress("UNCHECKED_CAST")
+                return@supplyAsync currentHandlerNotNull()
+                    .setPermissionsSync(
+                        this,
+                        player,
+                        permissionsMap.withDefault { TriState.UNSPECIFIED } as Map<AccountPermission, TriState>
+                    )
+            },
+            execSvc
+        )
+    }
+
     override fun retrievePermissions(
-        player: UUID
-    ): CompletableFuture<Response<Map<AccountPermission, TriState>>> {
+        player: UUID,
+    ): CompletableFuture<Map<AccountPermission, TriState>> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -139,32 +161,20 @@ class PolyNonPlayerAccount(
         )
     }
 
-    override fun retrievePermissionsMap(): CompletableFuture<Response<Map<UUID, Set<Map.Entry<AccountPermission, TriState>>>>> {
+    override fun retrievePermissionsMap(): CompletableFuture<Map<UUID, Map<AccountPermission, TriState>>> {
         return CompletableFuture.supplyAsync(
             {
-                val response = currentHandlerNotNull()
+                return@supplyAsync currentHandlerNotNull()
                     .retrievePermissionsMapSync(this)
-
-                if(!response.isSuccessful) {
-                    return@supplyAsync Response.failure { response.failureReason!!.description }
-                }
-
-                val uuidMap = mutableMapOf<UUID, Set<Map.Entry<AccountPermission, TriState>>>()
-
-                response.result!!.forEach { (uuid, permMap) ->
-                    uuidMap[uuid] = permMap.entries
-                }
-
-                return@supplyAsync Response.success(uuidMap)
             },
             execSvc
         )
     }
 
-    override fun hasPermission(
+    override fun hasPermissions(
         player: UUID,
-        vararg permissions: AccountPermission
-    ): CompletableFuture<Response<TriState>> {
+        vararg permissions: AccountPermission,
+    ): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync currentHandlerNotNull()
@@ -174,7 +184,7 @@ class PolyNonPlayerAccount(
         )
     }
 
-    override fun getIdentifier(): NamespacedKey {
+    override fun identifier(): NamespacedKey {
         return id
     }
 

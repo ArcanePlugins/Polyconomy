@@ -44,9 +44,9 @@ object StorageManager {
             currentHandler = availableHandlers.first { it.id.equals(id, ignoreCase = true) }
         } catch(ex: NoSuchElementException) {
             throw NoSuchElementException("""
-                |Unable to connect via StorageManager: There is no available storage handler with the ID '${id}'. Did you make a spelling mistake?
-                |Available storage handler IDs: ${availableHandlers.joinToString(separator = ", ", prefix = "[", postfix = "]") { it.id }}
-                |""".trimMargin())
+                Unable to connect via StorageManager: There is no available storage handler with the ID '${id}'. Did you make a spelling mistake?
+                Available storage handler IDs: ${availableHandlers.joinToString(separator = ", ", prefix = "[", postfix = "]") { it.id }}
+                """.trimMargin())
         }
 
         // let's connect

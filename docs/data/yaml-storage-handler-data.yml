@@ -8,8 +8,8 @@ account:
         <currency-dbid ; Int->String>: <balance ; Double>
       transaction:
         - currency-dbid: <Int>
-          initiator:
-            type: <PolyTransactionInitiator.Type>
+          cause:
+            type: <Cause>
             data: <String>
           timestamp: <Long ; epoch milliseconds>
           type: <PolyTransactionType>
