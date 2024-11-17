@@ -9,7 +9,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.PolyStopwatch
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -30,8 +29,6 @@ class Polyconomy : JavaPlugin() {
      * This method performs miscellaneous startup (pre-onEnable) measures.
      */
     override fun onLoad() {
-        val stopwatch = PolyStopwatch()
-
         try {
             CommandManager.loadOnLoad()
         } catch(ex: Exception) {
@@ -50,8 +47,6 @@ class Polyconomy : JavaPlugin() {
             )
             throw ex
         }
-
-        Log.i("Plugin initialized (took ${stopwatch.stop()}).")
     }
 
     /**
@@ -60,8 +55,6 @@ class Polyconomy : JavaPlugin() {
      * Runs the majority of the startup behaviour.
      */
     override fun onEnable() {
-        val stopwatch = PolyStopwatch()
-
         try {
             HookManager.ensureHardDependencies()
             ConfigManager.load()
@@ -91,8 +84,6 @@ class Polyconomy : JavaPlugin() {
             )
             throw ex
         }
-
-        Log.i("Plugin enabled (took ${stopwatch.stop()}).")
     }
 
     /**
@@ -101,14 +92,10 @@ class Polyconomy : JavaPlugin() {
      * This method performs all of the shutdown behaviour.
      */
     override fun onDisable() {
-        val stopwatch = PolyStopwatch()
-
         CommandManager.unloadOnDisable()
         HookManager.unregisterAll()
         ConcurrentManager.shutdown()
         StorageManager.disconnect()
-
-        Log.i("Plugin disabled (took ${stopwatch.stop()}).")
     }
 
     /**
@@ -125,8 +112,6 @@ class Polyconomy : JavaPlugin() {
     @Suppress("unused")
     fun softReload() {
         Log.i("Reloading Polyconomy v${description.version}")
-        val stopwatch = PolyStopwatch()
-
         try {
             /* soft-disabling */
             HookManager.unregisterAll()
@@ -146,7 +131,7 @@ class Polyconomy : JavaPlugin() {
             throw ex
         }
 
-        Log.i("Plugin reloaded (took ${stopwatch.stop()}).")
+        Log.i("Plugin reloaded successfully.")
     }
 
 }
