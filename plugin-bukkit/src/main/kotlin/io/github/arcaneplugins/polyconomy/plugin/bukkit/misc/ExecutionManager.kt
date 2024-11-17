@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.misc
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -28,7 +27,7 @@ object ExecutionManager {
 
             it.shutdown()
             it.awaitTermination(
-                if(DebugCategory.DEBUG_TEST.enabled()) 5 else 30,
+                30,
                 TimeUnit.SECONDS
             )
         }

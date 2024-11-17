@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager.currentHandlerNotNull
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
@@ -15,8 +16,13 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class PolyNonPlayerAccount(
+    val plugin: Polyconomy,
     val id: NamespacedKey,
 ) : NonPlayerAccount {
+
+    private fun currentHandlerNotNull(): StorageHandler {
+        return plugin.storageManager.currentHandler!!
+    }
 
     override fun getName(): Optional<String> {
         return currentHandlerNotNull().retrieveNameSync(this)
@@ -177,7 +183,7 @@ class PolyNonPlayerAccount(
     ): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync currentHandlerNotNull()
+                return@supplyAsync plugin.storageManager.currentHandler!!
                     .hasPermissionsSync(this, player, *permissions)
             },
             execSvc

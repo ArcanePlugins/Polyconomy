@@ -1,7 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local.YamlStorageHandler
 
@@ -11,7 +10,7 @@ class StorageManager(
 
     val availableHandlers: MutableSet<StorageHandler> = mutableSetOf(
         /* Local Storage Handlers */
-        YamlStorageHandler,
+        YamlStorageHandler(plugin),
         // ...... TODO
 
         /* Remote Storage Handlers */
@@ -28,7 +27,7 @@ class StorageManager(
                 """.trimIndent())
 
         // figure out what storage handler ID they want to connect with
-        val id: String? = SettingsCfg
+        val id: String? = plugin.configManager.settings
             .rootNode
             .node("storage", "implementation")
             .string

@@ -1,10 +1,8 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account.PolyAccountAccessor
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
@@ -43,7 +41,7 @@ class EconomyManager(
     private fun loadCurrencies() {
         registeredCurrencies.clear()
 
-        SettingsCfg
+        plugin.configManager.settings
             .rootNode
             .node("currencies")
             .childrenList()
@@ -190,7 +188,7 @@ class EconomyManager(
 
     private fun loadPrimaryCurrency() {
         primCurrency = findCurrencyNonNull(
-            SettingsCfg
+            plugin.configManager.settings
                 .rootNode
                 .node("primary-currency")
                 .string!!
@@ -199,7 +197,7 @@ class EconomyManager(
 
     private fun loadPrimaryLocale() {
         primLocale = Locale(
-            SettingsCfg
+            plugin.configManager.settings
                 .rootNode
                 .node("primary-locale")
                 .getString("en_US")
@@ -207,18 +205,18 @@ class EconomyManager(
     }
 
     override fun accountAccessor(): AccountAccessor {
-        return PolyAccountAccessor
+        return PolyAccountAccessor(plugin)
     }
 
     override fun hasAccount(accountData: AccountData): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
                 return@supplyAsync if(accountData.isPlayerAccount) {
-                    StorageManager
+                    plugin.storageManager
                         .currentHandler!!
                         .hasPlayerAccountSync(accountData.playerIdentifier.get())
                 } else {
-                    StorageManager
+                    plugin.storageManager
                         .currentHandler!!
                         .hasNonPlayerAccountSync(accountData.nonPlayerIdentifier.get())
                 }
@@ -230,7 +228,7 @@ class EconomyManager(
     override fun retrievePlayerAccountIds(): CompletableFuture<Collection<UUID>> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync StorageManager.currentHandler!!.retrievePlayerAccountIdsSync()
+                return@supplyAsync plugin.storageManager.currentHandler!!.retrievePlayerAccountIdsSync()
             },
             execSvc
         )
@@ -239,7 +237,7 @@ class EconomyManager(
     override fun retrieveNonPlayerAccountIds(): CompletableFuture<Collection<NamespacedKey>> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync StorageManager.currentHandler!!.retrieveNonPlayerAccountIdsSync()
+                return@supplyAsync plugin.storageManager.currentHandler!!.retrieveNonPlayerAccountIdsSync()
             },
             execSvc
         )

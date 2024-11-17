@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager.currentHandlerNotNull
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import me.lokka30.treasury.api.economy.account.PlayerAccount
 import me.lokka30.treasury.api.economy.currency.Currency
@@ -12,8 +13,13 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class PolyPlayerAccount(
-    val player: UUID
+    val plugin: Polyconomy,
+    val player: UUID,
 ) : PlayerAccount {
+
+    private fun currentHandlerNotNull(): StorageHandler {
+        return plugin.storageManager.currentHandler!!
+    }
 
     override fun getName(): Optional<String> {
         return currentHandlerNotNull().retrieveNameSync(this)

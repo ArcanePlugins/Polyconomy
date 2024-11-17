@@ -5,8 +5,9 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.Config
 import kotlin.io.path.Path
 
 class MessagesCfg(
-    val plugin: Polyconomy,
+    plugin: Polyconomy,
 ) : Config(
+    plugin = plugin,
     name = "Messages",
     relativePath = Path("messages.yml")
 ) {

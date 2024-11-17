@@ -24,7 +24,7 @@ class PlayerJoinListener(
 
     //TODO remove this method once debugging is done.
     private fun handleDebugTest() {
-        if(DebugCategory.DEBUG_TEST.disabled()) return
+        if(plugin.debugManager.enabled(DebugCategory.DEBUG_TEST)) return
 
         plugin.debugLog(DebugCategory.DEBUG_TEST) { "Handling debug method" }
 

@@ -9,6 +9,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 abstract class Config(
+    val plugin: Polyconomy,
     val name: String,
     val relativePath: Path
 ) {
@@ -48,12 +49,12 @@ abstract class Config(
      */
     private fun createIfNotExists() {
         if(absolutePath().exists()) return
-        Polyconomy.instance.saveResource(relativePath.toString(), false)
+        plugin.saveResource(relativePath.toString(), false)
     }
 
     fun absolutePath(): Path {
         return Path(
-            "${Polyconomy.instance.dataFolder.absolutePath}${File.separator}${relativePath}"
+            "${plugin.dataFolder.absolutePath}${File.separator}${relativePath}"
         )
     }
 

@@ -2,7 +2,6 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOK_TREASURY
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
 import me.lokka30.treasury.api.common.service.Service
@@ -29,7 +28,7 @@ class TreasuryHook(
     override fun register() {
         ServiceRegistry.INSTANCE.registerService(
             EconomyProvider::class.java,
-            EconomyManager,
+            plugin.economyManager,
             plugin.description.name,
             ServicePriority.NORMAL
         )
