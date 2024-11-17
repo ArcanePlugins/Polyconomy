@@ -1,9 +1,9 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account.PolyCause
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import me.lokka30.treasury.api.common.Cause
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.event.EventBus

@@ -7,7 +7,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.Settings
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager

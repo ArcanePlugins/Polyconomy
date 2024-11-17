@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage
 
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState

@@ -1,7 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import me.lokka30.treasury.api.economy.account.PlayerAccount
 import me.lokka30.treasury.api.economy.currency.Currency

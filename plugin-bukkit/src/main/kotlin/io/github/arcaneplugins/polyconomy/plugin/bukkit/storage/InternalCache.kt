@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 
