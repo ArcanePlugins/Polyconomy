@@ -10,7 +10,7 @@
         <module>plugin-bukkit</module>
     </modules>
     <groupId>io.github.arcaneplugins.polyconomy</groupId>
-    <version>0</version>
+    <version>1.0.0-SNAPSHOT-1</version>
 
     <name>Polyconomy</name>
     <description>Parent module of Polyconomy's source.</description>
