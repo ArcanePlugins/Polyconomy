@@ -1,27 +1,25 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command
 
-object CommandManager {
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 
-    //TODO
+class CommandManager(
+    val plugin: Polyconomy,
+) {
 
-    @Suppress("EmptyMethod")
-    fun loadOnLoad() {
-        //TODO
+    fun init() {
+        //TODO implement onLoad for CommandAPI
     }
 
-    @Suppress("EmptyMethod")
-    fun loadOnEnable() {
-        //TODO
+    fun load() {
+        //TODO implement onEnable for CommandAPI
     }
 
-    @Suppress("EmptyMethod")
-    fun unloadOnDisable() {
-        //TODO
+    fun disable() {
+        //TODO implement onDisable for CommandAPI
     }
 
-    @Suppress("EmptyMethod")
     fun reload() {
-        //TODO
+        //TODO implement reload for CommandAPI
     }
 
 }
