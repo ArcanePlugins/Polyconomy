@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy.Companion.instance
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
@@ -21,38 +20,17 @@ This serves as the 'hub' for the plugin. It's role is simple: handle the loading
 disabling, and soft-reloading of the plugin.
 
 Being the main class of the plugin, this is instantiated by Bukkit's plugin management system. An
-instance of this class may be replaced by Bukkit's plugin manager during runtime, this is tracked
-by the [instance] property within a companion object.
+instance of this class may be replaced by Bukkit's plugin manager during runtime.
  */
 class Polyconomy : JavaPlugin() {
-
-    companion object {
-
-        /**
-         * Stores the latest instance of the Polyconomy main class as instantiated by Bukkit's
-         * plugin manager.
-         *
-         *  1) This allows easy 'static' access to the main class without using patterns like
-         *  dependency injection.
-         *
-         *  2) As the particular object this property references can change during events such as
-         *  when an administrator uses the `/reload` command on their server, this vastly improves
-         *  compatibility with the (convenient, but discouraged) `/reload` command.
-         */
-        lateinit var instance: Polyconomy
-            private set
-    }
 
     /**
      * Implements [JavaPlugin.onLoad].
      *
-     * This method performs very basic start-up measures. At the moment, its only purpose is to
-     * set the [instance] property in the companion object.
+     * This method performs miscellaneous startup (pre-onEnable) measures.
      */
     override fun onLoad() {
         val stopwatch = PolyStopwatch()
-
-        instance = this
 
         try {
             CommandManager.loadOnLoad()
