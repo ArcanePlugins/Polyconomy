@@ -35,7 +35,7 @@ class Polyconomy : JavaPlugin() {
             Log.s(
                 """
                 
-                An error occurred whilst attempting to load Polyconomy.
+                An error occurred whilst attempting to load Polyconomy (is it up to date?).
                 
                 This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
                 
@@ -72,7 +72,7 @@ class Polyconomy : JavaPlugin() {
             Log.s(
                 """
                 
-                An error occurred whilst attempting to enable Polyconomy.
+                An error occurred whilst attempting to enable Polyconomy (is it up to date?).
                 
                 This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
                 
@@ -126,7 +126,18 @@ class Polyconomy : JavaPlugin() {
             HookManager.registerAll()
             CommandManager.reload()
         } catch(ex: Exception) {
-            Log.s("""Error occurred while reloading Polyconomy v${description.version} (Is it up to date?)""")
+            Log.s(
+                """
+                
+                Error occurred while reloading Polyconomy v${description.version} (Is it up to date?).
+                
+                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
+                
+                If you are unable to resolve this error yourself, feel free to ask our support team for help.
+                Discord: https://discord.gg/HqZwdcJ
+                
+                A stack trace will be printed below to aid advanced users in resolving this issue:
+                """.trimIndent())
             ex.printStackTrace()
             throw ex
         }
