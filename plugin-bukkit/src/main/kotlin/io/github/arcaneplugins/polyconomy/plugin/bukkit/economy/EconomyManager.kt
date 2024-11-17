@@ -82,7 +82,7 @@ class EconomyManager(
                                     map[locale] = character
                                 }
 
-                            if(!map.containsKey(primLocale))
+                            if (!map.containsKey(primLocale))
                                 map[primLocale] = '.'
 
                             return@let map
@@ -103,7 +103,7 @@ class EconomyManager(
                         }
 
                         override fun getDecimal(locale: Locale?): Char {
-                            return if(locale == null || !decimalLocaleMap.containsKey(locale)) {
+                            return if (locale == null || !decimalLocaleMap.containsKey(locale)) {
                                 decimalLocaleMap.getOrDefault(
                                     primLocale,
                                     '.'
@@ -161,7 +161,7 @@ class EconomyManager(
 
                         override fun format(
                             amount: BigDecimal,
-                            locale: Locale?
+                            locale: Locale?,
                         ): String {
                             return presentationFormat
                                 .replace("%symbol%", symbol)
@@ -176,7 +176,7 @@ class EconomyManager(
                         override fun format(
                             amount: BigDecimal,
                             locale: Locale?,
-                            precision: Int
+                            precision: Int,
                         ): String {
                             return format(amount, locale)
                         }
@@ -211,7 +211,7 @@ class EconomyManager(
     override fun hasAccount(accountData: AccountData): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync(
             {
-                return@supplyAsync if(accountData.isPlayerAccount) {
+                return@supplyAsync if (accountData.isPlayerAccount) {
                     plugin.storageManager
                         .currentHandler!!
                         .hasPlayerAccountSync(accountData.playerIdentifier.get())
@@ -258,7 +258,7 @@ class EconomyManager(
     fun findCurrencyNonNull(identifier: String): Currency {
         val currency = findCurrency(identifier)
 
-        if(currency.isPresent) {
+        if (currency.isPresent) {
             return currency.get()
         }
 
@@ -274,8 +274,8 @@ class EconomyManager(
     override fun registerCurrency(currency: Currency): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
-                if(registeredCurrencies
-                    .any { it.identifier.equals(currency.identifier, true) }
+                if (registeredCurrencies
+                        .any { it.identifier.equals(currency.identifier, true) }
                 ) {
                     return@supplyAsync TriState.UNSPECIFIED
                 }
@@ -291,7 +291,7 @@ class EconomyManager(
     override fun unregisterCurrency(currency: Currency): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync(
             {
-                if(!registeredCurrencies.contains(currency))
+                if (!registeredCurrencies.contains(currency))
                     return@supplyAsync TriState.UNSPECIFIED
 
                 registeredCurrencies.remove(currency)

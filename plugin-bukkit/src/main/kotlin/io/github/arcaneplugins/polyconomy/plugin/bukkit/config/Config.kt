@@ -11,7 +11,7 @@ import kotlin.io.path.exists
 abstract class Config(
     val plugin: Polyconomy,
     val name: String,
-    val relativePath: Path
+    val relativePath: Path,
 ) {
 
     private lateinit var loader: YamlConfigurationLoader
@@ -48,7 +48,7 @@ abstract class Config(
      * If the file doesn't exist on the disk, the default version of the file is written.
      */
     private fun createIfNotExists() {
-        if(absolutePath().exists()) return
+        if (absolutePath().exists()) return
         plugin.saveResource(relativePath.toString(), false)
     }
 

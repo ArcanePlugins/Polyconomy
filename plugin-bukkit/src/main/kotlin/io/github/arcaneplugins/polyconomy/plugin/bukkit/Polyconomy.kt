@@ -46,7 +46,7 @@ class Polyconomy : JavaPlugin() {
     override fun onLoad() {
         try {
             commandManager.init()
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
                 ex,
@@ -72,7 +72,7 @@ class Polyconomy : JavaPlugin() {
             hookManager.registerAll()
             commandManager.load()
             metricsManager.load()
-        } catch(ex: TerminateLoadException) {
+        } catch (ex: TerminateLoadException) {
             isEnabled = false
             return
         } catch (ex: Exception) {
@@ -96,7 +96,7 @@ class Polyconomy : JavaPlugin() {
             hookManager.unregisterAll()
             ExecutionManager.shutdown()
             storageManager.disconnect()
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
                 ex,
@@ -132,7 +132,7 @@ class Polyconomy : JavaPlugin() {
             storageManager.load()
             hookManager.registerAll()
             commandManager.reload()
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
                 ex,
@@ -158,7 +158,7 @@ class Polyconomy : JavaPlugin() {
      */
     @Suppress("unused")
     fun debugLog(cat: DebugCategory, msg: Supplier<Any>) {
-        if(debugManager.enabled(cat)) {
+        if (debugManager.enabled(cat)) {
             return
         }
 
@@ -166,7 +166,7 @@ class Polyconomy : JavaPlugin() {
 
         logger.info(output)
 
-        if(debugManager.enabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
+        if (debugManager.enabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
             Bukkit.getOnlinePlayers()
                 .filter(Player::isOp)
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }

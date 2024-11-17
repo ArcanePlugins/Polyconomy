@@ -12,7 +12,7 @@ import java.time.Instant
 import java.util.*
 
 abstract class StorageHandler(
-    val id: String
+    val id: String,
 ) {
 
     protected var connected: Boolean = false
@@ -22,29 +22,29 @@ abstract class StorageHandler(
     abstract fun disconnect()
 
     abstract fun hasPlayerAccountSync(
-        player: UUID
+        player: UUID,
     ): Boolean
 
     abstract fun hasNonPlayerAccountSync(
-        id: NamespacedKey
+        id: NamespacedKey,
     ): Boolean
 
     abstract fun retrieveNameSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): Optional<String>
 
     abstract fun retrieveNameSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Optional<String>
 
     abstract fun setNameSync(
         account: PlayerAccount,
-        name: String?
+        name: String?,
     ): Boolean
 
     abstract fun setNameSync(
         account: NonPlayerAccount,
-        name: String?
+        name: String?,
     ): Boolean
 
     abstract fun deleteAccountSync(
@@ -57,82 +57,82 @@ abstract class StorageHandler(
 
     abstract fun retrieveBalanceSync(
         account: PlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): BigDecimal
 
     abstract fun retrieveBalanceSync(
         account: NonPlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): BigDecimal
 
     abstract fun doTransactionSync(
         account: PlayerAccount,
-        transaction: EconomyTransaction
+        transaction: EconomyTransaction,
     ): BigDecimal
 
     abstract fun doTransactionSync(
         account: NonPlayerAccount,
-        transaction: EconomyTransaction
+        transaction: EconomyTransaction,
     ): BigDecimal
 
     abstract fun retrieveHeldCurrenciesSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): Collection<String>
 
     abstract fun retrieveHeldCurrenciesSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Collection<String>
 
     abstract fun retrieveTransactionHistorySync(
         account: PlayerAccount,
         transactionCount: Int,
         from: Instant,
-        to: Instant
+        to: Instant,
     ): Collection<EconomyTransaction>
 
     abstract fun retrieveTransactionHistorySync(
         account: NonPlayerAccount,
         transactionCount: Int,
         from: Instant,
-        to: Instant
+        to: Instant,
     ): Collection<EconomyTransaction>
 
     abstract fun retrieveMemberIdsSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Collection<UUID>
 
     abstract fun isMemberSync(
         account: NonPlayerAccount,
-        memberPlayer: UUID
+        memberPlayer: UUID,
     ): Boolean
 
     abstract fun setPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         permissionValue: TriState,
-        vararg permissions: AccountPermission
+        vararg permissions: AccountPermission,
     ): Boolean
 
     abstract fun setPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
-        permissionsMap: Map<AccountPermission, TriState>
+        permissionsMap: Map<AccountPermission, TriState>,
     ): Boolean
 
 
     abstract fun retrievePermissionsSync(
         account: NonPlayerAccount,
-        memberPlayer: UUID
+        memberPlayer: UUID,
     ): Map<AccountPermission, TriState>
 
     abstract fun retrievePermissionsMapSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Map<UUID, Map<AccountPermission, TriState>>
 
     abstract fun hasPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
-        vararg permissions: AccountPermission
+        vararg permissions: AccountPermission,
     ): TriState
 
     abstract fun retrievePlayerAccountIdsSync(): Collection<UUID>

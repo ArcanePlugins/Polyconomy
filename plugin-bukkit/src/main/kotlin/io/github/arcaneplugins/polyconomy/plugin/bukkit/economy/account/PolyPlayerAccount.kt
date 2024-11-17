@@ -26,7 +26,7 @@ class PolyPlayerAccount(
     }
 
     override fun retrieveBalance(
-        currency: Currency
+        currency: Currency,
     ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
@@ -38,7 +38,7 @@ class PolyPlayerAccount(
     }
 
     override fun doTransaction(
-        economyTransaction: EconomyTransaction
+        economyTransaction: EconomyTransaction,
     ): CompletableFuture<BigDecimal> {
         return CompletableFuture.supplyAsync(
             {
@@ -72,7 +72,7 @@ class PolyPlayerAccount(
     override fun retrieveTransactionHistory(
         transactionCount: Int,
         from: Temporal,
-        to: Temporal
+        to: Temporal,
     ): CompletableFuture<Collection<EconomyTransaction>> {
         return CompletableFuture.supplyAsync(
             {

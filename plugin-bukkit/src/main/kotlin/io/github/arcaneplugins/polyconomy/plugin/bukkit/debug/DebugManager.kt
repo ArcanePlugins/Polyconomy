@@ -26,11 +26,13 @@ class DebugManager(
         )
 
         plugin.debugLog(DEBUG_MANAGER) { "Loaded debug manager." }
-        plugin.debugLog(DEBUG_MANAGER) { "Current Categories: ${
-            enabledCategories.joinToString(separator = ", ") { it.name }
-        }" }
+        plugin.debugLog(DEBUG_MANAGER) {
+            "Current Categories: ${
+                enabledCategories.joinToString(separator = ", ") { it.name }
+            }"
+        }
 
-        if(enabledCategories.contains(DebugCategory.DEBUG_ALL)) {
+        if (enabledCategories.contains(DebugCategory.DEBUG_ALL)) {
             plugin.debugLog(DEBUG_MANAGER) { "'DEBUG_ALL' category detected: adding remaining categories." }
             enabledCategories.addAll(
                 DebugCategory.entries.filter {
@@ -40,7 +42,7 @@ class DebugManager(
             )
         }
 
-        if(!enabledCategories.isEmpty()) {
+        if (!enabledCategories.isEmpty()) {
             plugin.logger.warning("${enabledCategories.size} debug categories are enabled. These will spam your logs - remove them when you're done.")
         }
 

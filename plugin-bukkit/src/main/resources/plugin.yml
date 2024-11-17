@@ -13,7 +13,7 @@
 api-version: "1.13"
 
 # "ArcanePlugins" followed by each maintainer of Polyconomy.
-authors: ["ArcanePlugins", "lokka30"]
+authors: [ "ArcanePlugins", "lokka30" ]
 
 description: "The Ultimate Virtual Economy Service Provider"
 

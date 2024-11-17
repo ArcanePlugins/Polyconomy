@@ -24,11 +24,11 @@ class PlayerJoinListener(
 
     //TODO remove this method once debugging is done.
     private fun handleDebugTest() {
-        if(plugin.debugManager.enabled(DebugCategory.DEBUG_TEST)) return
+        if (plugin.debugManager.enabled(DebugCategory.DEBUG_TEST)) return
 
         plugin.debugLog(DebugCategory.DEBUG_TEST) { "Handling debug method" }
 
-        for(i in 1..5) {
+        for (i in 1..5) {
             val randomTime = ThreadLocalRandom.current().nextLong(1, 3 + 1)
 
             CompletableFuture

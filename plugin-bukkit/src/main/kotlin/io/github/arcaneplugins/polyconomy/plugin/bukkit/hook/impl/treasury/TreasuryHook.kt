@@ -39,13 +39,13 @@ class TreasuryHook(
         plugin.debugLog(HOOK_TREASURY) { "Unregistering service." }
 
         var service: Service<EconomyProvider>? = null
-        for(otherService in ServiceRegistry.INSTANCE.allServicesFor(EconomyProvider::class.java)) {
-            if(otherService.registrarName() != plugin.description.name) continue
+        for (otherService in ServiceRegistry.INSTANCE.allServicesFor(EconomyProvider::class.java)) {
+            if (otherService.registrarName() != plugin.description.name) continue
             service = otherService
             break
         }
 
-        if(service == null) {
+        if (service == null) {
             plugin.debugLog(HOOK_TREASURY) { "Can't unregister service: is already unregistered." }
             return
         }
