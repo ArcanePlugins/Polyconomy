@@ -10,7 +10,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -72,9 +71,6 @@ class Polyconomy : JavaPlugin() {
             hookManager.registerAll()
             commandManager.load()
             metricsManager.load()
-        } catch (ex: TerminateLoadException) {
-            isEnabled = false
-            return
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
