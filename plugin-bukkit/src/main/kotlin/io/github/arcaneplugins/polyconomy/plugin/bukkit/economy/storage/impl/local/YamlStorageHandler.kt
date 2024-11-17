@@ -1,11 +1,8 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.Cause
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.event.EventBus
@@ -34,7 +31,9 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 
-object YamlStorageHandler : StorageHandler("Yaml") {
+class YamlStorageHandler(
+    val plugin: Polyconomy,
+) : StorageHandler("Yaml") {
 
     private val relativePath: Path = Path("data${File.separator}data.yml")
 
@@ -43,34 +42,34 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     private lateinit var rootNode: CommentedConfigurationNode
 
     private fun read() {
-        Log.d(STORAGE_YAML) { "Reading data." }
-        Log.d(STORAGE_YAML) { "Absolute path: ${absolutePath()}" }
+        plugin.debugLog(STORAGE_YAML) { "Reading data." }
+        plugin.debugLog(STORAGE_YAML) { "Absolute path: ${absolutePath()}" }
         createIfNotExists()
         rootNode = loader.load()
-        Log.d(STORAGE_YAML) { "Read data." }
+        plugin.debugLog(STORAGE_YAML) { "Read data." }
     }
 
     private fun write() {
-        Log.d(STORAGE_YAML) { "Writing data." }
+        plugin.debugLog(STORAGE_YAML) { "Writing data." }
         loader.save(rootNode)
-        Log.d(STORAGE_YAML) { "Written data." }
+        plugin.debugLog(STORAGE_YAML) { "Written data." }
     }
 
     private fun absolutePath(): Path {
         return Path(
-            "${Polyconomy.instance.dataFolder.absolutePath}${File.separator}${relativePath}"
+            "${plugin.dataFolder.absolutePath}${File.separator}${relativePath}"
         )
     }
 
     private fun createIfNotExists() {
         val exists: Boolean = absolutePath().exists()
-        Log.d(STORAGE_YAML) { "Data file exists: ${if(exists) "Yes" else "No"}" }
+        plugin.debugLog(STORAGE_YAML) { "Data file exists: ${if(exists) "Yes" else "No"}" }
         if(exists) return
 
-        Log.d(STORAGE_YAML) { "File doesn't exist; creating." }
+        plugin.debugLog(STORAGE_YAML) { "File doesn't exist; creating." }
         absolutePath().parent.createDirectories()
         absolutePath().createFile()
-        Log.d(STORAGE_YAML) { "File created." }
+        plugin.debugLog(STORAGE_YAML) { "File created." }
     }
 
     private fun getAccountNodeSync(
@@ -161,40 +160,40 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     private fun getCurrencyByDbId(
         dbId: Int
     ): Currency {
-        return EconomyManager.currencies.first {
+        return plugin.economyManager.currencies.first {
             getOrGrantCurrencyDbIdSync(it) == dbId
         }
     }
 
     override fun connect() {
-        Log.d(STORAGE_YAML) { "Connecting." }
+        plugin.debugLog(STORAGE_YAML) { "Connecting." }
 
         if(connected)
             throw IllegalStateException("Attempted to connect whilst already connected")
 
-        Log.d(STORAGE_YAML) { "Initialising loader." }
+        plugin.debugLog(STORAGE_YAML) { "Initialising loader." }
         loader = YamlConfigurationLoader.builder()
             .path(absolutePath())
             .build()
-        Log.d(STORAGE_YAML) { "Initialised loader." }
+        plugin.debugLog(STORAGE_YAML) { "Initialised loader." }
 
-        Log.d(STORAGE_YAML) { "Checking if file has not been created yet." }
+        plugin.debugLog(STORAGE_YAML) { "Checking if file has not been created yet." }
         createIfNotExists()
-        Log.d(STORAGE_YAML) { "File present; continuing." }
+        plugin.debugLog(STORAGE_YAML) { "File present; continuing." }
 
-        Log.d(STORAGE_YAML) { "Initialising root node: reading data." }
+        plugin.debugLog(STORAGE_YAML) { "Initialising root node: reading data." }
         read()
-        Log.d(STORAGE_YAML) { "Initialised root node." }
+        plugin.debugLog(STORAGE_YAML) { "Initialised root node." }
 
         connected = true
-        Log.d(STORAGE_YAML) { "Connected." }
+        plugin.debugLog(STORAGE_YAML) { "Connected." }
     }
 
     override fun disconnect() {
-        Log.d(STORAGE_YAML) { "Disconnecting." }
+        plugin.debugLog(STORAGE_YAML) { "Disconnecting." }
 
         if(!connected) {
-            Log.d(STORAGE_YAML) { "Attempted to disconnect, but is already disconnected." }
+            plugin.debugLog(STORAGE_YAML) { "Attempted to disconnect, but is already disconnected." }
             return
         }
 
@@ -204,7 +203,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
          */
         connected = false
 
-        Log.d(STORAGE_YAML) { "Disconnected." }
+        plugin.debugLog(STORAGE_YAML) { "Disconnected." }
     }
 
     override fun hasPlayerAccountSync(
@@ -304,14 +303,14 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         currency: Currency
     ): BigDecimal {
         val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
-        Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
+        plugin.debugLog(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
         if(balanceNode.virtual()) {
-            Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
+            plugin.debugLog(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
             val startingBalance = currency.getStartingBalance(account)
 
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Starting balance = ~${startingBalance.toDouble()}"
             }
 
@@ -328,12 +327,12 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 )
             )
 
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Transaction complete for starting balance; returning response"
             }
         }
 
-        Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
+        plugin.debugLog(STORAGE_YAML) { "balanceNode is not virtual" }
 
         return BigDecimal(balanceNode.double)
     }
@@ -343,14 +342,14 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         currency: Currency
     ): BigDecimal {
         val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
-        Log.d(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
+        plugin.debugLog(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
         if(balanceNode.virtual()) {
-            Log.d(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
+            plugin.debugLog(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
             val startingBalance = currency.getStartingBalance(account)
 
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Starting balance = ~${startingBalance.toDouble()}"
             }
 
@@ -367,12 +366,12 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 )
             )
 
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Transaction complete for starting balance; returning response"
             }
         }
 
-        Log.d(STORAGE_YAML) { "balanceNode is not virtual" }
+        plugin.debugLog(STORAGE_YAML) { "balanceNode is not virtual" }
 
         return BigDecimal(balanceNode.double)
     }
@@ -381,20 +380,20 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         account: PlayerAccount,
         transaction: EconomyTransaction
     ): BigDecimal {
-        Log.d(STORAGE_YAML) {
+        plugin.debugLog(STORAGE_YAML) {
             "Finding currency by ID"
         }
 
-        val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
+        val currency = plugin.economyManager.findCurrencyNonNull(transaction.currencyId)
 
-        Log.d(STORAGE_YAML) {
+        plugin.debugLog(STORAGE_YAML) {
             "Found currency: ${currency.identifier}"
         }
 
         if(transaction.type != EconomyTransactionType.SET &&
             transaction.amount.compareTo(BigDecimal.ZERO) == -1
         ) {
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Error: Negative amount cannot be specified when transaction type is not SET."
             }
 
@@ -414,7 +413,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
             )
         }
 
-        Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
 
         val newBalance: BigDecimal = when (transaction.type) {
             EconomyTransactionType.SET ->
@@ -427,23 +426,23 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 previousBalance.subtract(transaction.amount)
         }
 
-        Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
 
         val minBalance = BigDecimal(
-            SettingsCfg
+            plugin.configManager.settings
                 .rootNode
                 .node("advanced", "minimum-balance")
                 .getDouble(0.0)
         )
 
-        Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
 
         if(newBalance.compareTo(minBalance) == -1) {
-            Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
+            plugin.debugLog(STORAGE_YAML) { "error: new balance is below min balance" }
             throw TreasuryException { "Transaction would result in an overdraft" }
         }
 
-        Log.d(STORAGE_YAML) { "Firing transaction event" }
+        plugin.debugLog(STORAGE_YAML) { "Firing transaction event" }
         val event: FireCompletion<PlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
             PlayerAccountTransactionEvent(
                 transaction,
@@ -458,22 +457,22 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         }
 
         if(eventThrowables.isNotEmpty()) {
-            Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
+            plugin.debugLog(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
             throw eventThrowables.first()
         }
 
-        Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
+        plugin.debugLog(STORAGE_YAML) { "Attempting to write new balance to data file" }
 
-        Log.d(STORAGE_YAML) { "Fetching balance node" }
+        plugin.debugLog(STORAGE_YAML) { "Fetching balance node" }
         val balanceNode = getAccountNodeSync(account)
             .node("balance", getOrGrantCurrencyDbIdSync(currency))
 
-        Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
+        plugin.debugLog(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
 
-        Log.d(STORAGE_YAML) { "Setting node to new balance" }
+        plugin.debugLog(STORAGE_YAML) { "Setting node to new balance" }
         balanceNode.set(newBalance.toDouble())
 
-        Log.d(STORAGE_YAML) { "Adding transaction to history" }
+        plugin.debugLog(STORAGE_YAML) { "Adding transaction to history" }
 
         val historyNodes = getAccountNodeSync(account).node("transaction")
         val index = historyNodes.childrenList().size
@@ -526,7 +525,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
             .set(transaction.importance.name)
 
 
-        Log.d(STORAGE_YAML) { "Writing changes to disk" }
+        plugin.debugLog(STORAGE_YAML) { "Writing changes to disk" }
         write()
 
         return newBalance
@@ -536,20 +535,20 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         account: NonPlayerAccount,
         transaction: EconomyTransaction
     ): BigDecimal {
-        Log.d(STORAGE_YAML) {
+        plugin.debugLog(STORAGE_YAML) {
             "Finding currency by ID"
         }
 
-        val currency = EconomyManager.findCurrencyNonNull(transaction.currencyId)
+        val currency = plugin.economyManager.findCurrencyNonNull(transaction.currencyId)
 
-        Log.d(STORAGE_YAML) {
+        plugin.debugLog(STORAGE_YAML) {
             "Found currency: ${currency.identifier}"
         }
 
         if(transaction.type != EconomyTransactionType.SET &&
             transaction.amount.compareTo(BigDecimal.ZERO) == -1
         ) {
-            Log.d(STORAGE_YAML) {
+            plugin.debugLog(STORAGE_YAML) {
                 "Error: Negative amount cannot be specified when transaction type is not SET."
             }
 
@@ -569,7 +568,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
             )
         }
 
-        Log.d(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "Previous balance: ${previousBalance.toDouble()}" }
 
         val newBalance: BigDecimal = when (transaction.type) {
             EconomyTransactionType.SET ->
@@ -582,23 +581,23 @@ object YamlStorageHandler : StorageHandler("Yaml") {
                 previousBalance.subtract(transaction.amount)
         }
 
-        Log.d(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
 
         val minBalance = BigDecimal(
-            SettingsCfg
+            plugin.configManager.settings
                 .rootNode
                 .node("advanced", "minimum-balance")
                 .getDouble(0.0)
         )
 
-        Log.d(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
+        plugin.debugLog(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
 
         if(newBalance.compareTo(minBalance) == -1) {
-            Log.d(STORAGE_YAML) { "error: new balance is below min balance" }
+            plugin.debugLog(STORAGE_YAML) { "error: new balance is below min balance" }
             throw TreasuryException { "Transaction would result in an overdraft" }
         }
 
-        Log.d(STORAGE_YAML) { "Firing transaction event" }
+        plugin.debugLog(STORAGE_YAML) { "Firing transaction event" }
         val event: FireCompletion<NonPlayerAccountTransactionEvent> = EventBus.INSTANCE.fire(
             NonPlayerAccountTransactionEvent(
                 transaction,
@@ -613,22 +612,22 @@ object YamlStorageHandler : StorageHandler("Yaml") {
         }
 
         if(eventThrowables.isNotEmpty()) {
-            Log.d(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
+            plugin.debugLog(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
             throw eventThrowables.first()
         }
 
-        Log.d(STORAGE_YAML) { "Attempting to write new balance to data file" }
+        plugin.debugLog(STORAGE_YAML) { "Attempting to write new balance to data file" }
 
-        Log.d(STORAGE_YAML) { "Fetching balance node" }
+        plugin.debugLog(STORAGE_YAML) { "Fetching balance node" }
         val balanceNode = getAccountNodeSync(account)
             .node("balance", getOrGrantCurrencyDbIdSync(currency))
 
-        Log.d(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
+        plugin.debugLog(STORAGE_YAML) { "Is virtual: ${balanceNode.virtual()}" }
 
-        Log.d(STORAGE_YAML) { "Setting node to new balance" }
+        plugin.debugLog(STORAGE_YAML) { "Setting node to new balance" }
         balanceNode.set(newBalance.toDouble())
 
-        Log.d(STORAGE_YAML) { "Adding transaction to history" }
+        plugin.debugLog(STORAGE_YAML) { "Adding transaction to history" }
 
         val historyNodes = getAccountNodeSync(account).node("transaction")
         val index = historyNodes.childrenList().size
@@ -681,7 +680,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
             .set(transaction.importance.name)
 
 
-        Log.d(STORAGE_YAML) { "Writing changes to disk" }
+        plugin.debugLog(STORAGE_YAML) { "Writing changes to disk" }
         write()
 
         return newBalance
@@ -690,7 +689,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     override fun retrieveHeldCurrenciesSync(
         account: PlayerAccount
     ): Collection<String> {
-        return EconomyManager
+        return plugin.economyManager
             .registeredCurrencies
             .stream()
             .filter { currency -> holdsCurrencySync(account, currency) }
@@ -701,7 +700,7 @@ object YamlStorageHandler : StorageHandler("Yaml") {
     override fun retrieveHeldCurrenciesSync(
         account: NonPlayerAccount
     ): Collection<String> {
-        return EconomyManager
+        return plugin.economyManager
             .registeredCurrencies
             .stream()
             .filter { currency -> holdsCurrencySync(account, currency) }
