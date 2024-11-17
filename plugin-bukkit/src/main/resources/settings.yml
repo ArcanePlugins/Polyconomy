@@ -23,7 +23,7 @@ currencies:
         value: "."
 
   - currency: "token"
-    enabled: true
+    enabled: false
     starting-balance: 0
     symbol: "T"
     amount-format: "#,##0.00"
