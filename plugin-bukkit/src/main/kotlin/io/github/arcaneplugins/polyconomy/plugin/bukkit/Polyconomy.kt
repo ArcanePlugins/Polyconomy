@@ -29,6 +29,7 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
  */
 class Polyconomy : JavaPlugin() {
 
+    val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
     val metricsManager = MetricsManager(this)
 
@@ -57,13 +58,13 @@ class Polyconomy : JavaPlugin() {
      */
     override fun onEnable() {
         try {
-            HookManager.ensureHardDependencies()
+            hookManager.ensureHardDependencies()
             ConfigManager.load()
             ExecutionManager.startup()
             EconomyManager.load()
             StorageManager.load()
             listenerManager.load()
-            HookManager.registerAll()
+            hookManager.registerAll()
             CommandManager.loadOnEnable()
             metricsManager.load()
         } catch(ex: TerminateLoadException) {
@@ -87,7 +88,7 @@ class Polyconomy : JavaPlugin() {
     override fun onDisable() {
         try {
             CommandManager.unloadOnDisable()
-            HookManager.unregisterAll()
+            hookManager.unregisterAll()
             ExecutionManager.shutdown()
             StorageManager.disconnect()
         } catch(ex: Exception) {
@@ -115,7 +116,7 @@ class Polyconomy : JavaPlugin() {
         logger.info("Reloading Polyconomy v${description.version}")
         try {
             /* soft-disabling */
-            HookManager.unregisterAll()
+            hookManager.unregisterAll()
             ExecutionManager.shutdown()
             StorageManager.disconnect()
 
@@ -124,7 +125,7 @@ class Polyconomy : JavaPlugin() {
             ExecutionManager.startup()
             EconomyManager.load()
             StorageManager.load()
-            HookManager.registerAll()
+            hookManager.registerAll()
             CommandManager.reload()
         } catch(ex: Exception) {
             throw ThrowableUtil.explainHelpfully(

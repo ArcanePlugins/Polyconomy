@@ -5,44 +5,49 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOK
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.service.Service
 import me.lokka30.treasury.api.common.service.ServicePriority
 import me.lokka30.treasury.api.common.service.ServiceRegistry
 import me.lokka30.treasury.api.economy.EconomyProvider
 import org.bukkit.Bukkit
 
-object TreasuryHook : Hook(
-    id = "Treasury",
-    type = HookType.ECONOMY_API
+class TreasuryHook(
+    val plugin: Polyconomy,
+) : Hook(
+    id = TREASURY_PLUGIN_NAME,
+    type = HookType.ECONOMY_API,
 ) {
 
+    companion object {
+        const val TREASURY_PLUGIN_NAME = "Treasury"
+    }
+
     override fun canRegister(): Boolean {
-        return !registered && Bukkit.getPluginManager().isPluginEnabled("Treasury")
+        return !registered && Bukkit.getPluginManager().isPluginEnabled(TREASURY_PLUGIN_NAME)
     }
 
     override fun register() {
         ServiceRegistry.INSTANCE.registerService(
             EconomyProvider::class.java,
             EconomyManager,
-            Polyconomy.instance.description.name,
+            plugin.description.name,
             ServicePriority.NORMAL
         )
         registered = true
     }
 
     override fun unregister() {
-        Log.d(HOOK_TREASURY) { "Unregistering Treasury service." }
+        plugin.debugLog(HOOK_TREASURY) { "Unregistering service." }
 
         var service: Service<EconomyProvider>? = null
         for(otherService in ServiceRegistry.INSTANCE.allServicesFor(EconomyProvider::class.java)) {
-            if(otherService.registrarName() != Polyconomy.instance.description.name) continue
+            if(otherService.registrarName() != plugin.description.name) continue
             service = otherService
             break
         }
 
         if(service == null) {
-            Log.d(HOOK_TREASURY) { "Can't unregister service: is already unregistered." }
+            plugin.debugLog(HOOK_TREASURY) { "Can't unregister service: is already unregistered." }
             return
         }
 
@@ -50,7 +55,7 @@ object TreasuryHook : Hook(
 
         registered = false
 
-        Log.d(HOOK_TREASURY) { "Unregistered Treasury service successfully." }
+        plugin.debugLog(HOOK_TREASURY) { "Unregistered service successfully." }
     }
 
 }
