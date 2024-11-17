@@ -24,7 +24,7 @@ class PolyAccountAccessor(
         val plugin: Polyconomy,
     ) : PlayerAccountAccessor() {
         override fun getOrCreate(
-            context: PlayerAccountCreateContext
+            context: PlayerAccountCreateContext,
         ): CompletableFuture<PlayerAccount> {
             return CompletableFuture.completedFuture(
                 PolyPlayerAccount(plugin, context.uniqueId)
@@ -36,7 +36,7 @@ class PolyAccountAccessor(
         val plugin: Polyconomy,
     ) : NonPlayerAccountAccessor() {
         override fun getOrCreate(
-            context: NonPlayerAccountCreateContext
+            context: NonPlayerAccountCreateContext,
         ): CompletableFuture<NonPlayerAccount> {
             return CompletableFuture.completedFuture(
                 PolyNonPlayerAccount(plugin, context.identifier)

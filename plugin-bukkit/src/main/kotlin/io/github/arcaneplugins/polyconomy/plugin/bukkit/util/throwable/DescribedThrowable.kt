@@ -5,5 +5,5 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable
  * to the end user, so no further explanation is needed.
  */
 class DescribedThrowable(
-    throwable: Throwable
+    throwable: Throwable,
 ) : Throwable(throwable)

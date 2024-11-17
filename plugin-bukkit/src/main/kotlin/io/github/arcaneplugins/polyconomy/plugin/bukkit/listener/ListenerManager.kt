@@ -5,7 +5,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.impl.PlayerJoin
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.impl.PlayerQuitListener
 
 class ListenerManager(
-    val plugin: Polyconomy
+    val plugin: Polyconomy,
 ) {
 
     val listeners: LinkedHashSet<PolyListener> = linkedSetOf(

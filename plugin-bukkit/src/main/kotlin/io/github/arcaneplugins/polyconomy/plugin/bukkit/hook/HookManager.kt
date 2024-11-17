@@ -54,7 +54,7 @@ class HookManager(
         val missing = listOf("Treasury")
             .filter { !Bukkit.getPluginManager().isPluginEnabled(it) }
 
-        if(missing.isEmpty()) {
+        if (missing.isEmpty()) {
             plugin.debugLog(HOOK_MANAGER) { "All hard dependencies are present." }
             return
         }

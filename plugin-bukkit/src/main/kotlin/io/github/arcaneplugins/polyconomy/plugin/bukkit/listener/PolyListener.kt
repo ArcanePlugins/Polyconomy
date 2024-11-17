@@ -17,14 +17,14 @@ abstract class PolyListener(
     private var registered: Boolean = false
 
     fun register() {
-        if(registered) {
+        if (registered) {
             throw IllegalStateException("${this::class.simpleName} is already registered.")
         }
 
         try {
             Bukkit.getPluginManager().registerEvents(this, plugin)
             registered = true
-        } catch(ex: DescribedThrowable) {
+        } catch (ex: DescribedThrowable) {
             throw ex
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(

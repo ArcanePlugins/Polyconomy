@@ -64,8 +64,8 @@ class YamlStorageHandler(
 
     private fun createIfNotExists() {
         val exists: Boolean = absolutePath().exists()
-        plugin.debugLog(STORAGE_YAML) { "Data file exists: ${if(exists) "Yes" else "No"}" }
-        if(exists) return
+        plugin.debugLog(STORAGE_YAML) { "Data file exists: ${if (exists) "Yes" else "No"}" }
+        if (exists) return
 
         plugin.debugLog(STORAGE_YAML) { "File doesn't exist; creating." }
         absolutePath().parent.createDirectories()
@@ -74,25 +74,25 @@ class YamlStorageHandler(
     }
 
     private fun getAccountNodeSync(
-        player: UUID
+        player: UUID,
     ): CommentedConfigurationNode {
         return rootNode.node("account", "player", player.toString())
     }
 
     private fun getAccountNodeSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): CommentedConfigurationNode {
         return getAccountNodeSync(account.identifier())
     }
 
     private fun getAccountNodeSync(
-        id: NamespacedKey
+        id: NamespacedKey,
     ): CommentedConfigurationNode {
         return rootNode.node("account", "non-player", id.namespace, id.key)
     }
 
     private fun getAccountNodeSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): CommentedConfigurationNode {
         return getAccountNodeSync(account.identifier())
     }
@@ -100,7 +100,7 @@ class YamlStorageHandler(
     @Suppress("BooleanMethodIsAlwaysInverted")
     private fun holdsCurrencySync(
         account: PlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): Boolean {
         return !getAccountNodeSync(account)
             .node("balance", getOrGrantCurrencyDbIdSync(currency))
@@ -110,7 +110,7 @@ class YamlStorageHandler(
     @Suppress("BooleanMethodIsAlwaysInverted")
     private fun holdsCurrencySync(
         account: NonPlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): Boolean {
         return !getAccountNodeSync(account)
             .node("balance", getOrGrantCurrencyDbIdSync(currency))
@@ -118,26 +118,26 @@ class YamlStorageHandler(
     }
 
     private fun getOrGrantCurrencyDbIdSync(
-        currencyId: String
+        currencyId: String,
     ): Int {
         return getCurrencyDbId(currencyId) ?: grantCurrencyDbId(currencyId)
     }
 
     private fun getOrGrantCurrencyDbIdSync(
-        currency: Currency
+        currency: Currency,
     ): Int {
         return getOrGrantCurrencyDbIdSync(currency.identifier)
     }
 
     private fun getCurrencyDbId(
-        currencyId: String
+        currencyId: String,
     ): Int? {
         val currencyDbIdNode = getCurrencyDbIdNode(currencyId)
-        return if(currencyDbIdNode.virtual()) null else currencyDbIdNode.int
+        return if (currencyDbIdNode.virtual()) null else currencyDbIdNode.int
     }
 
     private fun grantCurrencyDbId(
-        currencyId: String
+        currencyId: String,
     ): Int {
         val currencyDbIdNode = getCurrencyDbIdNode(currencyId)
         val latestDbIdGrantedNode = rootNode.node("currency", "current-db-id")
@@ -153,13 +153,13 @@ class YamlStorageHandler(
     }
 
     private fun getCurrencyDbIdNode(
-        currencyId: String
+        currencyId: String,
     ): CommentedConfigurationNode {
         return rootNode.node("currency", "db-id-map", currencyId)
     }
 
     private fun getCurrencyByDbId(
-        dbId: Int
+        dbId: Int,
     ): Currency {
         return plugin.economyManager.currencies.first {
             getOrGrantCurrencyDbIdSync(it) == dbId
@@ -169,7 +169,7 @@ class YamlStorageHandler(
     override fun connect() {
         plugin.debugLog(STORAGE_YAML) { "Connecting." }
 
-        if(connected)
+        if (connected)
             throw IllegalStateException("Attempted to connect whilst already connected")
 
         plugin.debugLog(STORAGE_YAML) { "Initialising loader." }
@@ -193,7 +193,7 @@ class YamlStorageHandler(
     override fun disconnect() {
         plugin.debugLog(STORAGE_YAML) { "Disconnecting." }
 
-        if(!connected) {
+        if (!connected) {
             plugin.debugLog(STORAGE_YAML) { "Attempted to disconnect, but is already disconnected." }
             return
         }
@@ -208,19 +208,19 @@ class YamlStorageHandler(
     }
 
     override fun hasPlayerAccountSync(
-        player: UUID
+        player: UUID,
     ): Boolean {
         return !getAccountNodeSync(player).virtual()
     }
 
     override fun hasNonPlayerAccountSync(
-        id: NamespacedKey
+        id: NamespacedKey,
     ): Boolean {
         return !getAccountNodeSync(id).virtual()
     }
 
     override fun retrieveNameSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): Optional<String> {
         return Optional.ofNullable(
             getAccountNodeSync(account)
@@ -230,7 +230,7 @@ class YamlStorageHandler(
     }
 
     override fun retrieveNameSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Optional<String> {
         return Optional.ofNullable(
             getAccountNodeSync(account)
@@ -241,11 +241,11 @@ class YamlStorageHandler(
 
     override fun setNameSync(
         account: PlayerAccount,
-        name: String?
+        name: String?,
     ): Boolean {
         val previousName: Optional<String> = retrieveNameSync(account)
 
-        if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
+        if ((!previousName.isPresent && name == null) || (previousName.get() == name)) {
             return false
         }
 
@@ -260,11 +260,11 @@ class YamlStorageHandler(
 
     override fun setNameSync(
         account: NonPlayerAccount,
-        name: String?
+        name: String?,
     ): Boolean {
         val previousName: Optional<String> = retrieveNameSync(account)
 
-        if((!previousName.isPresent && name == null) || (previousName.get() == name)) {
+        if ((!previousName.isPresent && name == null) || (previousName.get() == name)) {
             return false
         }
 
@@ -278,7 +278,7 @@ class YamlStorageHandler(
     }
 
     override fun deleteAccountSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): Boolean {
         getAccountNodeSync(account)
             .set(null)
@@ -289,7 +289,7 @@ class YamlStorageHandler(
     }
 
     override fun deleteAccountSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Boolean {
         getAccountNodeSync(account)
             .set(null)
@@ -301,12 +301,12 @@ class YamlStorageHandler(
 
     override fun retrieveBalanceSync(
         account: PlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): BigDecimal {
         val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
         plugin.debugLog(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
-        if(balanceNode.virtual()) {
+        if (balanceNode.virtual()) {
             plugin.debugLog(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
             val startingBalance = currency.getStartingBalance(account)
@@ -340,12 +340,12 @@ class YamlStorageHandler(
 
     override fun retrieveBalanceSync(
         account: NonPlayerAccount,
-        currency: Currency
+        currency: Currency,
     ): BigDecimal {
         val balanceNode = getAccountNodeSync(account).node("balance", getOrGrantCurrencyDbIdSync(currency))
         plugin.debugLog(STORAGE_YAML) { "balanceNode @ ${balanceNode.path()}" }
 
-        if(balanceNode.virtual()) {
+        if (balanceNode.virtual()) {
             plugin.debugLog(STORAGE_YAML) { "balanceNode is virtual; setting starting balance" }
 
             val startingBalance = currency.getStartingBalance(account)
@@ -379,7 +379,7 @@ class YamlStorageHandler(
 
     override fun doTransactionSync(
         account: PlayerAccount,
-        transaction: EconomyTransaction
+        transaction: EconomyTransaction,
     ): BigDecimal {
         plugin.debugLog(STORAGE_YAML) {
             "Finding currency by ID"
@@ -391,7 +391,7 @@ class YamlStorageHandler(
             "Found currency: ${currency.identifier}"
         }
 
-        if(transaction.type != EconomyTransactionType.SET &&
+        if (transaction.type != EconomyTransactionType.SET &&
             transaction.amount.compareTo(BigDecimal.ZERO) == -1
         ) {
             plugin.debugLog(STORAGE_YAML) {
@@ -404,7 +404,7 @@ class YamlStorageHandler(
         }
 
         val previousBalance: BigDecimal = let {
-            if(!holdsCurrencySync(account, currency)) {
+            if (!holdsCurrencySync(account, currency)) {
                 return@let BigDecimal.ZERO
             }
 
@@ -438,7 +438,7 @@ class YamlStorageHandler(
 
         plugin.debugLog(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
 
-        if(newBalance.compareTo(minBalance) == -1) {
+        if (newBalance.compareTo(minBalance) == -1) {
             plugin.debugLog(STORAGE_YAML) { "error: new balance is below min balance" }
             throw TreasuryException { "Transaction would result in an overdraft" }
         }
@@ -457,7 +457,7 @@ class YamlStorageHandler(
             eventThrowables.addAll(throwables)
         }
 
-        if(eventThrowables.isNotEmpty()) {
+        if (eventThrowables.isNotEmpty()) {
             plugin.debugLog(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
             throw eventThrowables.first()
         }
@@ -486,13 +486,13 @@ class YamlStorageHandler(
         historyNode
             .node("cause", "type")
             .set(let {
-                if(transaction.cause is Cause.Player) {
+                if (transaction.cause is Cause.Player) {
                     return@let "Player"
-                } else if(transaction.cause is Cause.NonPlayer) {
+                } else if (transaction.cause is Cause.NonPlayer) {
                     return@let "NonPlayer"
-                } else if(transaction.cause is Cause.Plugin) {
+                } else if (transaction.cause is Cause.Plugin) {
                     return@let "Plugin"
-                } else if(transaction.cause.equals(Cause.SERVER)) {
+                } else if (transaction.cause.equals(Cause.SERVER)) {
                     return@let "Server"
                 } else {
                     return@let "Custom"
@@ -511,7 +511,7 @@ class YamlStorageHandler(
             .node("type")
             .set(transaction.type.name)
 
-        if(transaction.reason.isPresent) {
+        if (transaction.reason.isPresent) {
             historyNode
                 .node("reason")
                 .set(transaction.reason.get())
@@ -534,7 +534,7 @@ class YamlStorageHandler(
 
     override fun doTransactionSync(
         account: NonPlayerAccount,
-        transaction: EconomyTransaction
+        transaction: EconomyTransaction,
     ): BigDecimal {
         plugin.debugLog(STORAGE_YAML) {
             "Finding currency by ID"
@@ -546,7 +546,7 @@ class YamlStorageHandler(
             "Found currency: ${currency.identifier}"
         }
 
-        if(transaction.type != EconomyTransactionType.SET &&
+        if (transaction.type != EconomyTransactionType.SET &&
             transaction.amount.compareTo(BigDecimal.ZERO) == -1
         ) {
             plugin.debugLog(STORAGE_YAML) {
@@ -559,7 +559,7 @@ class YamlStorageHandler(
         }
 
         val previousBalance: BigDecimal = let {
-            if(!holdsCurrencySync(account, currency)) {
+            if (!holdsCurrencySync(account, currency)) {
                 return@let BigDecimal.ZERO
             }
 
@@ -593,7 +593,7 @@ class YamlStorageHandler(
 
         plugin.debugLog(STORAGE_YAML) { "Min balance: ${minBalance.toDouble()}" }
 
-        if(newBalance.compareTo(minBalance) == -1) {
+        if (newBalance.compareTo(minBalance) == -1) {
             plugin.debugLog(STORAGE_YAML) { "error: new balance is below min balance" }
             throw TreasuryException { "Transaction would result in an overdraft" }
         }
@@ -612,7 +612,7 @@ class YamlStorageHandler(
             eventThrowables.addAll(throwables)
         }
 
-        if(eventThrowables.isNotEmpty()) {
+        if (eventThrowables.isNotEmpty()) {
             plugin.debugLog(STORAGE_YAML) { "Event exceptions is not empty; throwing" }
             throw eventThrowables.first()
         }
@@ -641,13 +641,13 @@ class YamlStorageHandler(
         historyNode
             .node("cause", "type")
             .set(let {
-                if(transaction.cause is Cause.Player) {
+                if (transaction.cause is Cause.Player) {
                     return@let "Player"
-                } else if(transaction.cause is Cause.NonPlayer) {
+                } else if (transaction.cause is Cause.NonPlayer) {
                     return@let "NonPlayer"
-                } else if(transaction.cause is Cause.Plugin) {
+                } else if (transaction.cause is Cause.Plugin) {
                     return@let "Plugin"
-                } else if(transaction.cause.identifier() == "Server") {
+                } else if (transaction.cause.identifier() == "Server") {
                     return@let "Server"
                 } else {
                     return@let "Custom"
@@ -666,7 +666,7 @@ class YamlStorageHandler(
             .node("type")
             .set(transaction.type.name)
 
-        if(transaction.reason.isPresent) {
+        if (transaction.reason.isPresent) {
             historyNode
                 .node("reason")
                 .set(transaction.reason.get())
@@ -688,7 +688,7 @@ class YamlStorageHandler(
     }
 
     override fun retrieveHeldCurrenciesSync(
-        account: PlayerAccount
+        account: PlayerAccount,
     ): Collection<String> {
         return plugin.economyManager
             .registeredCurrencies
@@ -699,7 +699,7 @@ class YamlStorageHandler(
     }
 
     override fun retrieveHeldCurrenciesSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Collection<String> {
         return plugin.economyManager
             .registeredCurrencies
@@ -713,7 +713,7 @@ class YamlStorageHandler(
         account: PlayerAccount,
         transactionCount: Int,
         from: Instant,
-        to: Instant
+        to: Instant,
     ): Collection<EconomyTransaction> {
         return getAccountNodeSync(account)
             .node("transaction")
@@ -735,12 +735,15 @@ class YamlStorageHandler(
                         PolyCause.PLAYER -> Cause.player(
                             UUID.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.NON_PLAYER -> Cause.nonPlayer(
                             NamespacedKey.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.PLUGIN -> Cause.plugin(
                             NamespacedKey.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.SERVER -> Cause.SERVER
                     },
 
@@ -789,7 +792,7 @@ class YamlStorageHandler(
         account: NonPlayerAccount,
         transactionCount: Int,
         from: Instant,
-        to: Instant
+        to: Instant,
     ): Collection<EconomyTransaction> {
         return getAccountNodeSync(account)
             .node("transaction")
@@ -811,12 +814,15 @@ class YamlStorageHandler(
                         PolyCause.PLAYER -> Cause.player(
                             UUID.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.NON_PLAYER -> Cause.nonPlayer(
                             NamespacedKey.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.PLUGIN -> Cause.plugin(
                             NamespacedKey.fromString(tNode.node("cause", "data").string!!)
                         )
+
                         PolyCause.SERVER -> Cause.SERVER
                     },
 
@@ -862,7 +868,7 @@ class YamlStorageHandler(
     }
 
     override fun retrieveMemberIdsSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Collection<UUID> {
         return getAccountNodeSync(account)
             .node("member")
@@ -873,12 +879,12 @@ class YamlStorageHandler(
 
     override fun isMemberSync(
         account: NonPlayerAccount,
-        memberPlayer: UUID
+        memberPlayer: UUID,
     ): Boolean {
         val memNode = getAccountNodeSync(account)
             .node("member", memberPlayer.toString())
 
-        if(memNode.virtual()) {
+        if (memNode.virtual()) {
             return false
         }
 
@@ -891,17 +897,17 @@ class YamlStorageHandler(
         account: NonPlayerAccount,
         memberPlayer: UUID,
         permissionValue: TriState,
-        vararg permissions: AccountPermission
+        vararg permissions: AccountPermission,
     ): Boolean {
         val permsNode = getAccountNodeSync(account)
             .node("member", memberPlayer.toString(), "permission")
 
         var adjustmentMade = false
 
-        for(permission in permissions) {
+        for (permission in permissions) {
             val node = permsNode.node(permission.name)
 
-            if(!node.getString("").equals(permissionValue.name, ignoreCase = true)) {
+            if (!node.getString("").equals(permissionValue.name, ignoreCase = true)) {
                 adjustmentMade = true
             }
 
@@ -923,9 +929,9 @@ class YamlStorageHandler(
 
     override fun retrievePermissionsSync(
         account: NonPlayerAccount,
-        memberPlayer: UUID
+        memberPlayer: UUID,
     ): Map<AccountPermission, TriState> {
-        if(!isMemberSync(account, memberPlayer)) {
+        if (!isMemberSync(account, memberPlayer)) {
             throw TreasuryException {
                 "Player is not a member of the account"
             }
@@ -944,13 +950,13 @@ class YamlStorageHandler(
     }
 
     override fun retrievePermissionsMapSync(
-        account: NonPlayerAccount
+        account: NonPlayerAccount,
     ): Map<UUID, Map<AccountPermission, TriState>> {
         val members = retrieveMemberIdsSync(account)
 
         val map = mutableMapOf<UUID, Map<AccountPermission, TriState>>()
 
-        for(member in members) {
+        for (member in members) {
             map[member] = retrievePermissionsSync(account, member)
         }
 
@@ -960,9 +966,9 @@ class YamlStorageHandler(
     override fun hasPermissionsSync(
         account: NonPlayerAccount,
         memberPlayer: UUID,
-        vararg permissions: AccountPermission
+        vararg permissions: AccountPermission,
     ): TriState {
-        if(permissions.isEmpty()) {
+        if (permissions.isEmpty()) {
             throw TreasuryException {
                 "At least one item must be specified in the permissions array."
             }

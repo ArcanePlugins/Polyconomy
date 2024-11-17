@@ -23,7 +23,7 @@ object ExecutionManager {
         listOf(
             execSvc
         ).forEach {
-            if(it == null) return@forEach
+            if (it == null) return@forEach
 
             it.shutdown()
             it.awaitTermination(

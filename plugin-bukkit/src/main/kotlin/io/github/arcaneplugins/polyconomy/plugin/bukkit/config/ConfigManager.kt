@@ -20,7 +20,7 @@ class ConfigManager(
     )
 
     fun load() {
-        if(plugin.storageManager.connected()) {
+        if (plugin.storageManager.connected()) {
             plugin.debugLog(CONFIG_MANAGER) { "Storage manager was connected - disconnecting." }
             plugin.storageManager.disconnect()
             plugin.debugLog(CONFIG_MANAGER) { "Disconnected storage manager; continuing." }
@@ -32,9 +32,9 @@ class ConfigManager(
                 config.load()
                 plugin.debugLog(CONFIG_MANAGER) { "Loaded config ${config.name}." }
             }
-        } catch(ex: DescribedThrowable) {
+        } catch (ex: DescribedThrowable) {
             throw ex
-        } catch(ex: Exception) {
+        } catch (ex: Exception) {
             plugin.debugLog(CONFIG_MANAGER) { "Caught exception ${ex::class.simpleName}; re-throwing." }
 
             throw ThrowableUtil.explainHelpfully(
