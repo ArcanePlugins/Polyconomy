@@ -430,7 +430,7 @@ class YamlStorageHandler(
         plugin.debugLog(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
 
         val minBalance = BigDecimal(
-            plugin.configManager.settings
+            plugin.settings
                 .rootNode
                 .node("advanced", "minimum-balance")
                 .getDouble(0.0)
@@ -585,7 +585,7 @@ class YamlStorageHandler(
         plugin.debugLog(STORAGE_YAML) { "New balance: ${newBalance.toDouble()}" }
 
         val minBalance = BigDecimal(
-            plugin.configManager.settings
+            plugin.settings
                 .rootNode
                 .node("advanced", "minimum-balance")
                 .getDouble(0.0)

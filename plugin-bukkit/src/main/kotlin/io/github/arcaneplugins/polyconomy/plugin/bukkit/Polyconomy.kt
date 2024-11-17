@@ -1,7 +1,9 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.Config
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.messages.MessagesCfg
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
@@ -10,6 +12,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.DescribedThrowable
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -29,13 +32,20 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
 class Polyconomy : JavaPlugin() {
 
     val debugManager = DebugManager(this)
-    val configManager = ConfigManager(this)
     val economyManager = EconomyManager(this)
     val storageManager = StorageManager(this)
     val commandManager = CommandManager(this)
     val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
     val metricsManager = MetricsManager(this)
+
+    val settings = SettingsCfg(this)
+    val messages = MessagesCfg(this)
+
+    val configs: LinkedHashSet<Config> = linkedSetOf(
+        settings,
+        messages,
+    )
 
     /**
      * Implements [JavaPlugin.onLoad].
@@ -63,7 +73,7 @@ class Polyconomy : JavaPlugin() {
     override fun onEnable() {
         try {
             hookManager.ensureHardDependencies()
-            configManager.load()
+            loadConfigs()
             ExecutionManager.startup()
             economyManager.load()
             storageManager.load()
@@ -122,7 +132,7 @@ class Polyconomy : JavaPlugin() {
             storageManager.disconnect()
 
             /* re-loading */
-            configManager.load()
+            loadConfigs()
             ExecutionManager.startup()
             economyManager.load()
             storageManager.load()
@@ -166,6 +176,36 @@ class Polyconomy : JavaPlugin() {
             Bukkit.getOnlinePlayers()
                 .filter(Player::isOp)
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }
+        }
+    }
+
+    fun loadConfigs() {
+        if (storageManager.connected()) {
+            debugLog(DebugCategory.CONFIG_MANAGER) { "Storage manager was connected - disconnecting." }
+            storageManager.disconnect()
+            debugLog(DebugCategory.CONFIG_MANAGER) { "Disconnected storage manager; continuing." }
+        }
+
+        try {
+            configs.forEach { config ->
+                debugLog(DebugCategory.CONFIG_MANAGER) { "Loading config ${config.name}." }
+                config.load()
+                debugLog(DebugCategory.CONFIG_MANAGER) { "Loaded config ${config.name}." }
+            }
+        } catch (ex: DescribedThrowable) {
+            throw ex
+        } catch (ex: Exception) {
+            debugLog(DebugCategory.CONFIG_MANAGER) { "Caught exception ${ex::class.simpleName}; re-throwing." }
+
+            throw ThrowableUtil.explainHelpfully(
+                plugin = this,
+                throwable = ex,
+                otherInfo = "Unable to load configs. You have most likely created an accidental " +
+                        "syntax error, such as a stray apostrophe or misaligned indentation. Prior " +
+                        "to seeking assistance with this error, please use a YAML parser website to " +
+                        "validate all of your YAML config files.",
+                otherContext = "Loading configs"
+            )
         }
     }
 

@@ -29,7 +29,7 @@ class StorageManager(
             )
 
         // figure out what storage handler ID they want to connect with
-        val id: String? = plugin.configManager.settings
+        val id: String? = plugin.settings
             .rootNode
             .node("storage", "implementation")
             .string

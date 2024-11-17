@@ -17,7 +17,7 @@ class DebugManager(
     fun load() {
         enabledCategories.clear()
 
-        val categoriesNode = plugin.configManager.settings
+        val categoriesNode = plugin.settings
             .rootNode
             .node("advanced", "debug-categories")
 

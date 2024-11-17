@@ -41,7 +41,7 @@ class EconomyManager(
     private fun loadCurrencies() {
         registeredCurrencies.clear()
 
-        plugin.configManager.settings
+        plugin.settings
             .rootNode
             .node("currencies")
             .childrenList()
@@ -62,7 +62,7 @@ class EconomyManager(
                         )
 
                         val decimalLocaleMap: Map<Locale, Char> = let { _ ->
-                            val map: MutableMap<Locale, Char> = mutableMapOf()
+                            val dlMap: MutableMap<Locale, Char> = mutableMapOf()
 
                             currencyNode
                                 .node("decimal")
@@ -79,13 +79,13 @@ class EconomyManager(
                                         .string!!
                                         .first()
 
-                                    map[locale] = character
+                                    dlMap[locale] = character
                                 }
 
-                            if (!map.containsKey(primLocale))
-                                map[primLocale] = '.'
+                            if (!dlMap.containsKey(primLocale))
+                                dlMap[primLocale] = '.'
 
-                            return@let map
+                            return@let dlMap
                         }
 
                         val presentationFormat = currencyNode
@@ -188,7 +188,7 @@ class EconomyManager(
 
     private fun loadPrimaryCurrency() {
         primCurrency = findCurrencyNonNull(
-            plugin.configManager.settings
+            plugin.settings
                 .rootNode
                 .node("primary-currency")
                 .string!!
@@ -197,7 +197,7 @@ class EconomyManager(
 
     private fun loadPrimaryLocale() {
         primLocale = Locale(
-            plugin.configManager.settings
+            plugin.settings
                 .rootNode
                 .node("primary-locale")
                 .getString("en_US")
