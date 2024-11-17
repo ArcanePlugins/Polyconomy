@@ -14,7 +14,7 @@ import kotlin.io.path.exists
 
 class YamlStorageHandler(
     val plugin: Polyconomy,
-) : StorageHandler("Yaml") {
+) : StorageHandler("yaml") {
 
     private val relativePath: Path = Path("data${File.separator}data.yml")
 
