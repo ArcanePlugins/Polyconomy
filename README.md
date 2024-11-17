@@ -25,12 +25,15 @@ It's reliable, robust, powerful, performant, featureful, and free.
 
 ## ⚠️ Pre-Alpha Notice ⚠️
 
-Polyconomy is currently in very early development. It is not usable in its current state. **Most of the links in this file are non-functional!**
+Polyconomy is currently in very early development. It is not usable in its current state. **Most of the links in this
+file are non-functional!**
 
-We're slowly but surely building up a to-do list of what needs to be done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).
+We're slowly but surely building up a to-do list of what needs to be
+done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).
 
 You are highly encouraged to discuss and partake in Polyconomy's development: join
-the [ArcanePlugins Discord guild](https://discord.gg/HqZwdcJ). Please select 'other lokka30 plugins' role on join and use the channel under the same name to chat.
+the [ArcanePlugins Discord guild](https://discord.gg/HqZwdcJ). Please select 'other lokka30 plugins' role on join and
+use the channel under the same name to chat.
 
 </div>
 
