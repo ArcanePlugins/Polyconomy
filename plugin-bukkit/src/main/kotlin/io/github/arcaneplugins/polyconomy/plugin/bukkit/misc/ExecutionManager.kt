@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-object ConcurrentManager {
+object ExecutionManager {
 
     var execSvc: ExecutorService? = null
         private set

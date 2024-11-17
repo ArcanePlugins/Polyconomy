@@ -1,7 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager.currentHandlerNotNull
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.execSvc
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
 import me.lokka30.treasury.api.economy.account.AccountPermission

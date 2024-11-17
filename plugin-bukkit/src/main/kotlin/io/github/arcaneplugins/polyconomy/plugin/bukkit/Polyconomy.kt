@@ -8,7 +8,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
@@ -56,7 +56,7 @@ class Polyconomy : JavaPlugin() {
         try {
             HookManager.ensureHardDependencies()
             ConfigManager.load()
-            ConcurrentManager.startup()
+            ExecutionManager.startup()
             EconomyManager.load()
             StorageManager.connect()
             ListenerManager.registerAll()
@@ -85,7 +85,7 @@ class Polyconomy : JavaPlugin() {
         try {
             CommandManager.unloadOnDisable()
             HookManager.unregisterAll()
-            ConcurrentManager.shutdown()
+            ExecutionManager.shutdown()
             StorageManager.disconnect()
         } catch(ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
@@ -100,7 +100,7 @@ class Polyconomy : JavaPlugin() {
      * Performs an internal 'soft reload':
      *
      * This reloads the entire hook and configuration system, and all systems within those (i.e.,
-     * storage management, economy management, and so on). It also restarts the [ConcurrentManager].
+     * storage management, economy management, and so on). It also restarts the [ExecutionManager].
      *
      * This method is called by Polyconomy's 'reload' subcommand so that administrators can easily
      * apply changes to their configuration during runtime, saving them minutes of each interruption
@@ -113,12 +113,12 @@ class Polyconomy : JavaPlugin() {
         try {
             /* soft-disabling */
             HookManager.unregisterAll()
-            ConcurrentManager.shutdown()
+            ExecutionManager.shutdown()
             StorageManager.disconnect()
 
             /* re-loading */
             ConfigManager.load()
-            ConcurrentManager.startup()
+            ExecutionManager.startup()
             EconomyManager.load()
             StorageManager.connect()
             HookManager.registerAll()

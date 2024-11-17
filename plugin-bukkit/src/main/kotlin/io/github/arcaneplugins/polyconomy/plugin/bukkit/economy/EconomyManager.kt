@@ -4,7 +4,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.Settings
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account.PolyAccountAccessor
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager.execSvc
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState

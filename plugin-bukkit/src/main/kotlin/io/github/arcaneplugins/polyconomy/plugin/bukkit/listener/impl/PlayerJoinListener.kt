@@ -2,7 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.impl
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.PolyListener
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerJoinEvent
@@ -36,7 +36,7 @@ object PlayerJoinListener : PolyListener(
                         Thread.sleep(randomTime * 1000)
                         Log.i("#${i}: supplied async.")
                     },
-                    ConcurrentManager.execSvc
+                    ExecutionManager.execSvc
                 )
                 .thenAccept {
                     Log.i("#${i}: accepted; done.")
