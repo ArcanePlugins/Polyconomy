@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>plugin-bukkit</module>
+        <module>api</module>
     </modules>
     <groupId>io.github.arcaneplugins.polyconomy</groupId>
     <version>1.0.0-SNAPSHOT-1</version>
