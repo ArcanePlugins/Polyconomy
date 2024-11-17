@@ -2,6 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.ConfigManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
@@ -10,7 +12,11 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.function.Supplier
 
 /**
 Welcome to Polyconomy's main class.
@@ -143,6 +149,33 @@ class Polyconomy : JavaPlugin() {
         }
 
         Log.i("Plugin reloaded successfully.")
+    }
+
+    /**
+     * Logs the given message if the given [DebugCategory] is enabled.
+     *
+     * **Note:** Under normal circumstances, this method will not log any debug categories until
+     * the DebugHandler has loaded the enabled categories from the Settings config. You can
+     * forcefully allow debug logs to happen at any point after [Polyconomy.onLoad] is called
+     * by programatically modifying [DebugManager.enabledCategories].
+     *
+     * @param dCat Debug category associated with the message being supplied
+     * @param msg  Supplier of the message which will be accessed if the category is enabled
+     */
+    fun debugLog(dCat: DebugCategory, msg: Supplier<Any>) {
+        if(dCat.disabled()) {
+            return
+        }
+
+        val output = "[DEBUG: ${dCat}] ${msg.get()}"
+
+        logger.info(output)
+
+        if(DebugCategory.DEBUG_BROADCAST_OPS.enabled()) {
+            Bukkit.getOnlinePlayers()
+                .filter(Player::isOp)
+                .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }
+        }
     }
 
 }
