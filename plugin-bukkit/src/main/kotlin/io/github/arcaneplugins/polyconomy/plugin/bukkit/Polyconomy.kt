@@ -29,6 +29,10 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
  */
 class Polyconomy : JavaPlugin() {
 
+    val debugManager = DebugManager(this)
+    val configManager = ConfigManager(this)
+    val economyManager = EconomyManager(this)
+    val storageManager = StorageManager(this)
     val commandManager = CommandManager(this)
     val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
@@ -60,10 +64,10 @@ class Polyconomy : JavaPlugin() {
     override fun onEnable() {
         try {
             hookManager.ensureHardDependencies()
-            ConfigManager.load()
+            configManager.load()
             ExecutionManager.startup()
-            EconomyManager.load()
-            StorageManager.load()
+            economyManager.load()
+            storageManager.load()
             listenerManager.load()
             hookManager.registerAll()
             commandManager.load()
@@ -91,7 +95,7 @@ class Polyconomy : JavaPlugin() {
             commandManager.disable()
             hookManager.unregisterAll()
             ExecutionManager.shutdown()
-            StorageManager.disconnect()
+            storageManager.disconnect()
         } catch(ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
@@ -119,13 +123,13 @@ class Polyconomy : JavaPlugin() {
             /* soft-disabling */
             hookManager.unregisterAll()
             ExecutionManager.shutdown()
-            StorageManager.disconnect()
+            storageManager.disconnect()
 
             /* re-loading */
-            ConfigManager.load()
+            configManager.load()
             ExecutionManager.startup()
-            EconomyManager.load()
-            StorageManager.load()
+            economyManager.load()
+            storageManager.load()
             hookManager.registerAll()
             commandManager.reload()
         } catch(ex: Exception) {
@@ -149,20 +153,20 @@ class Polyconomy : JavaPlugin() {
      * forcefully allow debug logs to happen at any point after [Polyconomy.onLoad] is called
      * by programatically modifying [DebugManager.enabledCategories].
      *
-     * @param dCat Debug category associated with the message being supplied
-     * @param msg  Supplier of the message which will be accessed if the category is enabled
+     * @param cat Debug category associated with the message being supplied
+     * @param msg Supplier of the message which will be accessed if the category is enabled
      */
     @Suppress("unused")
-    fun debugLog(dCat: DebugCategory, msg: Supplier<Any>) {
-        if(dCat.disabled()) {
+    fun debugLog(cat: DebugCategory, msg: Supplier<Any>) {
+        if(debugManager.enabled(cat)) {
             return
         }
 
-        val output = "[DEBUG: ${dCat}] ${msg.get()}"
+        val output = "[DEBUG: ${cat}] ${msg.get()}"
 
         logger.info(output)
 
-        if(DebugCategory.DEBUG_BROADCAST_OPS.enabled()) {
+        if(debugManager.enabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
             Bukkit.getOnlinePlayers()
                 .filter(Player::isOp)
                 .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }

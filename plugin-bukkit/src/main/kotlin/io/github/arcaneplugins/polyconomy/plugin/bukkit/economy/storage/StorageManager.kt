@@ -1,11 +1,13 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.local.YamlStorageHandler
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 
-object StorageManager {
+class StorageManager(
+    val plugin: Polyconomy,
+) {
 
     val availableHandlers: MutableSet<StorageHandler> = mutableSetOf(
         /* Local Storage Handlers */
@@ -55,7 +57,7 @@ object StorageManager {
 
     fun disconnect() {
         if(!connected()) {
-            Log.d(STORAGE_MANAGER) {
+            plugin.debugLog(STORAGE_MANAGER) {
                 """
                 Unable to disconnect via StorageManager: already disconnected.
                 """.trimIndent()
@@ -69,10 +71,6 @@ object StorageManager {
     @Suppress("BooleanMethodIsAlwaysInverted")
     fun connected(): Boolean {
         return currentHandler != null
-    }
-
-    fun currentHandlerNotNull(): StorageHandler {
-        return currentHandler!!
     }
 
 }

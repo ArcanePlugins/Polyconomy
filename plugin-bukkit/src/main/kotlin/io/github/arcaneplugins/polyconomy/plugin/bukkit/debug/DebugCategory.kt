@@ -73,16 +73,4 @@ enum class DebugCategory {
      */
     DEBUG_TEST,
 
-    ;
-
-    @Suppress("BooleanMethodIsAlwaysInverted")
-    fun enabled(): Boolean {
-        return DebugManager.isCategoryEnabled(this)
-    }
-
-    @Suppress("BooleanMethodIsAlwaysInverted")
-    fun disabled(): Boolean {
-        return !enabled()
-    }
-
 }

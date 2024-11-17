@@ -1,11 +1,11 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.ECONOMY_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account.PolyAccountAccessor
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager.execSvc
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
 import me.lokka30.treasury.api.economy.EconomyProvider
@@ -18,9 +18,13 @@ import java.text.DecimalFormat
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-object EconomyManager : EconomyProvider {
+class EconomyManager(
+    val plugin: Polyconomy,
+) : EconomyProvider {
 
-    const val PRECISION = 4
+    companion object {
+        const val PRECISION = 4
+    }
 
     lateinit var primCurrency: Currency
         private set
@@ -45,7 +49,7 @@ object EconomyManager : EconomyProvider {
             .childrenList()
             .filter { currencyNode -> currencyNode.node("enabled").getBoolean(true) }
             .forEach { currencyNode ->
-                Log.d(ECONOMY_MANAGER) { "Parsing currency node @ ${currencyNode.path()}" }
+                plugin.debugLog(ECONOMY_MANAGER) { "Parsing currency node @ ${currencyNode.path()}" }
 
                 registeredCurrencies.add(
                     object : Currency {
