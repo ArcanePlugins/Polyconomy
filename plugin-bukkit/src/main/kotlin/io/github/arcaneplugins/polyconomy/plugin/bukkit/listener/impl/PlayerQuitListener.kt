@@ -1,17 +1,19 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.impl
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.PolyListener
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerQuitEvent
 
-object PlayerQuitListener : PolyListener(
-    imperative = true
+class PlayerQuitListener(
+    plugin: Polyconomy,
+) : PolyListener(
+    plugin,
 ) {
 
-    @Suppress("EmptyMethod")
+    @Suppress("EmptyMethod") // TODO: Handle any caching required for the player. remove suppression.
     @EventHandler
-    fun handleEvent(event: PlayerQuitEvent) {
-        // TODO: Handle any caching required for the player.
+    fun handle(event: PlayerQuitEvent) {
     }
 
 }

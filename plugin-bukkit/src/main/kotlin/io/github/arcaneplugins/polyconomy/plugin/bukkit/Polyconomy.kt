@@ -29,6 +29,9 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
  */
 class Polyconomy : JavaPlugin() {
 
+    val listenerManager = ListenerManager(this)
+    val metricsManager = MetricsManager(this)
+
     /**
      * Implements [JavaPlugin.onLoad].
      *
@@ -58,11 +61,11 @@ class Polyconomy : JavaPlugin() {
             ConfigManager.load()
             ExecutionManager.startup()
             EconomyManager.load()
-            StorageManager.connect()
-            ListenerManager.registerAll()
+            StorageManager.load()
+            listenerManager.load()
             HookManager.registerAll()
             CommandManager.loadOnEnable()
-            MetricsManager.register(this)
+            metricsManager.load()
         } catch(ex: TerminateLoadException) {
             isEnabled = false
             return
@@ -106,7 +109,7 @@ class Polyconomy : JavaPlugin() {
      * apply changes to their configuration during runtime, saving them minutes of each interruption
      * where they would otherwise restart their server after each config adjustment.
      */
-    //TODO use
+    //TODO use function for the reload subcommand once implemented.
     @Suppress("unused")
     fun softReload() {
         logger.info("Reloading Polyconomy v${description.version}")
@@ -120,7 +123,7 @@ class Polyconomy : JavaPlugin() {
             ConfigManager.load()
             ExecutionManager.startup()
             EconomyManager.load()
-            StorageManager.connect()
+            StorageManager.load()
             HookManager.registerAll()
             CommandManager.reload()
         } catch(ex: Exception) {
@@ -135,6 +138,7 @@ class Polyconomy : JavaPlugin() {
         logger.info("Plugin reloaded successfully.")
     }
 
+    //TODO Use function
     /**
      * Logs the given message if the given [DebugCategory] is enabled.
      *
@@ -146,6 +150,7 @@ class Polyconomy : JavaPlugin() {
      * @param dCat Debug category associated with the message being supplied
      * @param msg  Supplier of the message which will be accessed if the category is enabled
      */
+    @Suppress("unused")
     fun debugLog(dCat: DebugCategory, msg: Supplier<Any>) {
         if(dCat.disabled()) {
             return

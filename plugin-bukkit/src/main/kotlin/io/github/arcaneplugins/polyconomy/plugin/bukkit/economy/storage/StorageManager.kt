@@ -18,7 +18,7 @@ object StorageManager {
 
     var currentHandler: StorageHandler? = null
 
-    fun connect() {
+    fun load() {
         // make sure we're not already connected
         if(connected())
             throw IllegalStateException("""

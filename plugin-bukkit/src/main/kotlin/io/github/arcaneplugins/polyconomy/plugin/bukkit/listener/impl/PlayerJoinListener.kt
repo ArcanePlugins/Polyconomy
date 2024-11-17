@@ -1,29 +1,32 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.impl
 
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.PolyListener
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import org.bukkit.event.EventHandler
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ThreadLocalRandom
 
-object PlayerJoinListener : PolyListener(
-    imperative = true
+class PlayerJoinListener(
+    plugin: Polyconomy,
+) : PolyListener(
+    plugin,
 ) {
 
     @EventHandler
-    fun handleEvent(event: PlayerJoinEvent) {
+    fun handle(event: PlayerJoinEvent) {
         // TODO: Handle any caching required for the player.
 
         handleDebugTest()
     }
 
+    //TODO remove this method once debugging is done.
     private fun handleDebugTest() {
         if(DebugCategory.DEBUG_TEST.disabled()) return
 
-        Log.i("Handling debug method")
+        plugin.debugLog(DebugCategory.DEBUG_TEST) { "Handling debug method" }
 
         for(i in 1..5) {
             val randomTime = ThreadLocalRandom.current().nextLong(1, 3 + 1)
@@ -31,21 +34,21 @@ object PlayerJoinListener : PolyListener(
             CompletableFuture
                 .supplyAsync(
                     {
-                        Log.i("#${i}: supplying async.")
-                        Log.i("#${i}: waiting ${randomTime} seconds.")
+                        plugin.debugLog(DebugCategory.DEBUG_TEST) { "#${i}: supplying async." }
+                        plugin.debugLog(DebugCategory.DEBUG_TEST) { "#${i}: waiting ${randomTime} seconds." }
                         Thread.sleep(randomTime * 1000)
-                        Log.i("#${i}: supplied async.")
+                        plugin.debugLog(DebugCategory.DEBUG_TEST) { "#${i}: supplied async." }
                     },
                     ExecutionManager.execSvc
                 )
                 .thenAccept {
-                    Log.i("#${i}: accepted; done.")
+                    plugin.debugLog(DebugCategory.DEBUG_TEST) { "#${i}: accepted; done." }
                 }
 
-            Log.i("CF #${i} sent")
+            plugin.debugLog(DebugCategory.DEBUG_TEST) { "CF #${i} sent" }
         }
 
-        Log.i("Finished debug handle method")
+        plugin.debugLog(DebugCategory.DEBUG_TEST) { "Finished debug handle method" }
     }
 
 }
