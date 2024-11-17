@@ -10,13 +10,12 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ConcurrentManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.Log
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.TerminateLoadException
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import sun.rmi.runtime.Log
 import java.util.function.Supplier
 
 /**
@@ -39,20 +38,12 @@ class Polyconomy : JavaPlugin() {
         try {
             CommandManager.loadOnLoad()
         } catch(ex: Exception) {
-            Log.s(
-                """
-                
-                An error occurred whilst attempting to load Polyconomy (is it up to date?).
-                
-                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
-                
-                If you are unable to resolve this error yourself, feel free to ask our support team for help.
-                Discord: https://discord.gg/HqZwdcJ
-                
-                A stack trace will be printed below to aid advanced users in resolving this issue:
-                """.trimIndent()
+            throw ThrowableUtil.explainHelpfully(
+                this,
+                ex,
+                otherInfo = "Issues during initialisation are sometimes caused by incompatible server software / versions.",
+                action = "initialising"
             )
-            throw ex
         }
     }
 
@@ -76,20 +67,12 @@ class Polyconomy : JavaPlugin() {
             isEnabled = false
             return
         } catch (ex: Exception) {
-            Log.s(
-                """
-                
-                An error occurred whilst attempting to enable Polyconomy (is it up to date?).
-                
-                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
-                
-                If you are unable to resolve this error yourself, feel free to ask our support team for help.
-                Discord: https://discord.gg/HqZwdcJ
-                
-                A stack trace will be printed below to aid advanced users in resolving this issue:
-                """.trimIndent()
+            throw ThrowableUtil.explainHelpfully(
+                this,
+                ex,
+                otherInfo = "Issues during startup are often caused by user configuration errors.",
+                action = "enabling"
             )
-            throw ex
         }
     }
 
@@ -99,10 +82,18 @@ class Polyconomy : JavaPlugin() {
      * This method performs all of the shutdown behaviour.
      */
     override fun onDisable() {
-        CommandManager.unloadOnDisable()
-        HookManager.unregisterAll()
-        ConcurrentManager.shutdown()
-        StorageManager.disconnect()
+        try {
+            CommandManager.unloadOnDisable()
+            HookManager.unregisterAll()
+            ConcurrentManager.shutdown()
+            StorageManager.disconnect()
+        } catch(ex: Exception) {
+            throw ThrowableUtil.explainHelpfully(
+                this,
+                ex,
+                action = "disabling"
+            )
+        }
     }
 
     /**
@@ -118,7 +109,7 @@ class Polyconomy : JavaPlugin() {
     //TODO use
     @Suppress("unused")
     fun softReload() {
-        Log.i("Reloading Polyconomy v${description.version}")
+        logger.info("Reloading Polyconomy v${description.version}")
         try {
             /* soft-disabling */
             HookManager.unregisterAll()
@@ -133,23 +124,15 @@ class Polyconomy : JavaPlugin() {
             HookManager.registerAll()
             CommandManager.reload()
         } catch(ex: Exception) {
-            Log.s(
-                """
-                
-                Error occurred while reloading Polyconomy v${description.version} (Is it up to date?).
-                
-                This error may or may not be caused by Polyconomy itself - users commonly make spelling mistakes when editing config files.
-                
-                If you are unable to resolve this error yourself, feel free to ask our support team for help.
-                Discord: https://discord.gg/HqZwdcJ
-                
-                A stack trace will be printed below to aid advanced users in resolving this issue:
-                """.trimIndent())
-            ex.printStackTrace()
-            throw ex
+            throw ThrowableUtil.explainHelpfully(
+                this,
+                ex,
+                otherInfo = "Issues during reloads are often caused by user configuration errors.",
+                action = "soft-reloading"
+            )
         }
 
-        Log.i("Plugin reloaded successfully.")
+        logger.info("Plugin reloaded successfully.")
     }
 
     /**
