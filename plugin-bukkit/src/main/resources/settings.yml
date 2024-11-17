@@ -38,12 +38,10 @@ currencies:
         value: "."
 
 storage:
-  implementation: "Yaml"
+  implementation: "yaml"
 
 advanced:
-  important-plugin-recommendations: false
   minimum-balance: 0
-  signed-balances: true
 
 metadata:
   file-version: 1
