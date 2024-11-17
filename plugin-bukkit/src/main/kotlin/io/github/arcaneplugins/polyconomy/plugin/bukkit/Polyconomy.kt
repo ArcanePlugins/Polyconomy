@@ -16,6 +16,7 @@ import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import sun.rmi.runtime.Log
 import java.util.function.Supplier
 
 /**
@@ -70,7 +71,7 @@ class Polyconomy : JavaPlugin() {
             ListenerManager.registerAll()
             HookManager.registerAll()
             CommandManager.loadOnEnable()
-            MetricsManager.register()
+            MetricsManager.register(this)
         } catch(ex: TerminateLoadException) {
             isEnabled = false
             return
