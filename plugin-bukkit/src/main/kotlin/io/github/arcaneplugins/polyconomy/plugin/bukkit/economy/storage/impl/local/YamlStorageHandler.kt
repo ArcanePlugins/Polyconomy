@@ -2,6 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.impl.lo
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.account.PolyCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.storage.StorageHandler
 import me.lokka30.treasury.api.common.Cause
 import me.lokka30.treasury.api.common.NamespacedKey
@@ -727,17 +728,21 @@ class YamlStorageHandler(
                     ).identifier,
 
                     // cause
-                    Cause.create(
-                        Cause.Type.valueOf( // todo
-                            tNode
-                                .node("cause", "type")
-                                .string!!
-                        ),
-
-                        tNode
-                            .node("cause", "data")
-                            .get(Any::class.java)
-                    ),
+                    when (PolyCause.valueOf(
+                        tNode.node("cause", "type").string!!
+                            .uppercase(Locale.ROOT)
+                    )) {
+                        PolyCause.PLAYER -> Cause.player(
+                            UUID.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.NON_PLAYER -> Cause.nonPlayer(
+                            NamespacedKey.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.PLUGIN -> Cause.plugin(
+                            NamespacedKey.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.SERVER -> Cause.SERVER
+                    },
 
                     // timestamp
                     Instant.ofEpochMilli(
@@ -799,17 +804,21 @@ class YamlStorageHandler(
                     ).identifier,
 
                     // cause
-                    Cause.create( // todo
-                        Cause.Type.valueOf(
-                            tNode
-                                .node("cause", "type")
-                                .string!!
-                        ),
-
-                        tNode
-                            .node("cause", "data")
-                            .get(Any::class.java)
-                    ),
+                    when (PolyCause.valueOf(
+                        tNode.node("cause", "type").string!!
+                            .uppercase(Locale.ROOT)
+                    )) {
+                        PolyCause.PLAYER -> Cause.player(
+                            UUID.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.NON_PLAYER -> Cause.nonPlayer(
+                            NamespacedKey.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.PLUGIN -> Cause.plugin(
+                            NamespacedKey.fromString(tNode.node("cause", "data").string!!)
+                        )
+                        PolyCause.SERVER -> Cause.SERVER
+                    },
 
                     // timestamp
                     Instant.ofEpochMilli(
