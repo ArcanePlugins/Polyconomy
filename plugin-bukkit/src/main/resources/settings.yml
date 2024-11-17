@@ -14,13 +14,13 @@ currencies:
     amount-format: "#,##0.00"
     presentation-format: "%symbol%%amount%"
     conversion-rate: 1
-    display-name:
-      - locale: "en_US"
-        singular-value: "Dollar"
-        plural-value: "Dollars"
-    decimal:
-      - locale: "en_US"
-        value: "."
+    locales:
+      - id: "en_US"
+        display-name:
+          singular: "Dollar"
+          plural: "Dollars"
+        decimal:
+          value: "."
 
   - currency: "token"
     enabled: false
@@ -29,13 +29,13 @@ currencies:
     amount-format: "#,##0.00"
     presentation-format: "%amount% %display-name%"
     conversion-rate: 100
-    display-name:
-      - locale: "en_US"
-        singular-value: "Token"
-        plural-value: "Tokens"
-    decimal:
-      - locale: "en_US"
-        value: "."
+    locales:
+      - id: "en_US"
+        display-name:
+          singular: "Token"
+          plural: "Tokens"
+        decimal:
+          value: "."
 
 storage:
   implementation: "yaml"
