@@ -14,7 +14,7 @@ It's reliable, robust, powerful, performant, featureful, and free.
 • [Discord (Support & Discussion)](https://discord.gg/HqZwdcJ)
 •
 
-• [To-Do List](https://github.com/orgs/ArcanePlugins/projects/10/views/1
+• [To-Do List](https://github.com/orgs/ArcanePlugins/projects/10/views/1)
 • [Source Code](https://github.com/ArcanePlugins/Polyconomy)
 • [Issue Tracker](https://github.com/ArcanePlugins/Polyconomy/issues)
 •
