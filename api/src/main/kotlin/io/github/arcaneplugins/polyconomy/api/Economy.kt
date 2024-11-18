@@ -24,13 +24,13 @@ interface Economy {
     suspend fun getNonPlayerAccountIds(): Collection<NamespacedKey>
 
     suspend fun getNonPlayerAccountsPlayerIsMemberof(
-        uuid: UUID
+        uuid: UUID,
     ): Collection<NonPlayerAccount>
 
     suspend fun getPrimaryCurrency(): Currency
 
     suspend fun getCurrency(
-        name: String
+        name: String,
     ): Currency?
 
     suspend fun getCurrencies(): Collection<Currency>

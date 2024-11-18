@@ -4,5 +4,5 @@ import java.util.*
 
 data class NonPlayerAccountMember(
     val memberId: UUID,
-    val permMap: Map<AccountPermission, Boolean?>
+    val permMap: Map<AccountPermission, Boolean?>,
 )
