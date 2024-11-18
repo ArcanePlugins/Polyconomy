@@ -4,21 +4,28 @@ import io.github.arcaneplugins.polyconomy.api.account.NonPlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
+import java.math.BigDecimal
 import java.util.*
 
 interface Economy {
 
     suspend fun getOrCreatePlayerAccount(
-        uuid: UUID
+        uuid: UUID,
+        name: String?,
     ): PlayerAccount
 
-    suspend fun getPlayerAccountIds(): Set<UUID>
+    suspend fun getOrCreateNonPlayerAccount(
+        namespacedKey: NamespacedKey,
+        name: String?,
+    ): NonPlayerAccount
 
-    suspend fun getNonPlayerAccountIds(): Set<NamespacedKey>
+    suspend fun getPlayerAccountIds(): Collection<UUID>
+
+    suspend fun getNonPlayerAccountIds(): Collection<NamespacedKey>
 
     suspend fun getNonPlayerAccountsPlayerIsMemberof(
         uuid: UUID
-    ): Set<NonPlayerAccount>
+    ): Collection<NonPlayerAccount>
 
     suspend fun getPrimaryCurrency(): Currency
 
@@ -26,9 +33,19 @@ interface Economy {
         name: String
     ): Currency?
 
-    suspend fun getCurrencies(): Set<Currency>
+    suspend fun getCurrencies(): Collection<Currency>
 
-    suspend fun registerCurrency(currency: Currency)
+    suspend fun registerCurrency(
+        name: String,
+        startingBalance: BigDecimal,
+        symbol: String,
+        amountFormat: String,
+        presentationFormat: String,
+        conversionRate: BigDecimal,
+        displayNameSingularLocaleMap: Map<Locale, String>,
+        displayNamePluralLocaleMap: Map<Locale, String>,
+        decimalLocaleMap: Map<Locale, String>,
+    ): Currency
 
     suspend fun unregisterCurrency(currency: Currency)
 

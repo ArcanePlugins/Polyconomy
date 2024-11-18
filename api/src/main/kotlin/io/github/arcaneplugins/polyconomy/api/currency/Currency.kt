@@ -16,9 +16,9 @@ abstract class Currency(
     abstract suspend fun getDisplayName(
         plural: Boolean,
         locale: Locale,
-    )
+    ): String
 
-    abstract suspend fun isPrimary(): Int
+    abstract suspend fun isPrimary(): Boolean
 
     abstract suspend fun getStartingBalance(): BigDecimal
 
@@ -27,7 +27,6 @@ abstract class Currency(
     abstract suspend fun format(
         amount: BigDecimal,
         locale: Locale,
-        precision: Int?
     ): String
 
 }

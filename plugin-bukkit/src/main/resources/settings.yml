@@ -3,39 +3,7 @@
 # |  (_) | \/ (_ (_) | | (_) | | | \/
 #          /                       /
 
-primary-currency: "dollar"
 primary-locale: "en_US"
-
-currencies:
-  - currency: "dollar"
-    enabled: true
-    starting-balance: 50
-    symbol: "$"
-    amount-format: "#,##0.00"
-    presentation-format: "%symbol%%amount%"
-    conversion-rate: 1
-    locales:
-      - id: "en_US"
-        display-name:
-          singular: "Dollar"
-          plural: "Dollars"
-        decimal:
-          value: "."
-
-  - currency: "token"
-    enabled: false
-    starting-balance: 0
-    symbol: "T"
-    amount-format: "#,##0.00"
-    presentation-format: "%amount% %display-name%"
-    conversion-rate: 100
-    locales:
-      - id: "en_US"
-        display-name:
-          singular: "Token"
-          plural: "Tokens"
-        decimal:
-          value: "."
 
 storage:
   implementation: "yaml"

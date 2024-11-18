@@ -1,52 +1,74 @@
 package io.github.arcaneplugins.polyconomy.api.account
 
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
+import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
 import java.math.BigDecimal
 import java.time.temporal.Temporal
 import java.util.*
 
-abstract class Account(
-    val name: String?,
-) {
+interface Account {
 
-    abstract suspend fun getBalance(
+    suspend fun getName(): String?
+
+    suspend fun setName(newName: String?)
+
+    suspend fun getBalance(
         currency: Currency,
     ): BigDecimal
 
-    abstract suspend fun makeTransaction(
+    suspend fun resetBalance(
+        currency: Currency,
+        cause: Cause,
+        importance: TransactionImportance,
+        reason: String
+    ) {
+        makeTransaction(
+            AccountTransaction(
+                amount = getBalance(currency),
+                by = null,
+                cause = cause,
+                currency = currency,
+                importance = importance,
+                method = TransactionMethod.RESET,
+                reason = reason,
+            )
+        )
+    }
+
+    suspend fun makeTransaction(
         transaction: AccountTransaction,
     )
 
-    abstract suspend fun deleteAccount()
+    suspend fun deleteAccount()
 
-    abstract suspend fun getHeldCurrencies(): Set<Currency>
+    suspend fun getHeldCurrencies(): Collection<Currency>
 
-    abstract suspend fun getTransactionHistory(
+    suspend fun getTransactionHistory(
         maxCount: Int,
         dateFrom: Temporal,
         dateTo: Temporal,
     ): List<AccountTransaction>
 
-    abstract suspend fun getMemberIds(): Set<UUID>
+    suspend fun getMemberIds(): Collection<UUID>
 
-    abstract suspend fun isMember(
+    suspend fun isMember(
         player: UUID,
     ): Boolean
 
-    abstract suspend fun setPermissions(
+    suspend fun setPermissions(
         player: UUID,
         perms: Map<AccountPermission, Boolean?>
     )
 
-    abstract suspend fun getPermissions(
+    suspend fun getPermissions(
         player: UUID
     ): Map<AccountPermission, Boolean?>
 
-    abstract suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>>
+    suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>>
 
-    abstract suspend fun hasPermissions(
+    suspend fun hasPermissions(
         player: UUID,
         vararg permissions: AccountPermission,
-    )
+    ): Boolean
 
 }

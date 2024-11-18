@@ -7,7 +7,8 @@ account:
       balance:
         <currency-dbid ; Int->String>: <balance ; Double>
       transaction:
-        - currency-dbid: <Int>
+        next-id: 0
+        <id>:
           cause:
             type: <Cause>
             data: <String>
@@ -16,6 +17,7 @@ account:
           reason: <String?>
           amount: <Double>
           importance: <PolyTransactionImportance>
+          currency: <String?>
 
 
   non-player:
@@ -29,10 +31,34 @@ account:
             permission:
               <PolyAccountPermission>: value ; <TriState>
 
+primary-currency: "dollar"
 currency:
-  current-db-id: <last granted currency db id ; Int>
-  db-id-map:
-    <currency-id ; String>: <currency-db-id ; Int>
+  dollar:
+    enabled: true
+    starting-balance: 50
+    symbol: "$"
+    amount-format: "#,##0.00"
+    presentation-format: "%symbol%%amount%"
+    conversion-rate: 1
+    locale:
+      en_US:
+        display-name:
+          singular: "Dollar"
+          plural: "Dollars"
+        decimal: "."
+  token:
+    enabled: false
+    starting-balance: 0
+    symbol: "T"
+    amount-format: "#,##0.00"
+    presentation-format: "%amount% %display-name%"
+    conversion-rate: 100
+    locale:
+      en_US:
+        display-name:
+          singular: "Token"
+          plural: "Tokens"
+        decimal: "."
 
 metadata:
   file-version: 1
