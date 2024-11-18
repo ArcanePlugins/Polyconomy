@@ -20,7 +20,7 @@ interface Account {
         currency: Currency,
         cause: Cause,
         importance: TransactionImportance,
-        reason: String
+        reason: String,
     ) {
         makeTransaction(
             AccountTransaction(
@@ -57,11 +57,11 @@ interface Account {
 
     suspend fun setPermissions(
         player: UUID,
-        perms: Map<AccountPermission, Boolean?>
+        perms: Map<AccountPermission, Boolean?>,
     )
 
     suspend fun getPermissions(
-        player: UUID
+        player: UUID,
     ): Map<AccountPermission, Boolean?>
 
     suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>>

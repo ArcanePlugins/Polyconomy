@@ -130,7 +130,7 @@ class YamlStorageHandler(
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
         val account = PlayerAccountImpl(uuid, this)
         val accountNode = rootNode.node("account", "player", uuid.toString())
-        if(!accountNode.virtual()) {
+        if (!accountNode.virtual()) {
             return account
         }
 
@@ -143,7 +143,7 @@ class YamlStorageHandler(
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
         val account = NonPlayerAccountImpl(namespacedKey, this)
         val accountNode = rootNode.node("account", "non-player", namespacedKey.namespace, namespacedKey.key)
-        if(!accountNode.virtual()) {
+        if (!accountNode.virtual()) {
             return account
         }
 
@@ -176,7 +176,7 @@ class YamlStorageHandler(
 
         for (namespaceNode in rootNode.node("account", "non-player").childrenList()) {
             for (keyNode in namespaceNode.childrenList()) {
-                if(keyNode.node("member").hasChild(uuid.toString())) {
+                if (keyNode.node("member").hasChild(uuid.toString())) {
                     list.add(
                         NonPlayerAccountImpl(
                             NamespacedKey(
@@ -218,7 +218,7 @@ class YamlStorageHandler(
     ): Currency {
         val currenciesNode = rootNode.node("currency")
 
-        if(currenciesNode.hasChild(name)) {
+        if (currenciesNode.hasChild(name)) {
             throw IllegalArgumentException("Currency by the name of '${name}' already exists")
         }
 
@@ -318,7 +318,7 @@ class YamlStorageHandler(
         }
 
         override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-            return if(player == uuid) {
+            return if (player == uuid) {
                 AccountPermission.entries.associateWith { true }
             } else {
                 emptyMap()
@@ -430,7 +430,13 @@ class YamlStorageHandler(
         override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
             return currencyNode()
                 .node("locale", locale.toLanguageTag(), "display-name")
-                .node(if(plural) { "plural" } else { "singular" })
+                .node(
+                    if (plural) {
+                        "plural"
+                    } else {
+                        "singular"
+                    }
+                )
                 .string!!
         }
 

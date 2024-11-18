@@ -4,7 +4,7 @@ import io.github.arcaneplugins.polyconomy.api.Economy
 
 abstract class StorageHandler(
     val id: String,
-): Economy {
+) : Economy {
 
     var connected: Boolean = false
         protected set
