@@ -33,6 +33,11 @@
             <url>https://repo.codemc.org/repository/maven-public</url>
             <!-- required for dependencies [Treasury] -->
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+            <!-- required for dependencies [Vault] -->
+        </repository>
     </repositories>
 
     <dependencies>
@@ -95,6 +100,12 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

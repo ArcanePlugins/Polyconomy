@@ -24,8 +24,6 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 
-const val PRECISION = 4
-
 class YamlStorageHandler(
     val plugin: Polyconomy,
 ) : StorageHandler("yaml") {

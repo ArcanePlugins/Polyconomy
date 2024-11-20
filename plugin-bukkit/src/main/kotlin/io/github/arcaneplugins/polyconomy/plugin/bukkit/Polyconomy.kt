@@ -6,7 +6,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.messages.Messages
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.economy.EconomyManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
@@ -32,7 +31,6 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
 class Polyconomy : JavaPlugin() {
 
     val debugManager = DebugManager(this)
-    val economyManager = EconomyManager(this)
     val storageManager = StorageManager(this)
     val commandManager = CommandManager(this)
     val hookManager = HookManager(this)
@@ -75,7 +73,6 @@ class Polyconomy : JavaPlugin() {
             hookManager.ensureHardDependencies()
             loadConfigs()
             ExecutionManager.startup()
-            economyManager.load()
             storageManager.load()
             listenerManager.load()
             hookManager.registerAll()
@@ -134,7 +131,6 @@ class Polyconomy : JavaPlugin() {
             /* re-loading */
             loadConfigs()
             ExecutionManager.startup()
-            economyManager.load()
             storageManager.load()
             hookManager.registerAll()
             commandManager.reload()
@@ -150,7 +146,6 @@ class Polyconomy : JavaPlugin() {
         logger.info("Plugin reloaded successfully.")
     }
 
-    //TODO Use function
     /**
      * Logs the given message if the given [DebugCategory] is enabled.
      *

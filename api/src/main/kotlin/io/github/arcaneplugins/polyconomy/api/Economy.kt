@@ -9,6 +9,10 @@ import java.util.*
 
 interface Economy {
 
+    companion object {
+        const val PRECISION = 4
+    }
+
     suspend fun getOrCreatePlayerAccount(
         uuid: UUID,
         name: String?,
