@@ -3,8 +3,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtAccountAccessor
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtCurrency
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.polyNskToTreasury
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.treasuryNskToPoly
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyToTreasury
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyFromTreasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.common.NamespacedKey
@@ -43,7 +43,7 @@ class TreasuryEconomyProvider(
                         .hasPlayerAccount(accountData.playerIdentifier.get())
                 } else {
                     storageHandler()
-                        .hasNonPlayerAccount(treasuryNskToPoly(accountData.nonPlayerIdentifier.get()))
+                        .hasNonPlayerAccount(convertNamespacedKeyFromTreasury(accountData.nonPlayerIdentifier.get()))
                 }
             }
         }
@@ -64,7 +64,7 @@ class TreasuryEconomyProvider(
                 return@runBlocking storageHandler()
                     .getNonPlayerAccountIds()
                     .stream()
-                    .map(::polyNskToTreasury)
+                    .map(::convertNamespacedKeyToTreasury)
                     .toList()
             }
         }

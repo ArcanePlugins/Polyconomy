@@ -32,7 +32,16 @@ class PtPlayerAccount(
     }
 
     override fun doTransaction(economyTransaction: EconomyTransaction): CompletableFuture<BigDecimal> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                val currency = provider.storageHandler().getCurrency(economyTransaction.currencyId)!!
+                val balBefore = polyObj.getBalance(currency)
+                polyObj.makeTransaction(TreasuryUtil.convertTransactionFromTreasury(provider, economyTransaction))
+                val balAfter = polyObj.getBalance(currency)
+
+                balAfter.subtract(balBefore)
+            }
+        }
     }
 
     override fun deleteAccount(): CompletableFuture<Boolean> {
@@ -58,7 +67,17 @@ class PtPlayerAccount(
         from: Temporal,
         to: Temporal,
     ): CompletableFuture<Collection<EconomyTransaction>> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj
+                    .getTransactionHistory(
+                        transactionCount,
+                        from,
+                        to,
+                    )
+                    .map { TreasuryUtil.convertTransactionToTreasury(it) }
+            }
+        }
     }
 
     override fun identifier(): UUID = polyObj.uuid

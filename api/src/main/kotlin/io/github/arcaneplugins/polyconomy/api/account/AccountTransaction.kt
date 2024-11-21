@@ -3,6 +3,7 @@ package io.github.arcaneplugins.polyconomy.api.account
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
 import java.math.BigDecimal
+import java.time.Instant
 
 data class AccountTransaction(
     val amount: BigDecimal,
@@ -10,5 +11,6 @@ data class AccountTransaction(
     val cause: Cause,
     val reason: String?,
     val importance: TransactionImportance,
-    val method: TransactionMethod,
+    val type: TransactionType,
+    val timestamp: Instant,
 )

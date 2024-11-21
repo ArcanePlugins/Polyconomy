@@ -2,6 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrap
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.TreasuryEconomyProvider
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyFromTreasury
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.economy.account.NonPlayerAccount
 import me.lokka30.treasury.api.economy.account.accessor.NonPlayerAccountAccessor
@@ -17,7 +18,7 @@ class PtNonPlayerAccountAccessor(
                 PtNonPlayerAccount(
                     provider = provider,
                     polyObj = provider.storageHandler().getOrCreateNonPlayerAccount(
-                        provider.treasuryNskToPoly(context.identifier),
+                        convertNamespacedKeyFromTreasury(context.identifier),
                         context.name
                     )
                 )

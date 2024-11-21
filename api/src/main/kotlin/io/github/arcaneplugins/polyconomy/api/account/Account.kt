@@ -3,6 +3,7 @@ package io.github.arcaneplugins.polyconomy.api.account
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
 import java.math.BigDecimal
+import java.time.Instant
 import java.time.temporal.Temporal
 import java.util.*
 
@@ -28,8 +29,9 @@ interface Account {
                 cause = cause,
                 currency = currency,
                 importance = importance,
-                method = TransactionMethod.RESET,
+                type = TransactionType.RESET,
                 reason = reason,
+                timestamp = Instant.now()
             )
         )
     }
@@ -67,7 +69,7 @@ interface Account {
 
     suspend fun hasPermissions(
         player: UUID,
-        vararg permissions: AccountPermission,
+        permissions: Collection<AccountPermission>,
     ): Boolean
 
 }

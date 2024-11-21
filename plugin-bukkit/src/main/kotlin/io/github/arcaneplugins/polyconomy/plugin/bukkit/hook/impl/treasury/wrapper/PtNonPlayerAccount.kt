@@ -1,6 +1,9 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.TreasuryEconomyProvider
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertAccountPermissionFromTreasury
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertAccountPermissionToTreasury
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertTransactionFromTreasury
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState
@@ -42,53 +45,127 @@ class PtNonPlayerAccount(
     }
 
     override fun doTransaction(economyTransaction: EconomyTransaction): CompletableFuture<BigDecimal> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                val currency = provider.storageHandler().getCurrency(economyTransaction.currencyId)!!
+                val balBefore = polyObj.getBalance(currency)
+                polyObj.makeTransaction(convertTransactionFromTreasury(provider, economyTransaction))
+                val balAfter = polyObj.getBalance(currency)
+
+                balAfter.subtract(balBefore)
+            }
+        }
     }
 
     override fun deleteAccount(): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.deleteAccount()
+                true
+            }
+        }
     }
 
     override fun retrieveHeldCurrencies(): CompletableFuture<Collection<String>> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.getHeldCurrencies().map { it.name }
+            }
+        }
     }
 
     override fun retrieveTransactionHistory(
         transactionCount: Int,
         from: Temporal,
         to: Temporal,
-    ): CompletableFuture<MutableCollection<EconomyTransaction>> {
-        TODO("Not yet implemented")
+    ): CompletableFuture<Collection<EconomyTransaction>> {
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj
+                    .getTransactionHistory(
+                        transactionCount,
+                        from,
+                        to,
+                    )
+                    .map { TreasuryUtil.convertTransactionToTreasury(it) }
+            }
+        }
     }
 
     override fun retrieveMemberIds(): CompletableFuture<Collection<UUID>> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.getMemberIds()
+            }
+        }
     }
 
     override fun isMember(player: UUID): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.isMember(player)
+            }
+        }
     }
 
     override fun setPermissions(
         player: UUID,
-        permissionsMap: MutableMap<AccountPermission, TriState>,
+        permissionsMap: Map<AccountPermission, TriState>,
     ): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.setPermissions(
+                    player = player,
+                    perms = permissionsMap
+                        .mapKeys { convertAccountPermissionFromTreasury(it.key) }
+                        .mapValues { it.value.asBoolean() }
+                )
+                true
+            }
+        }
     }
 
     override fun retrievePermissions(player: UUID): CompletableFuture<Map<AccountPermission, TriState>> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.getPermissions(player)
+                    .mapKeys { convertAccountPermissionToTreasury(it.key) }
+                    .mapValues { TriState.fromBoolean(it.value) }
+            }
+        }
     }
 
-    override fun retrievePermissionsMap(): CompletableFuture<MutableMap<UUID, Map<AccountPermission, TriState>>> {
-        TODO("Not yet implemented")
+    override fun retrievePermissionsMap(): CompletableFuture<Map<UUID, Map<AccountPermission, TriState>>> {
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                polyObj.getPermissionsMap()
+                    .mapValues { it1 ->
+                        it1.value
+                            .mapKeys { it2 ->
+                                convertAccountPermissionToTreasury(it2.key)
+                            }
+                            .mapValues { it2 ->
+                                TriState.fromBoolean(it2.value)
+                            }
+                    }
+            }
+        }
     }
 
     override fun hasPermissions(player: UUID, vararg permissions: AccountPermission): CompletableFuture<TriState> {
-        TODO("Not yet implemented")
+        return CompletableFuture.supplyAsync {
+            runBlocking {
+                TriState.fromBoolean(
+                    polyObj.hasPermissions(
+                        player,
+                        permissions.map { convertAccountPermissionFromTreasury(it) }
+                    )
+                )
+            }
+        }
     }
 
     override fun identifier(): NamespacedKey {
-        return TreasuryUtil.polyNskToTreasury(polyObj.namespacedKey)
+        return TreasuryUtil.convertNamespacedKeyToTreasury(polyObj.namespacedKey)
     }
 }

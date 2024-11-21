@@ -1,6 +1,6 @@
 package io.github.arcaneplugins.polyconomy.api.account
 
-enum class TransactionMethod {
+enum class TransactionType {
 
     SET,
 
@@ -9,5 +9,7 @@ enum class TransactionMethod {
     WITHDRAW,
 
     RESET,
+
+    UNKNOWN,
 
 }

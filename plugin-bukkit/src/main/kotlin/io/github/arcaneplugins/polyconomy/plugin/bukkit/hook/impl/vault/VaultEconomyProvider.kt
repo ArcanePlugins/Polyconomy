@@ -17,6 +17,11 @@ class VaultEconomyProvider(
     val plugin: Polyconomy,
 ) : Economy {
 
+    /*
+    JAVADOCS for Vault API
+    https://github.com/MilkBowl/VaultAPI/blob/master/src/main/java/net/milkbowl/vault/economy/Economy.java
+     */
+
     private fun storageHandler(): StorageHandler = plugin.storageManager.currentHandler!!
 
     private fun toVaultNsKey(str: String?) = NamespacedKey(VAULT_PLUGIN_NAME, str ?: "null")
