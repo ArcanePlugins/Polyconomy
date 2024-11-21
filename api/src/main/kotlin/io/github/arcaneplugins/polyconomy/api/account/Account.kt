@@ -25,7 +25,6 @@ interface Account {
         makeTransaction(
             AccountTransaction(
                 amount = getBalance(currency),
-                by = null,
                 cause = cause,
                 currency = currency,
                 importance = importance,

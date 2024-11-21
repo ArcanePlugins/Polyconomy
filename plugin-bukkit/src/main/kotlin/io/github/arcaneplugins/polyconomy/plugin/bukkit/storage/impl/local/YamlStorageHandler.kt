@@ -255,6 +255,14 @@ class YamlStorageHandler(
         write()
     }
 
+    override suspend fun hasPlayerAccount(uuid: UUID): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun hasNonPlayerAccount(nsKey: NamespacedKey): Boolean {
+        TODO("Not yet implemented")
+    }
+
     private class PlayerAccountImpl(
         uuid: UUID,
         val storageHandler: YamlStorageHandler,
