@@ -17,6 +17,8 @@ class TreasuryHook(
     type = HookType.ECONOMY_API,
 ) {
 
+    val provider = TreasuryEconomyProvider(plugin)
+
     companion object {
         const val TREASURY_PLUGIN_NAME = "Treasury"
     }
@@ -28,7 +30,7 @@ class TreasuryHook(
     override fun register() {
         ServiceRegistry.INSTANCE.registerService(
             EconomyProvider::class.java,
-            plugin.economyManager,
+            provider,
             plugin.description.name,
             ServicePriority.NORMAL
         )

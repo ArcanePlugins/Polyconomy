@@ -11,7 +11,7 @@ abstract class Currency(
 
     abstract suspend fun getDecimal(locale: Locale): String
 
-    abstract suspend fun getLocaleDecimalMap(locale: Locale): Map<Locale, String>
+    abstract suspend fun getLocaleDecimalMap(): Map<Locale, String>
 
     abstract suspend fun getDisplayName(
         plural: Boolean,

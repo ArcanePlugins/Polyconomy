@@ -417,7 +417,7 @@ class YamlStorageHandler(
             return currencyNode().node("locale", locale.toLanguageTag(), "decimal").string!!
         }
 
-        override suspend fun getLocaleDecimalMap(locale: Locale): Map<Locale, String> {
+        override suspend fun getLocaleDecimalMap(): Map<Locale, String> {
             return currencyNode()
                 .node("locale")
                 .childrenMap()
