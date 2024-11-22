@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture
 
 class PtPlayerAccount(
     val provider: TreasuryEconomyProvider,
-    val polyObj: PlayerAccount
-): me.lokka30.treasury.api.economy.account.PlayerAccount {
+    val polyObj: PlayerAccount,
+) : me.lokka30.treasury.api.economy.account.PlayerAccount {
 
     override fun getName(): Optional<String> {
         return runBlocking {

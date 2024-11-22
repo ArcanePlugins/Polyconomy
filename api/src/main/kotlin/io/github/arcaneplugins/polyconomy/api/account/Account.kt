@@ -17,6 +17,53 @@ interface Account {
         currency: Currency,
     ): BigDecimal
 
+    suspend fun has(
+        amount: BigDecimal,
+        currency: Currency,
+    ): Boolean {
+        return getBalance(currency) >= amount
+    }
+
+    suspend fun withdraw(
+        amount: BigDecimal,
+        currency: Currency,
+        cause: Cause,
+        importance: TransactionImportance,
+        reason: String?,
+    ) {
+        makeTransaction(
+            AccountTransaction(
+                amount = -amount,
+                currency = currency,
+                cause = cause,
+                importance = importance,
+                reason = reason,
+                timestamp = Instant.now(),
+                type = TransactionType.WITHDRAW,
+            )
+        )
+    }
+
+    suspend fun deposit(
+        amount: BigDecimal,
+        currency: Currency,
+        cause: Cause,
+        importance: TransactionImportance,
+        reason: String?,
+    ) {
+        makeTransaction(
+            AccountTransaction(
+                amount = amount,
+                currency = currency,
+                cause = cause,
+                importance = importance,
+                reason = reason,
+                timestamp = Instant.now(),
+                type = TransactionType.WITHDRAW,
+            )
+        )
+    }
+
     suspend fun resetBalance(
         currency: Currency,
         cause: Cause,
@@ -25,7 +72,7 @@ interface Account {
     ) {
         makeTransaction(
             AccountTransaction(
-                amount = getBalance(currency),
+                amount = -getBalance(currency),
                 cause = cause,
                 currency = currency,
                 importance = importance,

@@ -263,6 +263,34 @@ class YamlStorageHandler(
         TODO("Not yet implemented")
     }
 
+    override suspend fun isVaultBankOwner(bankId: NamespacedKey, memberId: NamespacedKey): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun isVaultBankOwner(bankId: NamespacedKey, memberId: UUID): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun isVaultBankMember(bankId: NamespacedKey, memberId: NamespacedKey): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun isVaultBankMember(bankId: NamespacedKey, memberId: UUID): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getVaultBankAccountIds(): Collection<NamespacedKey> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setVaultBankOwner(bankId: NamespacedKey, ownerId: NamespacedKey) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setVaultBankOwner(bankId: NamespacedKey, ownerId: UUID) {
+        TODO("Not yet implemented")
+    }
+
     private class PlayerAccountImpl(
         uuid: UUID,
         val storageHandler: YamlStorageHandler,
@@ -335,7 +363,7 @@ class YamlStorageHandler(
             return mapOf(uuid to getPermissions(uuid))
         }
 
-        override suspend fun hasPermissions(player: UUID, vararg permissions: AccountPermission): Boolean {
+        override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
             return player == uuid
         }
 
@@ -403,7 +431,7 @@ class YamlStorageHandler(
             TODO("Not yet implemented")
         }
 
-        override suspend fun hasPermissions(player: UUID, vararg permissions: AccountPermission): Boolean {
+        override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
             TODO("Not yet implemented")
         }
 

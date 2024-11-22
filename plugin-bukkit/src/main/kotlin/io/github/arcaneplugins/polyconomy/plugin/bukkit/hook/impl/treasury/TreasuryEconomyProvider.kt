@@ -3,8 +3,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtAccountAccessor
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtCurrency
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyToTreasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyFromTreasury
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyToTreasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.common.NamespacedKey
@@ -102,7 +102,7 @@ class TreasuryEconomyProvider(
     override fun registerCurrency(currency: Currency): CompletableFuture<TriState> {
         return CompletableFuture.supplyAsync {
             return@supplyAsync runBlocking {
-                if(getPolyCurrency(currency) != null) {
+                if (getPolyCurrency(currency) != null) {
                     // already registered
                     return@runBlocking TriState.UNSPECIFIED
                 }
@@ -112,8 +112,18 @@ class TreasuryEconomyProvider(
                     amountFormat = "#,##0.00",
                     conversionRate = currency.conversionRate,
                     decimalLocaleMap = currency.localeDecimalMap.mapValues { it.value.toString() }.toMap(),
-                    displayNamePluralLocaleMap = mapOf(getDefault() to currency.getDisplayName(BigDecimal.TEN, getDefault())),
-                    displayNameSingularLocaleMap = mapOf(getDefault() to currency.getDisplayName(BigDecimal.ONE, getDefault())),
+                    displayNamePluralLocaleMap = mapOf(
+                        getDefault() to currency.getDisplayName(
+                            BigDecimal.TEN,
+                            getDefault()
+                        )
+                    ),
+                    displayNameSingularLocaleMap = mapOf(
+                        getDefault() to currency.getDisplayName(
+                            BigDecimal.ONE,
+                            getDefault()
+                        )
+                    ),
                     presentationFormat = "%symbol%%amount%",
                     startingBalance = BigDecimal.ZERO,
                     symbol = currency.symbol,
@@ -129,7 +139,7 @@ class TreasuryEconomyProvider(
             return@supplyAsync runBlocking {
                 val polyCurr = getPolyCurrency(currency)
 
-                return@runBlocking if(polyCurr == null) {
+                return@runBlocking if (polyCurr == null) {
                     // already unregistered
                     TriState.FALSE
                 } else {

@@ -10,7 +10,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 
 class PtCurrency(
-    val currency: io.github.arcaneplugins.polyconomy.api.currency.Currency
+    val currency: io.github.arcaneplugins.polyconomy.api.currency.Currency,
 ) : Currency {
 
     override fun getIdentifier(): String {

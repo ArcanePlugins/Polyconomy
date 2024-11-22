@@ -1,8 +1,10 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault
 
 import io.github.arcaneplugins.polyconomy.api.Economy.Companion.PRECISION
+import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
+import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.VaultHook.Companion.VAULT_PLUGIN_NAME
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
@@ -21,6 +23,8 @@ class VaultEconomyProvider(
     JAVADOCS for Vault API
     https://github.com/MilkBowl/VaultAPI/blob/master/src/main/java/net/milkbowl/vault/economy/Economy.java
      */
+
+    private val vaultCause = PluginCause(NamespacedKey("polyconomy", "vault"))
 
     private fun storageHandler(): StorageHandler = plugin.storageManager.currentHandler!!
 
@@ -56,11 +60,15 @@ class VaultEconomyProvider(
 
     @Deprecated(message = "No per-world support.", replaceWith = ReplaceWith("hasAccount(OfflinePlayer)"))
     override fun hasAccount(p0: String): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler().hasNonPlayerAccount(toVaultNsKey(p0))
+        }
     }
 
     override fun hasAccount(p0: OfflinePlayer): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler().hasPlayerAccount(p0.uniqueId)
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -110,11 +118,25 @@ class VaultEconomyProvider(
 
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("has(OfflinePlayer, Double)"))
     override fun has(p0: String, p1: Double): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    toVaultNsKey(p0),
+                    p0
+                )
+                .has(BigDecimal.valueOf(p1), primaryCurrency())
+        }
     }
 
     override fun has(p0: OfflinePlayer, p1: Double): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreatePlayerAccount(
+                    p0.uniqueId,
+                    name = null
+                )
+                .has(BigDecimal.valueOf(p1), primaryCurrency())
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -129,11 +151,52 @@ class VaultEconomyProvider(
 
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("withdrawPlayer(OfflinePlayer, Double)"))
     override fun withdrawPlayer(p0: String, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    toVaultNsKey(p0),
+                    p0
+                )
+                .withdraw(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+
+            @Suppress("DEPRECATION")
+            EconomyResponse(
+                p1,
+                getBalance(p0),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun withdrawPlayer(p0: OfflinePlayer, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreatePlayerAccount(
+                    p0.uniqueId,
+                    p0.name
+                )
+                .withdraw(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+
+            EconomyResponse(
+                p1,
+                getBalance(p0),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -148,11 +211,52 @@ class VaultEconomyProvider(
 
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("depositPlayer(OfflinePlayer, Double)"))
     override fun depositPlayer(p0: String, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    toVaultNsKey(p0),
+                    p0
+                )
+                .deposit(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+
+            @Suppress("DEPRECATION")
+            EconomyResponse(
+                p1,
+                getBalance(p0),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun depositPlayer(p0: OfflinePlayer, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler()
+                .getOrCreatePlayerAccount(
+                    p0.uniqueId,
+                    p0.name
+                )
+                .deposit(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+
+            EconomyResponse(
+                p1,
+                getBalance(p0),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     @Suppress("DEPRECATION")
@@ -167,53 +271,221 @@ class VaultEconomyProvider(
 
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("createBank(String, OfflinePlayer)"))
     override fun createBank(p0: String, p1: String): EconomyResponse {
-        TODO("Not yet implemented")
+        runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+
+            storageHandler()
+                .setVaultBankOwner(
+                    bankId = toVaultNsKey(p0),
+                    ownerId = toVaultNsKey(p1)
+                )
+        }
+
+        return EconomyResponse(
+            0.0,
+            bankBalance(p0).balance,
+            EconomyResponse.ResponseType.SUCCESS,
+            null,
+        )
     }
 
     override fun createBank(p0: String, p1: OfflinePlayer): EconomyResponse {
-        TODO("Not yet implemented")
+        runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+
+            storageHandler()
+                .setVaultBankOwner(
+                    bankId = toVaultNsKey(p0),
+                    ownerId = p1.uniqueId
+                )
+        }
+
+        return EconomyResponse(
+            0.0,
+            bankBalance(p0).balance,
+            EconomyResponse.ResponseType.SUCCESS,
+            null,
+        )
     }
 
     override fun deleteBank(p0: String): EconomyResponse {
-        TODO("Not yet implemented")
+        runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .deleteAccount()
+        }
+
+        return EconomyResponse(
+            0.0,
+            0.0,
+            EconomyResponse.ResponseType.SUCCESS,
+            null,
+        )
     }
 
     override fun bankBalance(p0: String): EconomyResponse {
-        TODO("Not yet implemented")
+        val bal = runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .getBalance(primaryCurrency())
+        }
+
+        return EconomyResponse(
+            0.0,
+            bal.toDouble(),
+            EconomyResponse.ResponseType.SUCCESS,
+            null,
+        )
     }
 
     override fun bankHas(p0: String, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        val has = runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .has(BigDecimal.valueOf(p1), primaryCurrency())
+        }
+
+        return EconomyResponse(
+            p1,
+            bankBalance(p0).balance,
+            if (has) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+            "FAILURE if bank can't afford"
+        )
     }
 
     override fun bankWithdraw(p0: String, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .withdraw(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+        }
+
+        return EconomyResponse(
+            p1,
+            bankBalance(p0).balance,
+            EconomyResponse.ResponseType.SUCCESS,
+            null
+        )
     }
 
     override fun bankDeposit(p0: String, p1: Double): EconomyResponse {
-        TODO("Not yet implemented")
+        runBlocking {
+            storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .deposit(
+                    amount = BigDecimal.valueOf(p1),
+                    currency = primaryCurrency(),
+                    cause = vaultCause,
+                    importance = TransactionImportance.MEDIUM,
+                    reason = null,
+                )
+        }
+
+        return EconomyResponse(
+            p1,
+            bankBalance(p0).balance,
+            EconomyResponse.ResponseType.SUCCESS,
+            null
+        )
     }
 
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankOwner(String, OfflinePlayer)"))
     override fun isBankOwner(p0: String, p1: String): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            EconomyResponse(
+                0.0,
+                bankBalance(p0).balance,
+                if (storageHandler().isVaultBankOwner(
+                        bankId = toVaultNsKey(p0),
+                        memberId = toVaultNsKey(p1),
+                    )
+                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+                "Not a owner"
+            )
+        }
     }
 
     override fun isBankOwner(p0: String, p1: OfflinePlayer): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            EconomyResponse(
+                0.0,
+                bankBalance(p0).balance,
+                if (storageHandler().isVaultBankOwner(
+                        bankId = toVaultNsKey(p0),
+                        memberId = p1.uniqueId,
+                    )
+                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+                "FAILURE if not a owner"
+            )
+        }
     }
 
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankMember(String, OfflinePlayer)"))
     override fun isBankMember(p0: String, p1: String): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            EconomyResponse(
+                0.0,
+                bankBalance(p0).balance,
+                if (storageHandler().isVaultBankMember(
+                        bankId = toVaultNsKey(p0),
+                        memberId = toVaultNsKey(p1),
+                    )
+                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+                "Not a owner"
+            )
+        }
     }
 
     override fun isBankMember(p0: String, p1: OfflinePlayer): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            EconomyResponse(
+                0.0,
+                bankBalance(p0).balance,
+                if (storageHandler().isVaultBankMember(
+                        bankId = toVaultNsKey(p0),
+                        memberId = p1.uniqueId,
+                    )
+                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+                "Not a owner"
+            )
+        }
     }
 
-    override fun getBanks(): MutableList<String> {
-        TODO("Not yet implemented")
+    override fun getBanks(): List<String> {
+        return runBlocking {
+            storageHandler()
+                .getVaultBankAccountIds()
+                .map { it.key }
+        }
     }
 
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("createPlayerAccount(OfflinePlayer)"))
