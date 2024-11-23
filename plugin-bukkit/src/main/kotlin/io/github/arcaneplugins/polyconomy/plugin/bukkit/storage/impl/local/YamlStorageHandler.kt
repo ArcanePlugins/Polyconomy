@@ -560,7 +560,12 @@ class YamlStorageHandler(
             }
 
             override suspend fun deleteAccount() {
-                storageHandler.rootNode.node("account", "player").removeChild(namespacedKey.toString())
+                val accountsNode = storageHandler.rootNode.node("account", "non-player")
+                val namespaceNode = storageHandler.rootNode.node("account", "non-player", namespacedKey.namespace)
+                namespaceNode.removeChild(namespacedKey.key)
+                if(namespaceNode.childrenMap().isEmpty()) {
+                    accountsNode.removeChild(namespacedKey.namespace)
+                }
                 storageHandler.write()
             }
 
