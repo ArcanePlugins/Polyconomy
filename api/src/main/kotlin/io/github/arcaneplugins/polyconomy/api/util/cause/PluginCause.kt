@@ -5,5 +5,6 @@ import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 class PluginCause(
     val namespacedKey: NamespacedKey,
 ) : Cause(
-    data = namespacedKey
+    type = CauseType.PLUGIN,
+    data = namespacedKey,
 )

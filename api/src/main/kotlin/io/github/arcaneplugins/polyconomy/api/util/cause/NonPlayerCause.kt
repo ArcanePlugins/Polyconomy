@@ -5,5 +5,6 @@ import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 class NonPlayerCause(
     val namespacedKey: NamespacedKey,
 ) : Cause(
-    data = namespacedKey
+    type = CauseType.NON_PLAYER,
+    data = namespacedKey,
 )

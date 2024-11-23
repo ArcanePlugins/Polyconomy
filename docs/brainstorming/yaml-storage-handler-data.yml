@@ -17,7 +17,7 @@ account:
           reason: <String?>
           amount: <Double>
           importance: <PolyTransactionImportance>
-          currency: <String?>
+          currency: <String>
 
 
   non-player:

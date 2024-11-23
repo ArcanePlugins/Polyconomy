@@ -5,8 +5,13 @@ import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction
 import io.github.arcaneplugins.polyconomy.api.account.NonPlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
+import io.github.arcaneplugins.polyconomy.api.account.TransactionType
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
+import io.github.arcaneplugins.polyconomy.api.util.cause.CauseType
+import io.github.arcaneplugins.polyconomy.api.util.cause.NonPlayerCause
+import io.github.arcaneplugins.polyconomy.api.util.cause.PlayerCause
+import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
@@ -17,6 +22,7 @@ import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.text.DecimalFormat
+import java.time.Instant
 import java.time.temporal.Temporal
 import java.util.*
 import kotlin.io.path.Path
@@ -199,6 +205,10 @@ class YamlStorageHandler(
         return currencyCache.first { it.name == name }
     }
 
+    fun hasCurrency(name: String): Boolean {
+        return currencyCache.firstOrNull { it.name == name } != null
+    }
+
     override suspend fun getCurrencies(): Collection<Currency> {
         return currencyCache
     }
@@ -249,9 +259,11 @@ class YamlStorageHandler(
         if (!currencyCache.contains(currency)) {
             throw IllegalArgumentException("Currency ${currency.name} is not registered")
         }
+        // note: this storage handler doesn't cascade currency deletions onto transactions,
+        // so there will be transactions that reference an invalid currency. however, when loading currencies,
+        // the storage handler ignores entries with invalid currencies.
         currencyCache.remove(currency)
         rootNode.node("currency").removeChild(currency.name.lowercase(Locale.ROOT))
-        TODO("Removing transactions using this currency is not implemented")
         write()
     }
 
@@ -291,219 +303,349 @@ class YamlStorageHandler(
         TODO("Not yet implemented")
     }
 
-    private class PlayerAccountImpl(
-        uuid: UUID,
-        val storageHandler: YamlStorageHandler,
-    ) : PlayerAccount(uuid) {
-        private fun accountNode(): CommentedConfigurationNode {
-            return storageHandler.rootNode.node("account", "player", uuid.toString())
-        }
-
-        override suspend fun getName(): String? {
-            return accountNode().node("name").string
-        }
-
-        override suspend fun setName(newName: String?) {
-            accountNode().node("name").set(newName)
-            storageHandler.write()
-        }
-
-        override suspend fun getBalance(currency: Currency): BigDecimal {
-            return BigDecimal.valueOf(
-                accountNode().node("balance", currency.name).double
-            )
-        }
-
-        override suspend fun makeTransaction(transaction: AccountTransaction) {
-            TODO("Not yet implemented")
-            storageHandler.write()
-        }
-
-        override suspend fun deleteAccount() {
-            storageHandler.rootNode.node("account", "player").removeChild(uuid.toString())
-            storageHandler.write()
-        }
-
-        override suspend fun getHeldCurrencies(): Collection<Currency> {
-            return accountNode()
-                .node("balance")
-                .childrenList()
-                .map { storageHandler.getCurrency(it.key().toString()) }
-        }
-
-        override suspend fun getTransactionHistory(
-            maxCount: Int,
-            dateFrom: Temporal,
-            dateTo: Temporal,
-        ): List<AccountTransaction> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getMemberIds(): Collection<UUID> {
-            return Collections.singletonList(uuid)
-        }
-
-        override suspend fun isMember(player: UUID): Boolean {
-            return player == uuid
-        }
-
-        override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-            throw IllegalStateException("Unable to set permissions on a player account")
-        }
-
-        override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-            return if (player == uuid) {
-                AccountPermission.entries.associateWith { true }
-            } else {
-                emptyMap()
+    companion object {
+        private class PlayerAccountImpl(
+            uuid: UUID,
+            val storageHandler: YamlStorageHandler,
+        ) : PlayerAccount(uuid) {
+            private fun accountNode(): CommentedConfigurationNode {
+                return storageHandler.rootNode.node("account", "player", uuid.toString())
             }
-        }
 
-        override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-            return mapOf(uuid to getPermissions(uuid))
-        }
+            override suspend fun getName(): String? {
+                return accountNode().node("name").string
+            }
 
-        override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-            return player == uuid
-        }
+            override suspend fun setName(newName: String?) {
+                accountNode().node("name").set(newName)
+                storageHandler.write()
+            }
 
-    }
-
-    private class NonPlayerAccountImpl(
-        namespacedKey: NamespacedKey,
-        val storageHandler: YamlStorageHandler,
-    ) : NonPlayerAccount(namespacedKey) {
-        private fun accountNode(): CommentedConfigurationNode {
-            return storageHandler
-                .rootNode
-                .node("account", "non-player", namespacedKey.namespace, namespacedKey.key)
-        }
-
-        override suspend fun getName(): String? {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun setName(newName: String?) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getBalance(currency: Currency): BigDecimal {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun makeTransaction(transaction: AccountTransaction) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun deleteAccount() {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getHeldCurrencies(): Set<Currency> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getTransactionHistory(
-            maxCount: Int,
-            dateFrom: Temporal,
-            dateTo: Temporal,
-        ): List<AccountTransaction> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getMemberIds(): Set<UUID> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun isMember(player: UUID): Boolean {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-            TODO("Not yet implemented")
-        }
-
-    }
-
-    private class CurrencyImpl(
-        name: String,
-        val storageHandler: YamlStorageHandler,
-    ) : Currency(name) {
-        private fun currencyNode(): CommentedConfigurationNode {
-            return storageHandler.rootNode.node("currency", name)
-        }
-
-        override suspend fun getSymbol(): String {
-            return currencyNode().node("symbol").string!!
-        }
-
-        override suspend fun getDecimal(locale: Locale): String {
-            return currencyNode().node("locale", locale.toLanguageTag(), "decimal").string!!
-        }
-
-        override suspend fun getLocaleDecimalMap(): Map<Locale, String> {
-            return currencyNode()
-                .node("locale")
-                .childrenMap()
-                .mapKeys { Locale.forLanguageTag(it.toString()) }
-                .mapValues { it.value.node("decimal").string!! }
-        }
-
-        override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
-            return currencyNode()
-                .node("locale", locale.toLanguageTag(), "display-name")
-                .node(
-                    if (plural) {
-                        "plural"
-                    } else {
-                        "singular"
-                    }
+            override suspend fun getBalance(currency: Currency): BigDecimal {
+                return BigDecimal.valueOf(
+                    accountNode().node("balance", currency.name).double
                 )
-                .string!!
+            }
+
+            override suspend fun makeTransaction(transaction: AccountTransaction) {
+                val oldBalance: BigDecimal = getBalance(transaction.currency)
+                val newBalance: BigDecimal = when (transaction.type) {
+                    TransactionType.SET -> transaction.amount
+                    TransactionType.RESET -> transaction.currency.getStartingBalance()
+                    TransactionType.WITHDRAW -> oldBalance - transaction.amount
+                    TransactionType.DEPOSIT -> oldBalance + transaction.amount
+                }
+
+                // set new balance
+                accountNode().node("balance", transaction.currency.name).set(newBalance.toDouble())
+
+                // set transaction history
+                val transactionNextId: Int = accountNode().node("transaction", "next-id").getInt(0)
+                val transactionNode = accountNode().node("transaction", transactionNextId)
+                with (transactionNode) {
+                    node("amount").set(transaction.amount.toDouble())
+                    node("currency").set(transaction.currency.name)
+                    node("cause", "type").set(transaction.cause.type.name)
+                    node("cause", "data").set(transaction.cause.data.toString())
+                    node("reason").set(transaction.reason)
+                    node("importance").set(transaction.importance.name)
+                    node("type").set(transaction.type.name)
+                    node("timestamp").set(transaction.timestamp.epochSecond)
+                }
+
+                // write changes to disk
+                storageHandler.write()
+            }
+
+            override suspend fun deleteAccount() {
+                storageHandler.rootNode.node("account", "player").removeChild(uuid.toString())
+                storageHandler.write()
+            }
+
+            override suspend fun getHeldCurrencies(): Collection<Currency> {
+                return accountNode()
+                    .node("balance")
+                    .childrenList()
+                    .map { storageHandler.getCurrency(it.key().toString()) }
+            }
+
+            override suspend fun getTransactionHistory(
+                maxCount: Int,
+                dateFrom: Temporal,
+                dateTo: Temporal,
+            ): List<AccountTransaction> {
+                val dateFromEpoch = Instant.from(dateFrom).epochSecond
+                val dateToEpoch = Instant.from(dateTo).epochSecond
+
+                return accountNode()
+                    .node("transaction")
+                    .childrenList()
+                    .filter {
+                        // only get transaction IDs here, as `next-id` key is a str key, skip.
+                        it.key() is Int
+                    }
+                    .filter {
+                        // skip invalid currency
+                        storageHandler.hasCurrency(it.node("currency").string!!)
+                    }
+                    .filter {
+                        // make sure it's within the timeframe search
+                        it.node("timestamp").long in dateFromEpoch..dateToEpoch
+                    }
+                    .map {
+                        val causeData = it.node("cause", "data").string!!
+
+                        AccountTransaction(
+                            amount = BigDecimal.valueOf(it.node("amount").double),
+                            currency = storageHandler.getCurrency(it.node("currency").string!!),
+                            cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
+                                CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
+                                CauseType.NON_PLAYER -> NonPlayerCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.PLUGIN -> PluginCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.SERVER -> ServerCause
+                            },
+                            importance = TransactionImportance.valueOf(it.node("importance").string!!),
+                            timestamp = Instant.ofEpochSecond(it.node("timestamp").long),
+                            type = TransactionType.valueOf(it.node("type").string!!),
+                            reason = it.node("reason").string
+                        )
+                    }
+            }
+
+            override suspend fun getMemberIds(): Collection<UUID> {
+                return Collections.singletonList(uuid)
+            }
+
+            override suspend fun isMember(player: UUID): Boolean {
+                return player == uuid
+            }
+
+            override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
+                throw IllegalStateException("Unable to set permissions on a player account")
+            }
+
+            override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
+                return if (player == uuid) {
+                    AccountPermission.entries.associateWith { true }
+                } else {
+                    emptyMap()
+                }
+            }
+
+            override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
+                return mapOf(uuid to getPermissions(uuid))
+            }
+
+            override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
+                return player == uuid
+            }
+
         }
 
-        override suspend fun isPrimary(): Boolean {
-            return storageHandler.primaryCurrency.name == name
+        private class NonPlayerAccountImpl(
+            namespacedKey: NamespacedKey,
+            val storageHandler: YamlStorageHandler,
+        ) : NonPlayerAccount(namespacedKey) {
+            private fun accountNode(): CommentedConfigurationNode {
+                return storageHandler
+                    .rootNode
+                    .node("account", "non-player", namespacedKey.namespace, namespacedKey.key)
+            }
+
+            override suspend fun getName(): String? {
+                return accountNode().node("name").string
+            }
+
+            override suspend fun setName(newName: String?) {
+                accountNode().node("name").set(newName)
+                storageHandler.write()
+            }
+
+            override suspend fun getBalance(currency: Currency): BigDecimal {
+                return BigDecimal.valueOf(
+                    accountNode().node("balance", currency.name).double
+                )
+            }
+
+            override suspend fun makeTransaction(transaction: AccountTransaction) {
+                val oldBalance: BigDecimal = getBalance(transaction.currency)
+                val newBalance: BigDecimal = when (transaction.type) {
+                    TransactionType.SET -> transaction.amount
+                    TransactionType.RESET -> transaction.currency.getStartingBalance()
+                    TransactionType.WITHDRAW -> oldBalance - transaction.amount
+                    TransactionType.DEPOSIT -> oldBalance + transaction.amount
+                }
+
+                // set new balance
+                accountNode().node("balance", transaction.currency.name).set(newBalance.toDouble())
+
+                // set transaction history
+                val transactionNextId: Int = accountNode().node("transaction", "next-id").getInt(0)
+                val transactionNode = accountNode().node("transaction", transactionNextId)
+                with (transactionNode) {
+                    node("amount").set(transaction.amount.toDouble())
+                    node("currency").set(transaction.currency.name)
+                    node("cause", "type").set(transaction.cause.type.name)
+                    node("cause", "data").set(transaction.cause.data.toString())
+                    node("reason").set(transaction.reason)
+                    node("importance").set(transaction.importance.name)
+                    node("type").set(transaction.type.name)
+                    node("timestamp").set(transaction.timestamp.epochSecond)
+                }
+
+                // write changes to disk
+                storageHandler.write()
+            }
+
+            override suspend fun deleteAccount() {
+                storageHandler.rootNode.node("account", "player").removeChild(namespacedKey.toString())
+                storageHandler.write()
+            }
+
+            override suspend fun getHeldCurrencies(): Collection<Currency> {
+                return accountNode()
+                    .node("balance")
+                    .childrenList()
+                    .map { storageHandler.getCurrency(it.key().toString()) }
+            }
+
+            override suspend fun getTransactionHistory(
+                maxCount: Int,
+                dateFrom: Temporal,
+                dateTo: Temporal,
+            ): List<AccountTransaction> {
+                val dateFromEpoch = Instant.from(dateFrom).epochSecond
+                val dateToEpoch = Instant.from(dateTo).epochSecond
+
+                return accountNode()
+                    .node("transaction")
+                    .childrenList()
+                    .filter {
+                        // only get transaction IDs here, as `next-id` key is a str key, skip.
+                        it.key() is Int
+                    }
+                    .filter {
+                        // skip invalid currency
+                        storageHandler.hasCurrency(it.node("currency").string!!)
+                    }
+                    .filter {
+                        // make sure it's within the timeframe search
+                        it.node("timestamp").long in dateFromEpoch..dateToEpoch
+                    }
+                    .map {
+                        val causeData = it.node("cause", "data").string!!
+
+                        AccountTransaction(
+                            amount = BigDecimal.valueOf(it.node("amount").double),
+                            currency = storageHandler.getCurrency(it.node("currency").string!!),
+                            cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
+                                CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
+                                CauseType.NON_PLAYER -> NonPlayerCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.PLUGIN -> PluginCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.SERVER -> ServerCause
+                            },
+                            importance = TransactionImportance.valueOf(it.node("importance").string!!),
+                            timestamp = Instant.ofEpochSecond(it.node("timestamp").long),
+                            type = TransactionType.valueOf(it.node("type").string!!),
+                            reason = it.node("reason").string
+                        )
+                    }
+            }
+
+            override suspend fun getMemberIds(): Set<UUID> {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun isMember(player: UUID): Boolean {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
+                TODO("Not yet implemented")
+            }
+
         }
 
-        override suspend fun getStartingBalance(): BigDecimal {
-            return BigDecimal.valueOf(
-                currencyNode()
-                    .node("starting-balance")
-                    .double
-            )
+        private class CurrencyImpl(
+            name: String,
+            val storageHandler: YamlStorageHandler,
+        ) : Currency(name) {
+            private fun currencyNode(): CommentedConfigurationNode {
+                return storageHandler.rootNode.node("currency", name)
+            }
+
+            override suspend fun getSymbol(): String {
+                return currencyNode().node("symbol").string!!
+            }
+
+            override suspend fun getDecimal(locale: Locale): String {
+                return currencyNode().node("locale", locale.toLanguageTag(), "decimal").string!!
+            }
+
+            override suspend fun getLocaleDecimalMap(): Map<Locale, String> {
+                return currencyNode()
+                    .node("locale")
+                    .childrenMap()
+                    .mapKeys { Locale.forLanguageTag(it.toString()) }
+                    .mapValues { it.value.node("decimal").string!! }
+            }
+
+            override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
+                return currencyNode()
+                    .node("locale", locale.toLanguageTag(), "display-name")
+                    .node(
+                        if (plural) {
+                            "plural"
+                        } else {
+                            "singular"
+                        }
+                    )
+                    .string!!
+            }
+
+            override suspend fun isPrimary(): Boolean {
+                return storageHandler.primaryCurrency.name == name
+            }
+
+            override suspend fun getStartingBalance(): BigDecimal {
+                return BigDecimal.valueOf(
+                    currencyNode()
+                        .node("starting-balance")
+                        .double
+                )
+            }
+
+            override suspend fun getConversionRate(): BigDecimal {
+                return BigDecimal.valueOf(
+                    currencyNode()
+                        .node("conversion-rate")
+                        .double
+                )
+            }
+
+            override suspend fun format(amount: BigDecimal, locale: Locale): String {
+                val amountFormat = currencyNode().node("amount-format").string!!
+                val presentationFormat = currencyNode().node("presentation-format").string!!
+
+                return presentationFormat
+                    .replace("symbol", getSymbol())
+                    .replace("amount", DecimalFormat(amountFormat).format(amount))
+                    .replace("%display-name%", getDisplayName(amount.compareTo(BigDecimal.ONE) == 0, locale))
+            }
+
         }
-
-        override suspend fun getConversionRate(): BigDecimal {
-            return BigDecimal.valueOf(
-                currencyNode()
-                    .node("conversion-rate")
-                    .double
-            )
-        }
-
-        override suspend fun format(amount: BigDecimal, locale: Locale): String {
-            val amountFormat = currencyNode().node("amount-format").string!!
-            val presentationFormat = currencyNode().node("presentation-format").string!!
-
-            return presentationFormat
-                .replace("symbol", getSymbol())
-                .replace("amount", DecimalFormat(amountFormat).format(amount))
-                .replace("%display-name%", getDisplayName(amount.compareTo(BigDecimal.ONE) == 0, locale))
-        }
-
     }
 
 }

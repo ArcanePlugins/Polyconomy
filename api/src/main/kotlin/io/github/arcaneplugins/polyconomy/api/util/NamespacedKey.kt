@@ -5,6 +5,8 @@ class NamespacedKey(
     val key: String,
 ) {
 
+    constructor(string: String) : this(string.split(':')[0], string.split(':')[1])
+
     override fun toString(): String {
         return "${namespace}:${key}"
     }

@@ -10,6 +10,4 @@ enum class TransactionType {
 
     RESET,
 
-    UNKNOWN,
-
 }

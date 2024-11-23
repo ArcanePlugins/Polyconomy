@@ -5,5 +5,6 @@ import java.util.*
 class PlayerCause(
     val uuid: UUID,
 ) : Cause(
-    data = uuid
+    type = CauseType.PLAYER,
+    data = uuid,
 )
