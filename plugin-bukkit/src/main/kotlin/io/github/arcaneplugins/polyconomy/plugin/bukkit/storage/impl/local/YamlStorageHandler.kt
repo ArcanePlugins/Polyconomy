@@ -379,6 +379,7 @@ class YamlStorageHandler(
                     node("type").set(transaction.type.name)
                     node("timestamp").set(transaction.timestamp.epochSecond)
                 }
+                transactionNextIdNode.set(transactionNextId + 1)
 
                 // write changes to disk
                 storageHandler.write()
