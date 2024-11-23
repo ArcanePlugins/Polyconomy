@@ -279,8 +279,11 @@ class VaultEconomyProvider(
                 )
 
             storageHandler()
-                .setVaultBankOwner(
-                    bankId = toVaultNsKey(p0),
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
+                .setLegacyVaultBankOwner(
                     ownerId = toVaultNsKey(p1)
                 )
         }
@@ -302,8 +305,11 @@ class VaultEconomyProvider(
                 )
 
             storageHandler()
+                .getOrCreateNonPlayerAccount(
+                    namespacedKey = toVaultNsKey(p0),
+                    name = p0,
+                )
                 .setVaultBankOwner(
-                    bankId = toVaultNsKey(p0),
                     ownerId = p1.uniqueId
                 )
         }
