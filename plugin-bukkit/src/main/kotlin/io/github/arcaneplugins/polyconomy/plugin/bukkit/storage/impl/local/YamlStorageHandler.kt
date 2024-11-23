@@ -683,7 +683,20 @@ class YamlStorageHandler(
             }
 
             override suspend fun getDecimal(locale: Locale): String {
-                return currencyNode().node("locale", locale.toLanguageTag(), "decimal").string!!
+                val preferredNode = currencyNode().node("locale", locale.toLanguageTag(), "decimal")
+
+                if (!preferredNode.virtual()) {
+                    return preferredNode.string!!
+                }
+
+                return currencyNode()
+                    .node("locale")
+                    .childrenMap()
+                    .values
+                    .firstOrNull()
+                    ?.node("decimal")
+                    ?.getString("")
+                    ?: ""
             }
 
             override suspend fun getLocaleDecimalMap(): Map<Locale, String> {
@@ -695,16 +708,27 @@ class YamlStorageHandler(
             }
 
             override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
+                val singularOrPlural = if (plural) {
+                    "plural"
+                } else {
+                    "singular"
+                }
+
+                val preferredNode = currencyNode()
+                    .node("locale", locale.toLanguageTag(), "display-name", singularOrPlural)
+
+                if (!preferredNode.virtual()) {
+                    return preferredNode.getString("")
+                }
+
                 return currencyNode()
-                    .node("locale", locale.toLanguageTag(), "display-name")
-                    .node(
-                        if (plural) {
-                            "plural"
-                        } else {
-                            "singular"
-                        }
-                    )
-                    .string!!
+                    .node("locale")
+                    .childrenMap()
+                    .values
+                    .firstOrNull()
+                    ?.node("display-name", singularOrPlural)
+                    ?.getString("")
+                    ?: ""
             }
 
             override suspend fun isPrimary(): Boolean {
