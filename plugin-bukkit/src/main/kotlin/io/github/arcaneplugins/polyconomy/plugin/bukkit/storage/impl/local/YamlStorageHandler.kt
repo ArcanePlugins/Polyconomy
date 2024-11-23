@@ -364,7 +364,7 @@ class YamlStorageHandler(
 
                 // set transaction history
                 val transactionNextId: Int = accountNode().node("transaction", "next-id").getInt(0)
-                val transactionNode = accountNode().node("transaction", transactionNextId)
+                val transactionNode = accountNode().node("transaction", transactionNextId.toString())
                 with (transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
                     node("currency").set(transaction.currency.name)
@@ -405,7 +405,7 @@ class YamlStorageHandler(
                     .childrenList()
                     .filter {
                         // only get transaction IDs here, as `next-id` key is a str key, skip.
-                        it.key() is Int
+                        it.key() != "next-id"
                     }
                     .filter {
                         // skip invalid currency
