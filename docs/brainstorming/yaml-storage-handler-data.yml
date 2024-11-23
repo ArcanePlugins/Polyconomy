@@ -29,7 +29,14 @@ account:
         member:
           player ; <UUID>:
             permission:
-              <PolyAccountPermission>: value ; <TriState>
+              <PolyAccountPermission>: value ; <boolean>
+        vault-bank:
+          owner-string: str ; <String?>
+          owner-uuid: uuid ; <UUID?>
+          legacy-member:
+            - "Tim"
+            - "Jonno"
+            - "something else arbitrary?..."
 
 primary-currency: "dollar"
 currency:

@@ -1,13 +1,15 @@
 package io.github.arcaneplugins.polyconomy.api.account
 
-enum class AccountPermission {
+enum class AccountPermission(
+    val defaultValue: Boolean
+) {
 
-    BALANCE,
+    BALANCE(true),
 
-    WITHDRAW,
+    WITHDRAW(false),
 
-    DEPOSIT,
+    DEPOSIT(true),
 
-    MODIFY_PERMISSIONS,
+    MODIFY_PERMISSIONS(false),
 
 }

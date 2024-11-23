@@ -275,32 +275,9 @@ class YamlStorageHandler(
         return !rootNode.node("account", "non-player", nsKey.namespace, nsKey.key).virtual()
     }
 
-    override suspend fun isVaultBankOwner(bankId: NamespacedKey, memberId: NamespacedKey): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun isVaultBankOwner(bankId: NamespacedKey, memberId: UUID): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun isVaultBankMember(bankId: NamespacedKey, memberId: NamespacedKey): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun isVaultBankMember(bankId: NamespacedKey, memberId: UUID): Boolean {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getVaultBankAccountIds(): Collection<NamespacedKey> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setVaultBankOwner(bankId: NamespacedKey, ownerId: NamespacedKey) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun setVaultBankOwner(bankId: NamespacedKey, ownerId: UUID) {
-        TODO("Not yet implemented")
+        return getNonPlayerAccountIds()
+            .filter { getOrCreateNonPlayerAccount(it, null).isVaultBankAccount() }
     }
 
     companion object {
@@ -452,6 +429,40 @@ class YamlStorageHandler(
                     .node("account", "non-player", namespacedKey.namespace, namespacedKey.key)
             }
 
+            override suspend fun isVaultBankAccount(): Boolean {
+                return accountNode().hasChild("vault-bank")
+            }
+
+            @Suppress("OVERRIDE_DEPRECATION")
+            override suspend fun isLegacyVaultBankOwner(memberId: NamespacedKey): Boolean {
+                val node = accountNode().node("vault-bank", "owner-string")
+                return !node.virtual() && node.string == memberId.toString()
+            }
+
+            override suspend fun isVaultBankOwner(memberId: UUID): Boolean {
+                val node = accountNode().node("vault-bank", "owner-uuid")
+                return !node.virtual() && node.string == memberId.toString()
+            }
+
+            @Suppress("OVERRIDE_DEPRECATION")
+            override suspend fun isLegacyVaultBankMember(memberId: NamespacedKey): Boolean {
+                return accountNode()
+                    .node("vault-bank", "legacy-member")
+                    .getList(String::class.java)
+                    ?.contains(memberId.toString())
+                    ?: false
+            }
+
+            override suspend fun setLegacyVaultBankOwner(ownerId: NamespacedKey) {
+                accountNode().node("vault-bank", "owner-string").set(ownerId.toString())
+                storageHandler.write()
+            }
+
+            override suspend fun setVaultBankOwner(ownerId: UUID) {
+                accountNode().node("vault-bank", "owner-uuid").set(ownerId.toString())
+                storageHandler.write()
+            }
+
             override suspend fun getName(): String? {
                 return accountNode().node("name").string
             }
@@ -552,28 +563,63 @@ class YamlStorageHandler(
                     }
             }
 
-            override suspend fun getMemberIds(): Set<UUID> {
-                TODO("Not yet implemented")
+            override suspend fun getMemberIds(): Collection<UUID> {
+                return accountNode()
+                    .node("member")
+                    .childrenList()
+                    .map { UUID.fromString(it.key() as String) }
             }
 
             override suspend fun isMember(player: UUID): Boolean {
-                TODO("Not yet implemented")
+                val memberNode = accountNode().node("member", player.toString())
+                return !memberNode.virtual() && memberNode.childrenList().all { it.boolean }
             }
 
             override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-                TODO("Not yet implemented")
+                val permsNode = accountNode().node("member", player.toString(), "permission")
+                perms.forEach { (perm, state) ->
+                    permsNode.node(perm.name).set(state)
+                }
+                storageHandler.write()
             }
 
             override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-                TODO("Not yet implemented")
+                if(!isMember(player)) {
+                    return AccountPermission.entries.associateWith { false }
+                }
+
+                val permsNode = accountNode().node("member", player.toString(), "permission")
+                return AccountPermission.entries.associate {
+                    val permNode = permsNode.node(it.name)
+
+                    if (permNode.virtual()) {
+                        it to null
+                    } else {
+                        it to permNode.boolean
+                    }
+                }
             }
 
             override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-                TODO("Not yet implemented")
+                return getMemberIds().associateWith { getPermissions(it) }
             }
 
             override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-                TODO("Not yet implemented")
+                if(!isMember(player)) {
+                    return false
+                }
+
+                val permsNode = accountNode().node("member", player.toString(), "permission")
+
+                return permissions.all {
+                    val permNode = permsNode.node(it.name)
+
+                    if (permNode.virtual()) {
+                        it.defaultValue
+                    } else {
+                        permNode.boolean
+                    }
+                }
             }
 
         }

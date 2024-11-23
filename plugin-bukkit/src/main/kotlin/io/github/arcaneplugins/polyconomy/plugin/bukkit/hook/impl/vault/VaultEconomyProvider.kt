@@ -421,29 +421,36 @@ class VaultEconomyProvider(
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankOwner(String, OfflinePlayer)"))
     override fun isBankOwner(p0: String, p1: String): EconomyResponse {
         return runBlocking {
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+
+            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankOwner(memberId = toVaultNsKey(p1))) {
+                EconomyResponse.ResponseType.SUCCESS
+            } else {
+                EconomyResponse.ResponseType.FAILURE
+            }
+
             EconomyResponse(
                 0.0,
                 bankBalance(p0).balance,
-                if (storageHandler().isVaultBankOwner(
-                        bankId = toVaultNsKey(p0),
-                        memberId = toVaultNsKey(p1),
-                    )
-                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
-                "Not a owner"
+                status,
+                "FAILURE if not a owner"
             )
         }
     }
 
     override fun isBankOwner(p0: String, p1: OfflinePlayer): EconomyResponse {
         return runBlocking {
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            val status = if (account.isVaultBankOwner(memberId = p1.uniqueId)) {
+                EconomyResponse.ResponseType.SUCCESS
+            } else {
+                EconomyResponse.ResponseType.FAILURE
+            }
+
             EconomyResponse(
                 0.0,
                 bankBalance(p0).balance,
-                if (storageHandler().isVaultBankOwner(
-                        bankId = toVaultNsKey(p0),
-                        memberId = p1.uniqueId,
-                    )
-                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
+                status,
                 "FAILURE if not a owner"
             )
         }
@@ -452,30 +459,36 @@ class VaultEconomyProvider(
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankMember(String, OfflinePlayer)"))
     override fun isBankMember(p0: String, p1: String): EconomyResponse {
         return runBlocking {
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankMember(toVaultNsKey(p1))) {
+                EconomyResponse.ResponseType.SUCCESS
+            } else {
+                EconomyResponse.ResponseType.FAILURE
+            }
+
             EconomyResponse(
                 0.0,
                 bankBalance(p0).balance,
-                if (storageHandler().isVaultBankMember(
-                        bankId = toVaultNsKey(p0),
-                        memberId = toVaultNsKey(p1),
-                    )
-                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
-                "Not a owner"
+                status,
+                "FAILURE if not a owner"
             )
         }
     }
 
     override fun isBankMember(p0: String, p1: OfflinePlayer): EconomyResponse {
         return runBlocking {
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            val status = if (account.isMember(p1.uniqueId)) {
+                EconomyResponse.ResponseType.SUCCESS
+            } else {
+                EconomyResponse.ResponseType.FAILURE
+            }
+
             EconomyResponse(
                 0.0,
                 bankBalance(p0).balance,
-                if (storageHandler().isVaultBankMember(
-                        bankId = toVaultNsKey(p0),
-                        memberId = p1.uniqueId,
-                    )
-                ) EconomyResponse.ResponseType.SUCCESS else EconomyResponse.ResponseType.FAILURE,
-                "Not a owner"
+                status,
+                "FAILURE if not a owner"
             )
         }
     }

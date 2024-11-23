@@ -61,37 +61,7 @@ interface Economy {
         nsKey: NamespacedKey,
     ): Boolean
 
-    suspend fun isVaultBankOwner(
-        bankId: NamespacedKey,
-        memberId: NamespacedKey,
-    ): Boolean
-
-    suspend fun isVaultBankOwner(
-        bankId: NamespacedKey,
-        memberId: UUID,
-    ): Boolean
-
-    suspend fun isVaultBankMember(
-        bankId: NamespacedKey,
-        memberId: NamespacedKey,
-    ): Boolean
-
-    suspend fun isVaultBankMember(
-        bankId: NamespacedKey,
-        memberId: UUID,
-    ): Boolean
-
     suspend fun getVaultBankAccountIds(): Collection<NamespacedKey>
-
-    suspend fun setVaultBankOwner(
-        bankId: NamespacedKey,
-        ownerId: NamespacedKey,
-    )
-
-    suspend fun setVaultBankOwner(
-        bankId: NamespacedKey,
-        ownerId: UUID,
-    )
 
 
 }
