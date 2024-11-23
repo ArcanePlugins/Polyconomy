@@ -33,7 +33,7 @@ interface Account {
     ) {
         makeTransaction(
             AccountTransaction(
-                amount = -amount,
+                amount = amount,
                 currency = currency,
                 cause = cause,
                 importance = importance,
@@ -59,7 +59,7 @@ interface Account {
                 importance = importance,
                 reason = reason,
                 timestamp = Instant.now(),
-                type = TransactionType.WITHDRAW,
+                type = TransactionType.DEPOSIT,
             )
         )
     }
