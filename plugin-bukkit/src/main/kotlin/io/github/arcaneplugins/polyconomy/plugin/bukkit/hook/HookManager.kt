@@ -4,8 +4,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOK_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.TreasuryHook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.VaultHook
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
-import org.bukkit.Bukkit
 
 class HookManager(
     val plugin: Polyconomy,
@@ -46,34 +44,6 @@ class HookManager(
             }
 
         plugin.debugLog(HOOK_MANAGER) { "Unregistered hooks." }
-    }
-
-    fun ensureHardDependencies() {
-        plugin.debugLog(HOOK_MANAGER) { "Enforcing hard dependencies..." }
-
-        val missing = listOf("Treasury")
-            .filter { !Bukkit.getPluginManager().isPluginEnabled(it) }
-
-        if (missing.isEmpty()) {
-            plugin.debugLog(HOOK_MANAGER) { "All hard dependencies are present." }
-            return
-        }
-
-        throw ThrowableUtil.explainHelpfully(
-            plugin,
-            IllegalStateException(),
-            otherInfo = """
-            
-            You have not followed Polyconomy's installation instructions!
-            You are missing the following plugin dependencies:
-            
-            ${missing.joinToString(separator = "\n", prefix = " ✘ ")}
-            
-            Polyconomy will not be able to load until you resolve this issue.
-            Install the missing plugin(s) and then restart your server.
-            """.trimIndent(),
-            otherContext = "Whilst ensuring hard dependencies are met."
-        )
     }
 
 }

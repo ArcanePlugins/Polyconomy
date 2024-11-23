@@ -70,7 +70,6 @@ class Polyconomy : JavaPlugin() {
      */
     override fun onEnable() {
         try {
-            hookManager.ensureHardDependencies()
             loadConfigs()
             ExecutionManager.startup()
             storageManager.load()
