@@ -72,7 +72,7 @@ interface Account {
     ) {
         makeTransaction(
             AccountTransaction(
-                amount = -getBalance(currency),
+                amount = (getBalance(currency) - currency.getStartingBalance()).abs(),
                 cause = cause,
                 currency = currency,
                 importance = importance,
