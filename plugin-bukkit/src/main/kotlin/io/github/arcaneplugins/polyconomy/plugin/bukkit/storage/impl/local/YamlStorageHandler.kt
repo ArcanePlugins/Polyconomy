@@ -16,6 +16,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
@@ -90,24 +91,69 @@ class YamlStorageHandler(
         read()
         plugin.debugLog(STORAGE_YAML) { "Initialised root node." }
 
+        plugin.debugLog(STORAGE_YAML) { "Initial currency check: ensuring at least 1 currency is available." }
+        if (rootNode.node("primary-currency").virtual()
+            || rootNode.node("currency").virtual()
+            || rootNode.node("currency").childrenList().isEmpty())
+        {
+            plugin.logger.info { "New installation or misconfigured currency list in the database; applying default 'dollar' currency." }
+            val currencyNode = rootNode.node("currency", "dollar")
+
+            with (currencyNode) {
+                node("enabled").set(true)
+                node("starting-balance").set(50.0)
+                node("symbol").set("$")
+                node("amount-format").set("#,##0.00")
+                node("presentation-format").set("%symbol%%amount%")
+                node("conversion-rate").set(1)
+                node("locale", "en_US", "display-name", "singular").set("Dollar")
+                node("locale", "en_US", "display-name", "plural").set("Dollars")
+                node("locale", "en_US", "decimal").set(".")
+            }
+
+            rootNode.node("primary-currency").set("dollar")
+
+            write()
+        }
+        plugin.debugLog(STORAGE_YAML) { "Initial currency check complete." }
+
         plugin.debugLog(STORAGE_YAML) { "Caching currencies." }
         currencyCache.clear()
-        for (currencyNode in rootNode.node("currency").childrenList()) {
-            val currencyId = currencyNode.key().toString().lowercase(Locale.ROOT)
+        for ((currencyIdUnfmt, currencyNode) in rootNode.node("currency").childrenMap()) {
+            plugin.debugLog(STORAGE_YAML) { "Scanning node with key: ${currencyNode.key()}." }
+            val currencyId = currencyIdUnfmt.toString().lowercase(Locale.ROOT)
 
             plugin.debugLog(STORAGE_YAML) { "Found currency ${currencyId}." }
 
-            if (!currencyNode.node("enabled").boolean) {
+            if (!currencyNode.node("enabled").getBoolean(false)) {
                 plugin.debugLog(STORAGE_YAML) { "Currency ${currencyId} is not enabled, skipping." }
                 continue
             }
 
+            plugin.debugLog(STORAGE_YAML) { "Constructing object for ${currencyId} and adding to cache." }
             currencyCache.add(
                 CurrencyImpl(currencyId, this)
             )
         }
+        if(currencyCache.isEmpty()) {
+            throw ThrowableUtil.explainHelpfully(
+                plugin = plugin,
+                throwable = IllegalStateException("No currencies loaded"),
+                otherInfo = "You have not configured any currencies to load!",
+                otherContext = "Loading YAML data",
+                printTrace = false,
+            )
+        }
+        plugin.debugLog(STORAGE_YAML) { "Loading primary currency ID." }
         val primaryCurrencyId = rootNode.node("primary-currency").string!!
-        primaryCurrency = currencyCache.first { it.name == primaryCurrencyId }
+        primaryCurrency = currencyCache.find { it.name == primaryCurrencyId }
+            ?: throw ThrowableUtil.explainHelpfully(
+                plugin = plugin,
+                throwable = IllegalArgumentException(primaryCurrencyId),
+                otherInfo = "The primary currency ID you have specified (${primaryCurrencyId}) does not match any valid and enabled currency (${currencyCache.size} candidates)",
+                otherContext = "Loading YAML data",
+                printTrace = false,
+            )
         plugin.debugLog(STORAGE_YAML) { "Cached currencies." }
 
         connected = true

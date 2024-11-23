@@ -16,6 +16,7 @@ object ThrowableUtil {
         otherInfo: String? = null,
         otherContext: String? = null,
         action: String = "running",
+        printTrace: Boolean = true,
     ): DescribedThrowable {
         val stringWriter = StringWriter()
         val printWriter = PrintWriter(stringWriter)
@@ -46,7 +47,7 @@ object ThrowableUtil {
                 ${otherContext ?: "N/A"}
                 
                 Stack trace:
-                ${stackTrace}
+                ${if (printTrace) stackTrace else "Omitted"}
                 
                 ${divider}
                 ATTENTION: Please take a moment to read the error log above.

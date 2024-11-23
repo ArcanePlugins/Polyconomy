@@ -53,6 +53,10 @@ class Polyconomy : JavaPlugin() {
     override fun onLoad() {
         try {
             commandManager.init()
+        } catch (_: DescribedThrowable) {
+            isEnabled = false
+            // described throwable happened here - disable plugin
+            return
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
@@ -77,6 +81,10 @@ class Polyconomy : JavaPlugin() {
             hookManager.registerAll()
             commandManager.load()
             metricsManager.load()
+        } catch (_: DescribedThrowable) {
+            // error that's been described already - disable plugin
+            isEnabled = false
+            return
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
@@ -98,6 +106,9 @@ class Polyconomy : JavaPlugin() {
             hookManager.unregisterAll()
             ExecutionManager.shutdown()
             storageManager.disconnect()
+        } catch(_: DescribedThrowable) {
+            // error that's been described already - already disabling, no action needed.
+            return
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
