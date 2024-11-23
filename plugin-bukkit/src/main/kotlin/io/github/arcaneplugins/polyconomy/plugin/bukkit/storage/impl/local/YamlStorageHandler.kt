@@ -363,7 +363,11 @@ class YamlStorageHandler(
                 accountNode().node("balance", transaction.currency.name).set(newBalance.toDouble())
 
                 // set transaction history
-                val transactionNextId: Int = accountNode().node("transaction", "next-id").getInt(0)
+                val transactionNextIdNode = accountNode().node("transaction", "next-id")
+                if(transactionNextIdNode.virtual()) {
+                    transactionNextIdNode.set(0)
+                }
+                val transactionNextId = accountNode().node("transaction", "next-id").int
                 val transactionNode = accountNode().node("transaction", transactionNextId.toString())
                 with (transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
@@ -756,8 +760,8 @@ class YamlStorageHandler(
                 val presentationFormat = currencyNode().node("presentation-format").string!!
 
                 return presentationFormat
-                    .replace("symbol", getSymbol())
-                    .replace("amount", DecimalFormat(amountFormat).format(amount))
+                    .replace("%symbol%", getSymbol())
+                    .replace("%amount%", DecimalFormat(amountFormat).format(amount))
                     .replace("%display-name%", getDisplayName(amount.compareTo(BigDecimal.ONE) == 0, locale))
             }
 
