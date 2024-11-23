@@ -11,7 +11,7 @@ class PlayerQuitListener(
     plugin,
 ) {
 
-    @Suppress("EmptyMethod") // TODO: Handle any caching required for the player. remove suppression.
+    @Suppress("EmptyMethod")
     @EventHandler
     fun handle(event: PlayerQuitEvent) {
     }

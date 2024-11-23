@@ -54,6 +54,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.9.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>2.0.21</version>
@@ -190,6 +196,10 @@
                         <relocation>
                             <pattern>kotlin</pattern>
                             <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlin</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>kotlinx</pattern>
+                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlinx</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.spongepowered.configurate</pattern>

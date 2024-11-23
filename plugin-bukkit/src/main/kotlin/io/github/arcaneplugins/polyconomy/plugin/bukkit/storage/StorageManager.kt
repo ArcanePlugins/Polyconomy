@@ -11,10 +11,10 @@ class StorageManager(
     val availableHandlers: MutableSet<StorageHandler> = mutableSetOf(
         /* Local Storage Handlers */
         YamlStorageHandler(plugin),
-        // ...... TODO
+        // ...... TODO: H2/SQLite/etc
 
         /* Remote Storage Handlers */
-        // ...... TODO
+        // ...... TODO: MySQL/Redis/Postgres/etc
     )
 
     var currentHandler: StorageHandler? = null

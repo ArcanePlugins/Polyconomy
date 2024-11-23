@@ -268,11 +268,11 @@ class YamlStorageHandler(
     }
 
     override suspend fun hasPlayerAccount(uuid: UUID): Boolean {
-        TODO("Not yet implemented")
+        return !rootNode.node("account", "player", uuid.toString()).virtual()
     }
 
     override suspend fun hasNonPlayerAccount(nsKey: NamespacedKey): Boolean {
-        TODO("Not yet implemented")
+        return !rootNode.node("account", "non-player", nsKey.namespace, nsKey.key).virtual()
     }
 
     override suspend fun isVaultBankOwner(bankId: NamespacedKey, memberId: NamespacedKey): Boolean {
