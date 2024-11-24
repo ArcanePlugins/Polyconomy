@@ -38,15 +38,24 @@ open class VaultLegacyEconomyProvider(
     private suspend fun getAccountByLegacyStr(str: String): Account {
         val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == str }
 
-        return if (onlinePlayer == null) {
-            storageHandler().getOrCreateNonPlayerAccount(
-                namespacedKey = toVaultLegacyNsKey(str),
-                name = str
-            )
-        } else {
+        val offp: OfflinePlayer by lazy {
+            Bukkit.getOfflinePlayer(str)
+        }
+
+        return if (onlinePlayer != null) {
             storageHandler().getOrCreatePlayerAccount(
                 uuid = onlinePlayer.uniqueId,
                 name = onlinePlayer.name
+            )
+        } else if (!str.startsWith("towny-") && offp.hasPlayedBefore()) {
+            storageHandler().getOrCreatePlayerAccount(
+                uuid = offp.uniqueId,
+                name = offp.name
+            )
+        } else {
+            storageHandler().getOrCreateNonPlayerAccount(
+                namespacedKey = toVaultLegacyNsKey(str),
+                name = str
             )
         }
     }

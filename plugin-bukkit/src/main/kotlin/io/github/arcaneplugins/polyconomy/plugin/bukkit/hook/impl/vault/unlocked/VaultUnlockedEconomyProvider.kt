@@ -10,6 +10,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy.V
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault2.economy.Economy
 import net.milkbowl.vault2.economy.EconomyResponse
+import org.bukkit.Bukkit
 import java.math.BigDecimal
 import java.util.*
 import io.github.arcaneplugins.polyconomy.api.account.AccountPermission as PolyAccountPermission
@@ -39,7 +40,9 @@ class VaultUnlockedEconomyProvider(
     }
 
     private suspend fun getAccountByUuid(accountID: UUID, name: String? = accountID.toString()): Account {
-        val isPlayer = storageHandler().playerCacheIsPlayer(accountID)
+        val isPlayer = Bukkit.getOnlinePlayers().any { it.uniqueId == accountID } ||
+                storageHandler().playerCacheIsPlayer(accountID) ||
+                Bukkit.getOfflinePlayer(accountID).hasPlayedBefore()
 
         return if (isPlayer) {
             storageHandler().getOrCreatePlayerAccount(accountID, name)
