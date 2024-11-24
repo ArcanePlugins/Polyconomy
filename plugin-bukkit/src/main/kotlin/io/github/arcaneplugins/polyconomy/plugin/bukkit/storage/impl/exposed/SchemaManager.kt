@@ -8,6 +8,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sch
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.NonPlayerAccount
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.NonPlayerAccountMember
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.PlayerAccount
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.PlayerCache
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.VaultBankAccount
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.VaultBankAccountNonPlayerMember
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -26,6 +27,7 @@ object SchemaManager {
                 NonPlayerAccount,
                 NonPlayerAccountMember,
                 PlayerAccount,
+                PlayerCache,
                 VaultBankAccount,
                 VaultBankAccountNonPlayerMember,
             )
