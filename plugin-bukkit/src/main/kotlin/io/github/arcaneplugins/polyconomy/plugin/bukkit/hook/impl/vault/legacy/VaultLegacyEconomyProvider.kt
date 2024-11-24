@@ -1,4 +1,6 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault
+@file:Suppress("DEPRECATION")
+
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy
 
 import io.github.arcaneplugins.polyconomy.api.Economy.Companion.PRECISION
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
@@ -6,7 +8,6 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.VaultHook.Companion.VAULT_PLUGIN_NAME
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault.economy.Economy
@@ -15,7 +16,7 @@ import org.bukkit.OfflinePlayer
 import java.math.BigDecimal
 import java.util.*
 
-class VaultEconomyProvider(
+open class VaultLegacyEconomyProvider(
     val plugin: Polyconomy,
 ) : Economy {
 
@@ -24,13 +25,13 @@ class VaultEconomyProvider(
     https://github.com/MilkBowl/VaultAPI/blob/master/src/main/java/net/milkbowl/vault/economy/Economy.java
      */
 
-    private val vaultCause = PluginCause(NamespacedKey("polyconomy", "vault"))
+    private val vaultLegacyCause = PluginCause(NamespacedKey("vault-legacy", "cause"))
 
-    private fun storageHandler(): StorageHandler = plugin.storageManager.currentHandler!!
+    protected fun storageHandler(): StorageHandler = plugin.storageManager.currentHandler!!
 
-    private fun toVaultNsKey(str: String?) = NamespacedKey(VAULT_PLUGIN_NAME, str ?: "null")
+    private fun toVaultLegacyNsKey(str: String?) = NamespacedKey("vault-legacy", str ?: "null")
 
-    private suspend fun primaryCurrency(): Currency = storageHandler().getPrimaryCurrency()
+    protected suspend fun primaryCurrency(): Currency = storageHandler().getPrimaryCurrency()
 
     override fun isEnabled(): Boolean = plugin.isEnabled
 
@@ -61,7 +62,7 @@ class VaultEconomyProvider(
     @Deprecated(message = "No per-world support.", replaceWith = ReplaceWith("hasAccount(OfflinePlayer)"))
     override fun hasAccount(p0: String): Boolean {
         return runBlocking {
-            storageHandler().hasNonPlayerAccount(toVaultNsKey(p0))
+            storageHandler().hasNonPlayerAccount(toVaultLegacyNsKey(p0))
         }
     }
 
@@ -86,7 +87,7 @@ class VaultEconomyProvider(
         return runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    toVaultNsKey(p0),
+                    toVaultLegacyNsKey(p0),
                     p0
                 )
                 .getBalance(primaryCurrency())
@@ -121,7 +122,7 @@ class VaultEconomyProvider(
         return runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    toVaultNsKey(p0),
+                    toVaultLegacyNsKey(p0),
                     p0
                 )
                 .has(BigDecimal.valueOf(p1), primaryCurrency())
@@ -154,13 +155,13 @@ class VaultEconomyProvider(
         return runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    toVaultNsKey(p0),
+                    toVaultLegacyNsKey(p0),
                     p0
                 )
                 .withdraw(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -185,7 +186,7 @@ class VaultEconomyProvider(
                 .withdraw(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -214,13 +215,13 @@ class VaultEconomyProvider(
         return runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    toVaultNsKey(p0),
+                    toVaultLegacyNsKey(p0),
                     p0
                 )
                 .deposit(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -245,7 +246,7 @@ class VaultEconomyProvider(
                 .deposit(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -274,17 +275,17 @@ class VaultEconomyProvider(
         runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
 
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .setLegacyVaultBankOwner(
-                    ownerId = toVaultNsKey(p1)
+                    ownerId = toVaultLegacyNsKey(p1)
                 )
         }
 
@@ -300,13 +301,13 @@ class VaultEconomyProvider(
         runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
 
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .setVaultBankOwner(
@@ -326,7 +327,7 @@ class VaultEconomyProvider(
         runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .deleteAccount()
@@ -344,7 +345,7 @@ class VaultEconomyProvider(
         val bal = runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .getBalance(primaryCurrency())
@@ -362,7 +363,7 @@ class VaultEconomyProvider(
         val has = runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .has(BigDecimal.valueOf(p1), primaryCurrency())
@@ -380,13 +381,13 @@ class VaultEconomyProvider(
         runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .withdraw(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -404,13 +405,13 @@ class VaultEconomyProvider(
         runBlocking {
             storageHandler()
                 .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultNsKey(p0),
+                    namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
                 .deposit(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
-                    cause = vaultCause,
+                    cause = vaultLegacyCause,
                     importance = TransactionImportance.MEDIUM,
                     reason = null,
                 )
@@ -427,9 +428,9 @@ class VaultEconomyProvider(
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankOwner(String, OfflinePlayer)"))
     override fun isBankOwner(p0: String, p1: String): EconomyResponse {
         return runBlocking {
-            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultLegacyNsKey(p0), p0)
 
-            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankOwner(memberId = toVaultNsKey(p1))) {
+            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankOwner(memberId = toVaultLegacyNsKey(p1))) {
                 EconomyResponse.ResponseType.SUCCESS
             } else {
                 EconomyResponse.ResponseType.FAILURE
@@ -446,7 +447,7 @@ class VaultEconomyProvider(
 
     override fun isBankOwner(p0: String, p1: OfflinePlayer): EconomyResponse {
         return runBlocking {
-            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultLegacyNsKey(p0), p0)
             val status = if (account.isVaultBankOwner(memberId = p1.uniqueId)) {
                 EconomyResponse.ResponseType.SUCCESS
             } else {
@@ -465,8 +466,8 @@ class VaultEconomyProvider(
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("isBankMember(String, OfflinePlayer)"))
     override fun isBankMember(p0: String, p1: String): EconomyResponse {
         return runBlocking {
-            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
-            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankMember(toVaultNsKey(p1))) {
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultLegacyNsKey(p0), p0)
+            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankMember(toVaultLegacyNsKey(p1))) {
                 EconomyResponse.ResponseType.SUCCESS
             } else {
                 EconomyResponse.ResponseType.FAILURE
@@ -483,7 +484,7 @@ class VaultEconomyProvider(
 
     override fun isBankMember(p0: String, p1: OfflinePlayer): EconomyResponse {
         return runBlocking {
-            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultNsKey(p0), p0)
+            val account = storageHandler().getOrCreateNonPlayerAccount(toVaultLegacyNsKey(p0), p0)
             val status = if (account.isMember(p1.uniqueId)) {
                 EconomyResponse.ResponseType.SUCCESS
             } else {
@@ -511,7 +512,7 @@ class VaultEconomyProvider(
     override fun createPlayerAccount(p0: String): Boolean {
         runBlocking {
             storageHandler().getOrCreateNonPlayerAccount(
-                namespacedKey = toVaultNsKey(p0),
+                namespacedKey = toVaultLegacyNsKey(p0),
                 name = p0,
             )
         }

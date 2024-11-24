@@ -468,6 +468,14 @@ class YamlStorageHandler(
                 return player == uuid
             }
 
+            override suspend fun addMember(player: UUID) {
+                throw IllegalStateException("Unable to add members to a player account")
+            }
+
+            override suspend fun removeMember(player: UUID) {
+                throw IllegalStateException("Unable to remove members from a player account")
+            }
+
         }
 
         private class NonPlayerAccountImpl(
@@ -676,6 +684,16 @@ class YamlStorageHandler(
                         permNode.boolean
                     }
                 }
+            }
+
+            override suspend fun addMember(player: UUID) {
+                setPermissions(player, AccountPermission.entries.associateWith { null })
+                storageHandler.write()
+            }
+
+            override suspend fun removeMember(player: UUID) {
+                accountNode().node("member").removeChild(player.toString())
+                storageHandler.write()
             }
 
         }

@@ -6,10 +6,20 @@ enum class AccountPermission(
 
     BALANCE(true),
 
-    WITHDRAW(false),
+    WITHDRAW(true),
 
     DEPOSIT(true),
 
     MODIFY_PERMISSIONS(false),
+
+    OWNER(false),
+
+    TRANSFER_OWNERSHIP(false),
+
+    INVITE_MEMBER(false),
+
+    REMOVE_MEMBER(false),
+
+    DELETE(false),
 
 }

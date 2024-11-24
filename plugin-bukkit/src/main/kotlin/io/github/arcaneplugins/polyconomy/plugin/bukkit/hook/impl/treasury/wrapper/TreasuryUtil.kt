@@ -1,5 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper
 
+import io.github.arcaneplugins.polyconomy.api.account.AccountPermission
 import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.api.account.TransactionType
@@ -138,19 +139,17 @@ object TreasuryUtil {
 
     fun convertAccountPermissionToTreasury(
         polyObj: PolyAccountPermission,
-    ): TreasuryAccountPermission {
+    ): TreasuryAccountPermission? {
         return when (polyObj) {
-            PolyAccountPermission.MODIFY_PERMISSIONS ->
-                TreasuryAccountPermission.MODIFY_PERMISSIONS
-
-            PolyAccountPermission.DEPOSIT ->
-                TreasuryAccountPermission.DEPOSIT
-
-            PolyAccountPermission.WITHDRAW ->
-                TreasuryAccountPermission.WITHDRAW
-
-            PolyAccountPermission.BALANCE ->
-                TreasuryAccountPermission.BALANCE
+            PolyAccountPermission.MODIFY_PERMISSIONS -> TreasuryAccountPermission.MODIFY_PERMISSIONS
+            PolyAccountPermission.DEPOSIT -> TreasuryAccountPermission.DEPOSIT
+            PolyAccountPermission.WITHDRAW -> TreasuryAccountPermission.WITHDRAW
+            PolyAccountPermission.BALANCE -> TreasuryAccountPermission.BALANCE
+            AccountPermission.OWNER -> null
+            AccountPermission.TRANSFER_OWNERSHIP -> null
+            AccountPermission.INVITE_MEMBER -> null
+            AccountPermission.REMOVE_MEMBER -> null
+            AccountPermission.DELETE -> null
         }
     }
 

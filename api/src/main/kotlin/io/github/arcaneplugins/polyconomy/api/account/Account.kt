@@ -119,4 +119,12 @@ interface Account {
         permissions: Collection<AccountPermission>,
     ): Boolean
 
+    suspend fun addMember(
+        player: UUID
+    )
+
+    suspend fun removeMember(
+        player: UUID
+    )
+
 }

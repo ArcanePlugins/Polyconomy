@@ -31,12 +31,7 @@
         <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
-            <!-- required for dependencies [Treasury] -->
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-            <!-- required for dependencies [Vault] -->
+            <!-- required for dependencies [Treasury, VaultUnlocked] -->
         </repository>
     </repositories>
 
@@ -108,9 +103,9 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.MilkBowl</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.7.1</version>
+            <groupId>net.milkbowl.vault</groupId>
+            <artifactId>VaultUnlockedAPI</artifactId>
+            <version>2.7</version><!-- Validate this is the most recent version from the CI -->
             <scope>provided</scope>
         </dependency>
     </dependencies>

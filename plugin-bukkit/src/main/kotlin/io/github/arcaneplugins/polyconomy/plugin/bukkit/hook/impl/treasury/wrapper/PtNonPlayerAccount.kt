@@ -130,6 +130,8 @@ class PtNonPlayerAccount(
             runBlocking {
                 polyObj.getPermissions(player)
                     .mapKeys { convertAccountPermissionToTreasury(it.key) }
+                    .filterKeys { it != null }
+                    .mapKeys { it.key!! }
                     .mapValues { TriState.fromBoolean(it.value) }
             }
         }
@@ -144,6 +146,8 @@ class PtNonPlayerAccount(
                             .mapKeys { it2 ->
                                 convertAccountPermissionToTreasury(it2.key)
                             }
+                            .filterKeys { it != null }
+                            .mapKeys { it.key!! }
                             .mapValues { it2 ->
                                 TriState.fromBoolean(it2.value)
                             }
