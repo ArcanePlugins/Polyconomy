@@ -7,6 +7,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.player.PlayerJoinEvent
 
 class PlayerJoinListener(
@@ -15,7 +16,7 @@ class PlayerJoinListener(
     plugin,
 ) {
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     fun handle(event: PlayerJoinEvent) {
         createPlayerAccount(event.player)
     }
@@ -23,7 +24,10 @@ class PlayerJoinListener(
     @OptIn(DelicateCoroutinesApi::class)
     private fun createPlayerAccount(player: Player) {
         GlobalScope.launch {
-            plugin.storageManager.currentHandler!!.getOrCreatePlayerAccount(player.uniqueId, player.name)
+            with (plugin.storageManager.currentHandler!!) {
+                playerCacheSetName(player.uniqueId, player.name)
+                getOrCreatePlayerAccount(player.uniqueId, player.name)
+            }
         }
     }
 
