@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.impl
 
 import io.github.arcaneplugins.polyconomy.api.account.NonPlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
@@ -6,11 +6,12 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.SchemaManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import java.io.File
 import java.math.BigDecimal
-import java.sql.Connection
-import java.sql.DriverManager
 import java.util.*
 
 class SqliteStorageHandler(
@@ -20,20 +21,17 @@ class SqliteStorageHandler(
 ) {
 
     val dbFile = File(plugin.dataFolder, "data${File.separator}sqlite.db")
-    lateinit var connection: Connection
+    lateinit var db: Database
 
     override fun connect() {
-        var requiresInitialization = false
-
         if (!dbFile.exists()) {
             dbFile.mkdirs()
             dbFile.createNewFile()
-            requiresInitialization = true
         }
 
-        connection = DriverManager.getConnection("jdbc:sqlite:${dbFile.absolutePath}")
+        db = Database.connect("jdbc:sqlite:${dbFile.absolutePath}", driver = "org.sqlite.JDBC")
 
-        if (requiresInitialization)
+        SchemaManager.createTables()
 
         connected = true
     }
@@ -48,9 +46,7 @@ class SqliteStorageHandler(
                 printTrace = false
             )
         }
-        if (::connection.isInitialized && !connection.isClosed) {
-            connection.close()
-        }
+        TransactionManager.closeAndUnregister(database = db)
         connected = false
     }
 

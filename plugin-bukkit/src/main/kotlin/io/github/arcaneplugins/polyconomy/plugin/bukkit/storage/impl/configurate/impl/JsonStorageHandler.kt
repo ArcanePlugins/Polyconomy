@@ -1,21 +1,21 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.impl
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.ConfigurateStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.ConfigurateStorageHandler
 import org.spongepowered.configurate.ScopedConfigurationNode
+import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
-class YamlStorageHandler(
+class JsonStorageHandler(
     plugin: Polyconomy
 ) : ConfigurateStorageHandler(
     plugin = plugin,
-    fileExtension = "yml",
-    id = "yaml",
+    fileExtension = "json",
+    id = "json",
 ) {
 
     override fun buildLoader(): AbstractConfigurationLoader<out ScopedConfigurationNode<*>> {
-        return YamlConfigurationLoader
+        return GsonConfigurationLoader
             .builder()
             .path(absolutePath())
             .build()

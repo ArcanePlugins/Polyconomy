@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate
 
 import io.github.arcaneplugins.polyconomy.api.account.AccountPermission
 import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction

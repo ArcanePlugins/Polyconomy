@@ -2,8 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_MANAGER
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.impl.JsonStorageHandler
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.impl.YamlStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl.JsonStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl.YamlStorageHandler
 
 class StorageManager(
     val plugin: Polyconomy,
