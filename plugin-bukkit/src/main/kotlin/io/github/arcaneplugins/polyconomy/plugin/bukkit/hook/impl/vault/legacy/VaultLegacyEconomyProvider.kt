@@ -9,6 +9,7 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault.economy.Economy
@@ -39,6 +40,7 @@ open class VaultLegacyEconomyProvider(
         val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == str }
 
         val offp: OfflinePlayer by lazy {
+            plugin.debugLog(DebugCategory.DEBUG_TEST) { "Lazily evaluated OfflinePlayer for str: ${str}"}
             Bukkit.getOfflinePlayer(str)
         }
 
@@ -47,7 +49,12 @@ open class VaultLegacyEconomyProvider(
                 uuid = onlinePlayer.uniqueId,
                 name = onlinePlayer.name
             )
-        } else if (!str.startsWith("towny-") && offp.hasPlayedBefore()) {
+        } else if (str.startsWith("town-")) {
+            storageHandler().getOrCreateNonPlayerAccount(
+                namespacedKey = toVaultLegacyNsKey(str),
+                name = str
+            )
+        } else if (offp.hasPlayedBefore()) {
             storageHandler().getOrCreatePlayerAccount(
                 uuid = offp.uniqueId,
                 name = offp.name
