@@ -14,7 +14,7 @@ class StorageManager(
         /* Local Storage Handlers */
         JsonStorageHandler(plugin),
         YamlStorageHandler(plugin),
-        SqLiteStorageHandler(plugin)
+        SqLiteStorageHandler(plugin),
 
         /* Remote Storage Handlers */
         // ...... TODO: MySQL/Redis/Postgres/etc

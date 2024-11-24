@@ -13,4 +13,15 @@ data class AccountTransaction(
     val importance: TransactionImportance,
     val type: TransactionType,
     val timestamp: Instant,
-)
+) {
+
+    suspend fun resultingBalance(oldBalance: BigDecimal): BigDecimal {
+        return when (type) {
+            TransactionType.SET -> amount
+            TransactionType.RESET -> currency.getStartingBalance()
+            TransactionType.WITHDRAW -> oldBalance - amount
+            TransactionType.DEPOSIT -> oldBalance + amount
+        }
+    }
+
+}

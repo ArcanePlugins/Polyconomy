@@ -383,11 +383,18 @@ abstract class ConfigurateStorageHandler(
 
             override suspend fun makeTransaction(transaction: AccountTransaction) {
                 val oldBalance: BigDecimal = getBalance(transaction.currency)
-                val newBalance: BigDecimal = when (transaction.type) {
-                    TransactionType.SET -> transaction.amount
-                    TransactionType.RESET -> transaction.currency.getStartingBalance()
-                    TransactionType.WITHDRAW -> oldBalance - transaction.amount
-                    TransactionType.DEPOSIT -> oldBalance + transaction.amount
+                val newBalance: BigDecimal = let {
+                    val value = transaction.resultingBalance(oldBalance)
+                    val minBal = storageHandler.plugin.settings.getMinimumBalance()
+
+                    return@let if (value < minBal) {
+                        throw IllegalArgumentException(
+                            "A ${transaction.type} transaction of ${transaction.amount} would evaluate to a balance " +
+                                    "of ${value}, which is below the minimum allowed balance of ${minBal}"
+                        )
+                    } else {
+                        value
+                    }
                 }
 
                 // set new balance

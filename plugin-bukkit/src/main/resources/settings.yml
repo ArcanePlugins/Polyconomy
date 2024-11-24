@@ -10,7 +10,7 @@ storage:
   implementation: "json"
 
 advanced:
-  minimum-balance: 0
+  minimum-balance: 0.0
 
 metadata:
   file-version: 1

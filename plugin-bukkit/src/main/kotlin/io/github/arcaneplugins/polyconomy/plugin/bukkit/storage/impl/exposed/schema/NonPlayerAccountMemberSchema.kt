@@ -1,9 +1,10 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema
 
+import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 
 object NonPlayerAccountMemberSchema : Table("NonPlayerAccountMember") {
-    val accountId = reference("account_id", AccountSchema.id)
+    val accountId = reference("account_id", AccountSchema.id, onDelete = ReferenceOption.CASCADE)
     val memberId = binary("member_id", 16)
     val permBalance = bool("perm_balance").nullable()
     val permWithdraw = bool("perm_withdraw").nullable()
