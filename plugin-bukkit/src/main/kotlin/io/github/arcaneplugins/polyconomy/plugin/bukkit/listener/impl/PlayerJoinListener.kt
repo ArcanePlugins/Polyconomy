@@ -24,7 +24,7 @@ class PlayerJoinListener(
     @OptIn(DelicateCoroutinesApi::class)
     private fun createPlayerAccount(player: Player) {
         GlobalScope.launch {
-            with (plugin.storageManager.currentHandler!!) {
+            with(plugin.storageManager.currentHandler!!) {
                 playerCacheSetName(player.uniqueId, player.name)
                 getOrCreatePlayerAccount(player.uniqueId, player.name)
             }

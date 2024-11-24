@@ -7,7 +7,7 @@ import org.spongepowered.configurate.gson.GsonConfigurationLoader
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 
 class JsonStorageHandler(
-    plugin: Polyconomy
+    plugin: Polyconomy,
 ) : ConfigurateStorageHandler(
     plugin = plugin,
     fileExtension = "json",

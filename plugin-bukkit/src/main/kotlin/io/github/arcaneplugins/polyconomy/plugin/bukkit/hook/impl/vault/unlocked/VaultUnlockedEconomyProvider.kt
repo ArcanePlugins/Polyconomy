@@ -18,7 +18,7 @@ import net.milkbowl.vault2.economy.AccountPermission as VuAccountPermission
 
 class VaultUnlockedEconomyProvider(
     plugin: Polyconomy,
-): VaultLegacyEconomyProvider(plugin), Economy {
+) : VaultLegacyEconomyProvider(plugin), Economy {
 
     /*
     TODO Awaiting resolution of https://github.com/TheNewEconomy/VaultUnlockedAPI/issues/11 otherwise currency code
@@ -140,7 +140,7 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun defaultCurrencyNamePlural(
-        pluginName: String?
+        pluginName: String?,
     ): String {
         return runBlocking {
             primaryCurrency().getDisplayName(true, Locale.getDefault())
@@ -148,7 +148,7 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun defaultCurrencyNameSingular(
-        pluginName: String?
+        pluginName: String?,
     ): String {
         return runBlocking {
             primaryCurrency().getDisplayName(false, Locale.getDefault())
@@ -186,7 +186,7 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun getAccountName(
-        accountID: UUID
+        accountID: UUID,
     ): Optional<String> {
         return runBlocking {
             Optional.ofNullable(getAccountByUuid(accountID).getName())
@@ -194,7 +194,7 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun hasAccount(
-        accountID: UUID
+        accountID: UUID,
     ): Boolean {
         return runBlocking {
             storageHandler().hasPlayerAccount(accountID) ||

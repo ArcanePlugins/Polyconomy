@@ -40,7 +40,7 @@ open class VaultLegacyEconomyProvider(
         val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == str }
 
         val offp: OfflinePlayer by lazy {
-            plugin.debugLog(DebugCategory.DEBUG_TEST) { "Lazily evaluated OfflinePlayer for str: ${str}"}
+            plugin.debugLog(DebugCategory.DEBUG_TEST) { "Lazily evaluated OfflinePlayer for str: ${str}" }
             Bukkit.getOfflinePlayer(str)
         }
 
@@ -98,7 +98,7 @@ open class VaultLegacyEconomyProvider(
         return runBlocking {
             val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == p0 }
 
-            if(onlinePlayer != null) {
+            if (onlinePlayer != null) {
                 storageHandler().hasPlayerAccount(onlinePlayer.uniqueId)
             } else {
                 storageHandler().hasNonPlayerAccount(toVaultLegacyNsKey(p0))
@@ -442,11 +442,12 @@ open class VaultLegacyEconomyProvider(
         return runBlocking {
             val account = storageHandler().getOrCreateNonPlayerAccount(toVaultLegacyNsKey(p0), p0)
 
-            @Suppress("DEPRECATION") val status = if (account.isLegacyVaultBankOwner(memberId = toVaultLegacyNsKey(p1))) {
-                EconomyResponse.ResponseType.SUCCESS
-            } else {
-                EconomyResponse.ResponseType.FAILURE
-            }
+            @Suppress("DEPRECATION") val status =
+                if (account.isLegacyVaultBankOwner(memberId = toVaultLegacyNsKey(p1))) {
+                    EconomyResponse.ResponseType.SUCCESS
+                } else {
+                    EconomyResponse.ResponseType.FAILURE
+                }
 
             EconomyResponse(
                 0.0,

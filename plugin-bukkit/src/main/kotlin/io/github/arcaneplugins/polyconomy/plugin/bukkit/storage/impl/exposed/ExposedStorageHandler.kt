@@ -12,10 +12,16 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.api
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.apiImpl.NonPlayerAccountImpl
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.apiImpl.PlayerAccountImpl
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.AccountBalanceSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.AccountSchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.AccountTransactionSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencyLocaleSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencySchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.NonPlayerAccountMemberSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.NonPlayerAccountSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.PlayerAccountSchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.PlayerCacheSchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.VaultBankAccountNonPlayerMemberSchema
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.VaultBankAccountSchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.ByteUtil.bytesToUuid
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.ByteUtil.uuidToBytes
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
@@ -36,12 +42,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.math.BigDecimal
 import java.util.*
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.AccountSchema as AccountSchema
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencySchema as CurrencySchema
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencyLocaleSchema as CurrencyLocaleSchema
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.NonPlayerAccountSchema as NonPlayerAccountSchema
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.PlayerAccountSchema as PlayerAccountSchema
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.VaultBankAccountSchema as VaultBankAccountSchema
 
 abstract class ExposedStorageHandler(
     val plugin: Polyconomy,

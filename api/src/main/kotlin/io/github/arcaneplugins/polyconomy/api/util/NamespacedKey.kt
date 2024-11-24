@@ -9,7 +9,7 @@ class NamespacedKey(
         fun fromString(str: String): NamespacedKey {
             val split = str.split(':')
 
-            if(split.size != 2) {
+            if (split.size != 2) {
                 throw IllegalArgumentException(
                     "A namespacedkey must have a namespace and key separated by 1 colon character"
                 )

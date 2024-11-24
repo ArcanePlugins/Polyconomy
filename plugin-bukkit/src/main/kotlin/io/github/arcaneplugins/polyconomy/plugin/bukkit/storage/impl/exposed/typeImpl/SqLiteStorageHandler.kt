@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.Database
 import java.io.File
 
 class SqLiteStorageHandler(
-    plugin: Polyconomy
+    plugin: Polyconomy,
 ) : ExposedStorageHandler(
     plugin = plugin,
     id = "sqlite",

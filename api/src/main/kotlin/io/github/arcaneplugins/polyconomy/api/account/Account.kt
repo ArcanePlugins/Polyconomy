@@ -120,11 +120,11 @@ interface Account {
     ): Boolean
 
     suspend fun addMember(
-        player: UUID
+        player: UUID,
     )
 
     suspend fun removeMember(
-        player: UUID
+        player: UUID,
     )
 
 }

@@ -106,7 +106,7 @@ class Polyconomy : JavaPlugin() {
             hookManager.unregisterAll()
             ExecutionManager.shutdown()
             storageManager.disconnect()
-        } catch(_: DescribedThrowable) {
+        } catch (_: DescribedThrowable) {
             // error that's been described already - already disabling, no action needed.
             return
         } catch (ex: Exception) {

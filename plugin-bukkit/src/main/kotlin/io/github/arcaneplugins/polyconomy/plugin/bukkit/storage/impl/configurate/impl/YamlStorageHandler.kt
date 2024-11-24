@@ -7,7 +7,7 @@ import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 
 class YamlStorageHandler(
-    plugin: Polyconomy
+    plugin: Polyconomy,
 ) : ConfigurateStorageHandler(
     plugin = plugin,
     fileExtension = "yml",

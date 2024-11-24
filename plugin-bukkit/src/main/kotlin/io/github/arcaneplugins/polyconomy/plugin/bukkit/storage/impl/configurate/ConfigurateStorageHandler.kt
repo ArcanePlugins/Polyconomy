@@ -98,12 +98,12 @@ abstract class ConfigurateStorageHandler(
 
         plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check: ensuring at least 1 currency is available." }
         if (rootNode.node("currency").virtual()
-            || rootNode.node("currency").childrenList().isEmpty())
-        {
+            || rootNode.node("currency").childrenList().isEmpty()
+        ) {
             plugin.logger.info { "New installation or misconfigured currency list in the database; applying default 'dollar' currency." }
             val currencyNode = rootNode.node("currency", "dollar")
 
-            with (currencyNode) {
+            with(currencyNode) {
                 node("enabled").set(true)
                 node("starting-balance").set(50.0)
                 node("symbol").set("$")
@@ -137,7 +137,7 @@ abstract class ConfigurateStorageHandler(
                 CurrencyImpl(currencyId, this)
             )
         }
-        if(currencyCache.isEmpty()) {
+        if (currencyCache.isEmpty()) {
             throw ThrowableUtil.explainHelpfully(
                 plugin = plugin,
                 throwable = IllegalStateException("No currencies loaded"),
@@ -395,12 +395,12 @@ abstract class ConfigurateStorageHandler(
 
                 // set transaction history
                 val transactionNextIdNode = accountNode().node("transaction", "next-id")
-                if(transactionNextIdNode.virtual()) {
+                if (transactionNextIdNode.virtual()) {
                     transactionNextIdNode.set(0)
                 }
                 val transactionNextId = accountNode().node("transaction", "next-id").int
                 val transactionNode = accountNode().node("transaction", transactionNextId.toString())
-                with (transactionNode) {
+                with(transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
                     node("currency").set(transaction.currency.name)
                     node("cause", "type").set(transaction.cause.type.name)
@@ -582,12 +582,12 @@ abstract class ConfigurateStorageHandler(
 
                 // set transaction history
                 val transactionNextIdNode = accountNode().node("transaction", "next-id")
-                if(transactionNextIdNode.virtual()) {
+                if (transactionNextIdNode.virtual()) {
                     transactionNextIdNode.set(0)
                 }
                 val transactionNextId = accountNode().node("transaction", "next-id").int
                 val transactionNode = accountNode().node("transaction", transactionNextId.toString())
-                with (transactionNode) {
+                with(transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
                     node("currency").set(transaction.currency.name)
                     node("cause", "type").set(transaction.cause.type.name)
@@ -607,7 +607,7 @@ abstract class ConfigurateStorageHandler(
                 val accountsNode = storageHandler.rootNode.node("account", "non-player")
                 val namespaceNode = storageHandler.rootNode.node("account", "non-player", namespacedKey.namespace)
                 namespaceNode.removeChild(namespacedKey.key)
-                if(namespaceNode.childrenMap().isEmpty()) {
+                if (namespaceNode.childrenMap().isEmpty()) {
                     accountsNode.removeChild(namespacedKey.namespace)
                 }
                 storageHandler.write()
@@ -684,7 +684,7 @@ abstract class ConfigurateStorageHandler(
             }
 
             override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-                if(!isMember(player)) {
+                if (!isMember(player)) {
                     return AccountPermission.entries.associateWith { false }
                 }
 
@@ -705,7 +705,7 @@ abstract class ConfigurateStorageHandler(
             }
 
             override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-                if(!isMember(player)) {
+                if (!isMember(player)) {
                     return false
                 }
 

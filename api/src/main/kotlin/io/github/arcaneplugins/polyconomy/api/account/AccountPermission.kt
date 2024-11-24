@@ -1,7 +1,7 @@
 package io.github.arcaneplugins.polyconomy.api.account
 
 enum class AccountPermission(
-    val defaultValue: Boolean
+    val defaultValue: Boolean,
 ) {
 
     BALANCE(true),

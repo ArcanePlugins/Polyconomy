@@ -87,7 +87,7 @@ class CurrencyImpl(
 
     override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
         populate()
-        return if(plural) {
+        return if (plural) {
             displayNameSingularLocaleMap[locale]!!
         } else {
             displayNamePluralLocaleMap[locale]!!
