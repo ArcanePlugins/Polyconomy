@@ -3,6 +3,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy
 
 import io.github.arcaneplugins.polyconomy.api.Economy.Companion.PRECISION
+import io.github.arcaneplugins.polyconomy.api.account.Account
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
@@ -12,6 +13,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault.economy.Economy
 import net.milkbowl.vault.economy.EconomyResponse
+import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import java.math.BigDecimal
 import java.util.*
@@ -32,6 +34,22 @@ open class VaultLegacyEconomyProvider(
     private fun toVaultLegacyNsKey(str: String?) = NamespacedKey("vault-legacy", str ?: "null")
 
     protected suspend fun primaryCurrency(): Currency = storageHandler().getPrimaryCurrency()
+
+    private suspend fun getAccountByLegacyStr(str: String): Account {
+        val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == str }
+
+        return if (onlinePlayer == null) {
+            storageHandler().getOrCreateNonPlayerAccount(
+                namespacedKey = toVaultLegacyNsKey(str),
+                name = str
+            )
+        } else {
+            storageHandler().getOrCreatePlayerAccount(
+                uuid = onlinePlayer.uniqueId,
+                name = onlinePlayer.name
+            )
+        }
+    }
 
     override fun isEnabled(): Boolean = plugin.isEnabled
 
@@ -62,7 +80,13 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "No per-world support.", replaceWith = ReplaceWith("hasAccount(OfflinePlayer)"))
     override fun hasAccount(p0: String): Boolean {
         return runBlocking {
-            storageHandler().hasNonPlayerAccount(toVaultLegacyNsKey(p0))
+            val onlinePlayer = Bukkit.getOnlinePlayers().firstOrNull { it.name == p0 }
+
+            if(onlinePlayer != null) {
+                storageHandler().hasPlayerAccount(onlinePlayer.uniqueId)
+            } else {
+                storageHandler().hasNonPlayerAccount(toVaultLegacyNsKey(p0))
+            }
         }
     }
 
@@ -85,11 +109,7 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("getBalance(OfflinePlayer)"))
     override fun getBalance(p0: String): Double {
         return runBlocking {
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    toVaultLegacyNsKey(p0),
-                    p0
-                )
+            getAccountByLegacyStr(p0)
                 .getBalance(primaryCurrency())
                 .toDouble()
         }
@@ -120,11 +140,7 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("has(OfflinePlayer, Double)"))
     override fun has(p0: String, p1: Double): Boolean {
         return runBlocking {
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    toVaultLegacyNsKey(p0),
-                    p0
-                )
+            getAccountByLegacyStr(p0)
                 .has(BigDecimal.valueOf(p1), primaryCurrency())
         }
     }
@@ -153,11 +169,7 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("withdrawPlayer(OfflinePlayer, Double)"))
     override fun withdrawPlayer(p0: String, p1: Double): EconomyResponse {
         return runBlocking {
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    toVaultLegacyNsKey(p0),
-                    p0
-                )
+            getAccountByLegacyStr(p0)
                 .withdraw(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
@@ -213,11 +225,7 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "Use offline players.", replaceWith = ReplaceWith("depositPlayer(OfflinePlayer, Double)"))
     override fun depositPlayer(p0: String, p1: Double): EconomyResponse {
         return runBlocking {
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    toVaultLegacyNsKey(p0),
-                    p0
-                )
+            getAccountByLegacyStr(p0)
                 .deposit(
                     amount = BigDecimal.valueOf(p1),
                     currency = primaryCurrency(),
@@ -278,12 +286,6 @@ open class VaultLegacyEconomyProvider(
                     namespacedKey = toVaultLegacyNsKey(p0),
                     name = p0,
                 )
-
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultLegacyNsKey(p0),
-                    name = p0,
-                )
                 .setLegacyVaultBankOwner(
                     ownerId = toVaultLegacyNsKey(p1)
                 )
@@ -299,12 +301,6 @@ open class VaultLegacyEconomyProvider(
 
     override fun createBank(p0: String, p1: OfflinePlayer): EconomyResponse {
         runBlocking {
-            storageHandler()
-                .getOrCreateNonPlayerAccount(
-                    namespacedKey = toVaultLegacyNsKey(p0),
-                    name = p0,
-                )
-
             storageHandler()
                 .getOrCreateNonPlayerAccount(
                     namespacedKey = toVaultLegacyNsKey(p0),
@@ -511,10 +507,7 @@ open class VaultLegacyEconomyProvider(
     @Deprecated(message = "Use offline players", replaceWith = ReplaceWith("createPlayerAccount(OfflinePlayer)"))
     override fun createPlayerAccount(p0: String): Boolean {
         runBlocking {
-            storageHandler().getOrCreateNonPlayerAccount(
-                namespacedKey = toVaultLegacyNsKey(p0),
-                name = p0,
-            )
+            getAccountByLegacyStr(p0)
         }
         return true
     }
