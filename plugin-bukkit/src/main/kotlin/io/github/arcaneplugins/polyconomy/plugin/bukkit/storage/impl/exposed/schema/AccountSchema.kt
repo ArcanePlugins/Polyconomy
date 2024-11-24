@@ -2,6 +2,6 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 
-object Account : IntIdTable("Account", "id") {
-    val name = varchar("name", 255)
+object AccountSchema : IntIdTable("Account", "id") {
+    val name = varchar("name", 255).nullable()
 }

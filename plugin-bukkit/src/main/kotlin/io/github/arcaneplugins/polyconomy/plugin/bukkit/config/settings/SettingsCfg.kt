@@ -15,4 +15,9 @@ class SettingsCfg(
         read()
         plugin.debugManager.load()
     }
+
+    fun getPrimaryCurrencyId(): String {
+        return rootNode.node("primary-currency").string!!
+    }
+
 }

@@ -2,9 +2,9 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 
 import org.jetbrains.exposed.sql.Table
 
-object NonPlayerAccount : Table("NonPlayerAccount") {
-    val id = reference("id", Account.id)
-    val namespacedKey = varchar("namespaced_key", 255).uniqueIndex("namespaced_key_index")
+object PlayerAccountSchema : Table("PlayerAccount") {
+    val id = reference("id", AccountSchema.id)
+    val playerUuid = binary("player_uuid", 16).uniqueIndex("player_uuid_index")
 
     override val primaryKey by lazy {
         super.primaryKey ?: PrimaryKey(id)

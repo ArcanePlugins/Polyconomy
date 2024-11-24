@@ -14,10 +14,10 @@ abstract class StorageHandler(
 
     abstract fun disconnect()
 
-    abstract fun playerCacheGetName(uuid: UUID): String?
+    abstract suspend fun playerCacheGetName(uuid: UUID): String?
 
-    abstract fun playerCacheSetName(uuid: UUID, name: String)
+    abstract suspend fun playerCacheSetName(uuid: UUID, name: String)
 
-    abstract fun playerCacheIsPlayer(uuid: UUID): Boolean
+    abstract suspend fun playerCacheIsPlayer(uuid: UUID): Boolean
 
 }

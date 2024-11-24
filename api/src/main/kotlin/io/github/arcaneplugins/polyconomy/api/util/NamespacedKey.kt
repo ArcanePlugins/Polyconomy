@@ -5,7 +5,22 @@ class NamespacedKey(
     val key: String,
 ) {
 
-    constructor(string: String) : this(string.split(':')[0], string.split(':')[1])
+    companion object {
+        fun fromString(str: String): NamespacedKey {
+            val split = str.split(':')
+
+            if(split.size != 2) {
+                throw IllegalArgumentException(
+                    "A namespacedkey must have a namespace and key separated by 1 colon character"
+                )
+            }
+
+            return NamespacedKey(
+                split[0],
+                split[1]
+            )
+        }
+    }
 
     override fun toString(): String {
         return "${namespace}:${key}"

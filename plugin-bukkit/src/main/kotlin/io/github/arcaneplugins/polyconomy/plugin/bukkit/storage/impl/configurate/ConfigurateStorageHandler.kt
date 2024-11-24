@@ -97,8 +97,7 @@ abstract class ConfigurateStorageHandler(
         plugin.debugLog(STORAGE_CONFIGURATE) { "Initialised root node." }
 
         plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check: ensuring at least 1 currency is available." }
-        if (rootNode.node("primary-currency").virtual()
-            || rootNode.node("currency").virtual()
+        if (rootNode.node("currency").virtual()
             || rootNode.node("currency").childrenList().isEmpty())
         {
             plugin.logger.info { "New installation or misconfigured currency list in the database; applying default 'dollar' currency." }
@@ -115,8 +114,6 @@ abstract class ConfigurateStorageHandler(
                 node("locale", "en_US", "display-name", "plural").set("Dollars")
                 node("locale", "en_US", "decimal").set(".")
             }
-
-            rootNode.node("primary-currency").set("dollar")
 
             write()
         }
@@ -150,7 +147,7 @@ abstract class ConfigurateStorageHandler(
             )
         }
         plugin.debugLog(STORAGE_CONFIGURATE) { "Loading primary currency ID." }
-        val primaryCurrencyId = rootNode.node("primary-currency").string!!
+        val primaryCurrencyId = plugin.settings.getPrimaryCurrencyId()
         primaryCurrency = currencyCache.find { it.name == primaryCurrencyId }
             ?: throw ThrowableUtil.explainHelpfully(
                 plugin = plugin,
@@ -182,16 +179,16 @@ abstract class ConfigurateStorageHandler(
         plugin.debugLog(STORAGE_CONFIGURATE) { "Disconnected." }
     }
 
-    override fun playerCacheGetName(uuid: UUID): String? {
+    override suspend fun playerCacheGetName(uuid: UUID): String? {
         return rootNode.node("player-cache", uuid.toString()).string
     }
 
-    override fun playerCacheSetName(uuid: UUID, name: String) {
+    override suspend fun playerCacheSetName(uuid: UUID, name: String) {
         rootNode.node("player-cache", uuid.toString()).set(name)
         write()
     }
 
-    override fun playerCacheIsPlayer(uuid: UUID): Boolean {
+    override suspend fun playerCacheIsPlayer(uuid: UUID): Boolean {
         return !rootNode.node("player-cache", uuid.toString()).virtual()
     }
 
@@ -269,7 +266,7 @@ abstract class ConfigurateStorageHandler(
         return currencyCache.first { it.name == name }
     }
 
-    fun hasCurrency(name: String): Boolean {
+    override suspend fun hasCurrency(name: String): Boolean {
         return currencyCache.firstOrNull { it.name == name } != null
     }
 
@@ -462,8 +459,8 @@ abstract class ConfigurateStorageHandler(
                             currency = storageHandler.getCurrency(it.node("currency").string!!),
                             cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
                                 CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
-                                CauseType.NON_PLAYER -> NonPlayerCause(namespacedKey = NamespacedKey(causeData))
-                                CauseType.PLUGIN -> PluginCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.NON_PLAYER -> NonPlayerCause(NamespacedKey.fromString(causeData))
+                                CauseType.PLUGIN -> PluginCause(NamespacedKey.fromString(causeData))
                                 CauseType.SERVER -> ServerCause
                             },
                             importance = TransactionImportance.valueOf(it.node("importance").string!!),
@@ -654,8 +651,8 @@ abstract class ConfigurateStorageHandler(
                             currency = storageHandler.getCurrency(it.node("currency").string!!),
                             cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
                                 CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
-                                CauseType.NON_PLAYER -> NonPlayerCause(namespacedKey = NamespacedKey(causeData))
-                                CauseType.PLUGIN -> PluginCause(namespacedKey = NamespacedKey(causeData))
+                                CauseType.NON_PLAYER -> NonPlayerCause(NamespacedKey.fromString(causeData))
+                                CauseType.PLUGIN -> PluginCause(NamespacedKey.fromString(causeData))
                                 CauseType.SERVER -> ServerCause
                             },
                             importance = TransactionImportance.valueOf(it.node("importance").string!!),

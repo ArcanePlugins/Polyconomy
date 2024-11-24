@@ -53,6 +53,8 @@ interface Economy {
 
     suspend fun unregisterCurrency(currency: Currency)
 
+    suspend fun hasCurrency(name: String): Boolean
+
     suspend fun hasPlayerAccount(
         uuid: UUID,
     ): Boolean
