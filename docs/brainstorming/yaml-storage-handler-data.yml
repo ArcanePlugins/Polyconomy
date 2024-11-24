@@ -67,6 +67,9 @@ currency:
           plural: "Tokens"
         decimal: "."
 
+player-cache:
+  "5f9f71d7-bcef-4f2c-affb-f7bf96682b52": "lokka30"
+
 metadata:
   file-version: 1
   original:

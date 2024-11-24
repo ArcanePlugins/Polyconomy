@@ -63,5 +63,7 @@ interface Economy {
 
     suspend fun getVaultBankAccountIds(): Collection<NamespacedKey>
 
+    suspend fun getVaultUnlockedUuidNameMap(): Map<UUID, String>
+
 
 }

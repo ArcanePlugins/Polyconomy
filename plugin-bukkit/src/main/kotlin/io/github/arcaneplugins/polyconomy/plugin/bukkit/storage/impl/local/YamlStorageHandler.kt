@@ -15,6 +15,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.unlocked.VaultUnlockedEconomyProvider
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import org.spongepowered.configurate.CommentedConfigurationNode
@@ -177,6 +178,19 @@ class YamlStorageHandler(
         plugin.debugLog(STORAGE_YAML) { "Disconnected." }
     }
 
+    override fun playerCacheGetName(uuid: UUID): String? {
+        return rootNode.node("player-cache", uuid.toString()).string
+    }
+
+    override fun playerCacheSetName(uuid: UUID, name: String) {
+        rootNode.node("player-cache", uuid.toString()).set(name)
+        write()
+    }
+
+    override fun playerCacheIsPlayer(uuid: UUID): Boolean {
+        return !rootNode.node("player-cache", uuid.toString()).virtual()
+    }
+
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
         val account = PlayerAccountImpl(uuid, this)
         val accountNode = rootNode.node("account", "player", uuid.toString())
@@ -324,6 +338,22 @@ class YamlStorageHandler(
     override suspend fun getVaultBankAccountIds(): Collection<NamespacedKey> {
         return getNonPlayerAccountIds()
             .filter { getOrCreateNonPlayerAccount(it, null).isVaultBankAccount() }
+    }
+
+    override suspend fun getVaultUnlockedUuidNameMap(): Map<UUID, String> {
+        return getNonPlayerAccountIds()
+            .filter {
+                it.namespace == VaultUnlockedEconomyProvider.NAMESPACE_FOR_STANDARD_ACCOUNTS ||
+                        it.namespace == VaultUnlockedEconomyProvider.NAMESPACE_FOR_SHARED_ACCOUNTS
+            }
+            .map { getOrCreateNonPlayerAccount(it, null) }
+            .associate { UUID.fromString(it.namespacedKey.key) to (it.getName() ?: "") }
+            .plus(
+                getPlayerAccountIds()
+                    .associateWith {
+                        getOrCreatePlayerAccount(it, null).getName() ?: playerCacheGetName(it) ?: ""
+                    }
+            )
     }
 
     companion object {

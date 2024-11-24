@@ -1,7 +1,10 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.unlocked
 
 import io.github.arcaneplugins.polyconomy.api.Economy.Companion.PRECISION
+import io.github.arcaneplugins.polyconomy.api.account.Account
+import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
+import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy.VaultLegacyEconomyProvider
 import kotlinx.coroutines.runBlocking
@@ -16,9 +19,15 @@ class VaultUnlockedEconomyProvider(
     plugin: Polyconomy,
 ): VaultLegacyEconomyProvider(plugin), Economy {
 
+    /*
+    TODO Awaiting resolution of https://github.com/TheNewEconomy/VaultUnlockedAPI/issues/11 otherwise currency code
+        may break when using VaultUnlocked, since currencies are arbitrarily defined (until issue above is resolved).
+    */
+
     companion object {
         const val NAMESPACE_FOR_STANDARD_ACCOUNTS = "vault-unlocked-standard"
         const val NAMESPACE_FOR_SHARED_ACCOUNTS = "vault-unlocked-shared"
+        private val vaultUnlockedCause = PluginCause(NamespacedKey("vault-unlocked", "cause"))
     }
 
     private fun vuNskForStdAccount(uuid: UUID): NamespacedKey {
@@ -27,6 +36,16 @@ class VaultUnlockedEconomyProvider(
 
     private fun vuNskForSharedAccount(uuid: UUID): NamespacedKey {
         return NamespacedKey(NAMESPACE_FOR_SHARED_ACCOUNTS, uuid.toString())
+    }
+
+    private suspend fun getAccountByUuid(accountID: UUID, name: String? = accountID.toString()): Account {
+        val isPlayer = storageHandler().playerCacheIsPlayer(accountID)
+
+        return if (isPlayer) {
+            storageHandler().getOrCreatePlayerAccount(accountID, name)
+        } else {
+            storageHandler().getOrCreateNonPlayerAccount(vuNskForStdAccount(accountID), name)
+        }
     }
 
     @Suppress("unused")
@@ -144,7 +163,7 @@ class VaultUnlockedEconomyProvider(
         name: String,
     ): Boolean {
         return runBlocking {
-            storageHandler().getOrCreateNonPlayerAccount(vuNskForStdAccount(accountID), name)
+            getAccountByUuid(accountID, name)
             true
         }
     }
@@ -158,17 +177,16 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun getUUIDNameMap(): Map<UUID, String> {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler().getVaultUnlockedUuidNameMap()
+        }
     }
 
     override fun getAccountName(
         accountID: UUID
     ): Optional<String> {
         return runBlocking {
-            Optional.ofNullable(
-                storageHandler().getOrCreateNonPlayerAccount(vuNskForStdAccount(accountID), accountID.toString())
-                    .getName()
-            )
+            Optional.ofNullable(getAccountByUuid(accountID).getName())
         }
     }
 
@@ -176,7 +194,8 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID
     ): Boolean {
         return runBlocking {
-            storageHandler().hasNonPlayerAccount(vuNskForStdAccount(accountID))
+            storageHandler().hasPlayerAccount(accountID) ||
+                    storageHandler().hasNonPlayerAccount(vuNskForStdAccount(accountID))
         }
     }
 
@@ -191,7 +210,10 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         name: String,
     ): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID, name).setName(name)
+            true
+        }
     }
 
     override fun renameAccount(
@@ -199,14 +221,17 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         name: String,
     ): Boolean {
-        TODO("Not yet implemented")
+        return renameAccount(accountID, name)
     }
 
     override fun deleteAccount(
         plugin: String,
         accountID: UUID,
     ): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID).deleteAccount()
+            true
+        }
     }
 
     override fun accountSupportsCurrency(
@@ -214,7 +239,9 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         currency: String,
     ): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            storageHandler().getCurrencies().any { it.name == currency }
+        }
     }
 
     override fun accountSupportsCurrency(
@@ -230,7 +257,9 @@ class VaultUnlockedEconomyProvider(
         pluginName: String,
         accountID: UUID,
     ): BigDecimal {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID).getBalance(primaryCurrency())
+        }
     }
 
     override fun getBalance(
@@ -247,7 +276,9 @@ class VaultUnlockedEconomyProvider(
         world: String,
         currency: String,
     ): BigDecimal {
-        return getBalance(pluginName, accountID, currency)
+        return runBlocking {
+            getAccountByUuid(accountID).getBalance(storageHandler().getCurrency(currency)!!)
+        }
     }
 
     override fun has(
@@ -255,7 +286,9 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         amount: BigDecimal,
     ): Boolean {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID).has(amount, primaryCurrency())
+        }
     }
 
     override fun has(
@@ -274,7 +307,9 @@ class VaultUnlockedEconomyProvider(
         currency: String,
         amount: BigDecimal,
     ): Boolean {
-        TODO("Can't redirect to non-world method, will have to ignore parameter")
+        return runBlocking {
+            getAccountByUuid(accountID).has(amount, storageHandler().getCurrency(currency)!!)
+        }
     }
 
     override fun withdraw(
@@ -282,7 +317,22 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         amount: BigDecimal,
     ): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID).withdraw(
+                amount,
+                primaryCurrency(),
+                vaultUnlockedCause,
+                TransactionImportance.MEDIUM,
+                null
+            )
+
+            EconomyResponse(
+                amount,
+                getBalance(pluginName, accountID),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun withdraw(
@@ -301,7 +351,22 @@ class VaultUnlockedEconomyProvider(
         currency: String,
         amount: BigDecimal,
     ): EconomyResponse {
-        TODO("Can't redirect to non-world method, will have to ignore parameter")
+        return runBlocking {
+            getAccountByUuid(accountID).withdraw(
+                amount,
+                storageHandler().getCurrency(currency)!!,
+                vaultUnlockedCause,
+                TransactionImportance.MEDIUM,
+                null
+            )
+
+            EconomyResponse(
+                amount,
+                getBalance(pluginName, accountID),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun deposit(
@@ -309,7 +374,22 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
         amount: BigDecimal,
     ): EconomyResponse {
-        TODO("Not yet implemented")
+        return runBlocking {
+            getAccountByUuid(accountID).deposit(
+                amount,
+                primaryCurrency(),
+                vaultUnlockedCause,
+                TransactionImportance.MEDIUM,
+                null
+            )
+
+            EconomyResponse(
+                amount,
+                getBalance(pluginName, accountID),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun deposit(
@@ -328,7 +408,22 @@ class VaultUnlockedEconomyProvider(
         currency: String,
         amount: BigDecimal,
     ): EconomyResponse {
-        TODO("Can't redirect to non-world method, will have to ignore parameter")
+        return runBlocking {
+            getAccountByUuid(accountID).deposit(
+                amount,
+                storageHandler().getCurrency(currency)!!,
+                vaultUnlockedCause,
+                TransactionImportance.MEDIUM,
+                null
+            )
+
+            EconomyResponse(
+                amount,
+                getBalance(pluginName, accountID),
+                EconomyResponse.ResponseType.SUCCESS,
+                null
+            )
+        }
     }
 
     override fun createSharedAccount(
