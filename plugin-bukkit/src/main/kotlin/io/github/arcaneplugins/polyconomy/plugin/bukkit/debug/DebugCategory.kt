@@ -22,7 +22,7 @@ enum class DebugCategory {
      *
      * @since v0.1.0
      */
-    STORAGE_YAML,
+    STORAGE_CONFIGURATE,
 
     /**
      * Reports activity in `StorageManager`

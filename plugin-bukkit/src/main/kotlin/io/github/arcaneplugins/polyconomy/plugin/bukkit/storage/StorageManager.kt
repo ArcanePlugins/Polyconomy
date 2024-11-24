@@ -2,7 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_MANAGER
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.YamlStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.impl.JsonStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate.impl.YamlStorageHandler
 
 class StorageManager(
     val plugin: Polyconomy,
@@ -10,6 +11,7 @@ class StorageManager(
 
     val availableHandlers: MutableSet<StorageHandler> = mutableSetOf(
         /* Local Storage Handlers */
+        JsonStorageHandler(plugin),
         YamlStorageHandler(plugin),
         // ...... TODO: H2/SQLite/etc
 

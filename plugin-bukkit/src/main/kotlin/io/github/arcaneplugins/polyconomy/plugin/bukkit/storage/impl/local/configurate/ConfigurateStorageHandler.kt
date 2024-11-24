@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.local.configurate
 
 import io.github.arcaneplugins.polyconomy.api.account.AccountPermission
 import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction
@@ -14,12 +14,12 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.PlayerCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_YAML
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_CONFIGURATE
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.unlocked.VaultUnlockedEconomyProvider
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
-import org.spongepowered.configurate.CommentedConfigurationNode
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import org.spongepowered.configurate.ScopedConfigurationNode
+import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Path
@@ -32,36 +32,40 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
 import kotlin.io.path.exists
 
-class YamlStorageHandler(
+abstract class ConfigurateStorageHandler(
     val plugin: Polyconomy,
-) : StorageHandler("yaml") {
+    id: String,
+    fileExtension: String,
+) : StorageHandler(id) {
 
-    private val relativePath: Path = Path("data${File.separator}data.yml")
+    private val relativePath: Path = Path("data${File.separator}data.${fileExtension}")
 
-    private val loader: YamlConfigurationLoader = YamlConfigurationLoader.builder()
-        .path(absolutePath())
-        .build()
-
-    private lateinit var rootNode: CommentedConfigurationNode
+    private lateinit var rootNode: ScopedConfigurationNode<*>
 
     private val currencyCache = mutableSetOf<Currency>()
     private lateinit var primaryCurrency: Currency
 
+    protected val loader: AbstractConfigurationLoader<out ScopedConfigurationNode<*>> by lazy {
+        buildLoader()
+    }
+
+    protected abstract fun buildLoader(): AbstractConfigurationLoader<out ScopedConfigurationNode<*>>
+
     private fun read() {
-        plugin.debugLog(STORAGE_YAML) { "Reading data." }
-        plugin.debugLog(STORAGE_YAML) { "Absolute path: ${absolutePath()}" }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Reading data." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Absolute path: ${absolutePath()}" }
         createIfNotExists()
         rootNode = loader.load()
-        plugin.debugLog(STORAGE_YAML) { "Read data." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Read data." }
     }
 
     private fun write() {
-        plugin.debugLog(STORAGE_YAML) { "Writing data." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Writing data." }
         loader.save(rootNode)
-        plugin.debugLog(STORAGE_YAML) { "Written data." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Written data." }
     }
 
-    private fun absolutePath(): Path {
+    protected fun absolutePath(): Path {
         return Path(
             "${plugin.dataFolder.absolutePath}${File.separator}${relativePath}"
         )
@@ -69,30 +73,30 @@ class YamlStorageHandler(
 
     private fun createIfNotExists() {
         val exists: Boolean = absolutePath().exists()
-        plugin.debugLog(STORAGE_YAML) { "Data file exists: ${if (exists) "Yes" else "No"}" }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Data file exists: ${if (exists) "Yes" else "No"}" }
         if (exists) return
 
-        plugin.debugLog(STORAGE_YAML) { "File doesn't exist; creating." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "File doesn't exist; creating." }
         absolutePath().parent.createDirectories()
         absolutePath().createFile()
-        plugin.debugLog(STORAGE_YAML) { "File created." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "File created." }
     }
 
     override fun connect() {
-        plugin.debugLog(STORAGE_YAML) { "Connecting." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Connecting." }
 
         if (connected)
             throw IllegalStateException("Attempted to connect whilst already connected")
 
-        plugin.debugLog(STORAGE_YAML) { "Checking if file has not been created yet." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Checking if file has not been created yet." }
         createIfNotExists()
-        plugin.debugLog(STORAGE_YAML) { "File present; continuing." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "File present; continuing." }
 
-        plugin.debugLog(STORAGE_YAML) { "Initialising root node: reading data." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Initialising root node: reading data." }
         read()
-        plugin.debugLog(STORAGE_YAML) { "Initialised root node." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Initialised root node." }
 
-        plugin.debugLog(STORAGE_YAML) { "Initial currency check: ensuring at least 1 currency is available." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check: ensuring at least 1 currency is available." }
         if (rootNode.node("primary-currency").virtual()
             || rootNode.node("currency").virtual()
             || rootNode.node("currency").childrenList().isEmpty())
@@ -116,22 +120,22 @@ class YamlStorageHandler(
 
             write()
         }
-        plugin.debugLog(STORAGE_YAML) { "Initial currency check complete." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check complete." }
 
-        plugin.debugLog(STORAGE_YAML) { "Caching currencies." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Caching currencies." }
         currencyCache.clear()
         for ((currencyIdUnfmt, currencyNode) in rootNode.node("currency").childrenMap()) {
-            plugin.debugLog(STORAGE_YAML) { "Scanning node with key: ${currencyNode.key()}." }
+            plugin.debugLog(STORAGE_CONFIGURATE) { "Scanning node with key: ${currencyNode.key()}." }
             val currencyId = currencyIdUnfmt.toString().lowercase(Locale.ROOT)
 
-            plugin.debugLog(STORAGE_YAML) { "Found currency ${currencyId}." }
+            plugin.debugLog(STORAGE_CONFIGURATE) { "Found currency ${currencyId}." }
 
             if (!currencyNode.node("enabled").getBoolean(false)) {
-                plugin.debugLog(STORAGE_YAML) { "Currency ${currencyId} is not enabled, skipping." }
+                plugin.debugLog(STORAGE_CONFIGURATE) { "Currency ${currencyId} is not enabled, skipping." }
                 continue
             }
 
-            plugin.debugLog(STORAGE_YAML) { "Constructing object for ${currencyId} and adding to cache." }
+            plugin.debugLog(STORAGE_CONFIGURATE) { "Constructing object for ${currencyId} and adding to cache." }
             currencyCache.add(
                 CurrencyImpl(currencyId, this)
             )
@@ -141,41 +145,41 @@ class YamlStorageHandler(
                 plugin = plugin,
                 throwable = IllegalStateException("No currencies loaded"),
                 otherInfo = "You have not configured any currencies to load!",
-                otherContext = "Loading YAML data",
+                otherContext = "Loading configurate data",
                 printTrace = false,
             )
         }
-        plugin.debugLog(STORAGE_YAML) { "Loading primary currency ID." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Loading primary currency ID." }
         val primaryCurrencyId = rootNode.node("primary-currency").string!!
         primaryCurrency = currencyCache.find { it.name == primaryCurrencyId }
             ?: throw ThrowableUtil.explainHelpfully(
                 plugin = plugin,
                 throwable = IllegalArgumentException(primaryCurrencyId),
                 otherInfo = "The primary currency ID you have specified (${primaryCurrencyId}) does not match any valid and enabled currency (${currencyCache.size} candidates)",
-                otherContext = "Loading YAML data",
+                otherContext = "Loading configurate data",
                 printTrace = false,
             )
-        plugin.debugLog(STORAGE_YAML) { "Cached currencies." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Cached currencies." }
 
         connected = true
-        plugin.debugLog(STORAGE_YAML) { "Connected." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Connected." }
     }
 
     override fun disconnect() {
-        plugin.debugLog(STORAGE_YAML) { "Disconnecting." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Disconnecting." }
 
         if (!connected) {
-            plugin.debugLog(STORAGE_YAML) { "Attempted to disconnect, but is already disconnected." }
+            plugin.debugLog(STORAGE_CONFIGURATE) { "Attempted to disconnect, but is already disconnected." }
             return
         }
 
         /*
-        YAML does not need any disconnect behaviour. The underlying libraries handle the file
+        Configurate storage handlers don't need any disconnect behaviour. The underlying libraries handle the file
         connection being closed with the operating system.
          */
         connected = false
 
-        plugin.debugLog(STORAGE_YAML) { "Disconnected." }
+        plugin.debugLog(STORAGE_CONFIGURATE) { "Disconnected." }
     }
 
     override fun playerCacheGetName(uuid: UUID): String? {
@@ -359,9 +363,9 @@ class YamlStorageHandler(
     companion object {
         private class PlayerAccountImpl(
             uuid: UUID,
-            val storageHandler: YamlStorageHandler,
+            val storageHandler: ConfigurateStorageHandler,
         ) : PlayerAccount(uuid) {
-            private fun accountNode(): CommentedConfigurationNode {
+            private fun accountNode(): ScopedConfigurationNode<*> {
                 return storageHandler.rootNode.node("account", "player", uuid.toString())
             }
 
@@ -510,9 +514,9 @@ class YamlStorageHandler(
 
         private class NonPlayerAccountImpl(
             namespacedKey: NamespacedKey,
-            val storageHandler: YamlStorageHandler,
+            val storageHandler: ConfigurateStorageHandler,
         ) : NonPlayerAccount(namespacedKey) {
-            private fun accountNode(): CommentedConfigurationNode {
+            private fun accountNode(): ScopedConfigurationNode<*> {
                 return storageHandler
                     .rootNode
                     .node("account", "non-player", namespacedKey.namespace, namespacedKey.key)
@@ -735,9 +739,9 @@ class YamlStorageHandler(
 
         private class CurrencyImpl(
             name: String,
-            val storageHandler: YamlStorageHandler,
+            val storageHandler: ConfigurateStorageHandler,
         ) : Currency(name) {
-            private fun currencyNode(): CommentedConfigurationNode {
+            private fun currencyNode(): ScopedConfigurationNode<*> {
                 return storageHandler.rootNode.node("currency", name)
             }
 

@@ -108,6 +108,12 @@
             <version>2.7</version><!-- Validate this is the most recent version from the CI -->
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.3.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -6,7 +6,7 @@
 primary-locale: "en_US"
 
 storage:
-  implementation: "yaml"
+  implementation: "json"
 
 advanced:
   minimum-balance: 0
