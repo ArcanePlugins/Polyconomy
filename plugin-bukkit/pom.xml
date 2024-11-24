@@ -67,52 +67,81 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <!-- SpigotMC API -->
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.21.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- Configs & Files - Configurate YAML -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>4.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- Configs & Files - Configurate JSON -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-gson</artifactId>
             <version>4.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- Configs & Files - Configurate Kotlin Extras -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-extra-kotlin</artifactId>
             <version>4.1.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- Economy API - Treasury -->
             <groupId>me.lokka30</groupId>
             <artifactId>treasury-api</artifactId>
             <version>2.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- Metrics - bStats -->
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- Economy API - Vault Unlocked -->
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultUnlockedAPI</artifactId>
-            <version>2.7</version><!-- Validate this is the most recent version from the CI -->
+            <version>2.7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- Databases - SQLite JDBC Driver -->
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.45.3.0</version>
+            <version>3.47.0.0</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <!-- Databases - Exposed Core - Base framework for database operations -->
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-core</artifactId>
+            <version>0.56.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <!-- Databases - Exposed DAO - Simplifies working with data objects -->
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-dao</artifactId>
+            <version>0.56.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <!-- Databases - Exposed JDBC - Required for connecting to SQL JDBC -->
+            <groupId>org.jetbrains.exposed</groupId>
+            <artifactId>exposed-jdbc</artifactId>
+            <version>0.56.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
