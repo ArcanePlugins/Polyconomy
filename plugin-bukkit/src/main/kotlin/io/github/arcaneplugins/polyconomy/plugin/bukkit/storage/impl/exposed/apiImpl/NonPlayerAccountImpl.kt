@@ -27,8 +27,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.JoinType
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.delete
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -226,7 +228,10 @@ class NonPlayerAccountImpl(
                         otherColumn = CurrencySchema.id
                     )
                     .select(AccountBalanceSchema.balance)
-                    .where { CurrencySchema.name eq currency.name }
+                    .where {
+                        (NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString()) and
+                                (CurrencySchema.name eq currency.name)
+                    }
                     .map { it[AccountBalanceSchema.balance] }
                     .first()
             }
@@ -338,6 +343,7 @@ class NonPlayerAccountImpl(
                         otherColumn = CurrencySchema.id
                     )
                     .select(CurrencySchema.name)
+                    .where { NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString() }
                     .map { CurrencyImpl(handler, it[CurrencySchema.name]) }
             }
         }
@@ -423,27 +429,155 @@ class NonPlayerAccountImpl(
     }
 
     override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            transaction {
+                if (!runBlocking { isMember(player) }) {
+                    runBlocking { addMember(player) }
+                }
+
+                NonPlayerAccountMemberSchema
+                    .join(
+                        otherTable = NonPlayerAccountSchema,
+                        joinType = JoinType.INNER,
+                        onColumn = NonPlayerAccountMemberSchema.accountId,
+                        otherColumn = NonPlayerAccountSchema.id
+                    )
+                    .update(
+                        where = {
+                        (NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString()) and
+                                (NonPlayerAccountMemberSchema.memberId eq uuidToBytes(player))
+                        }
+                    ) {
+                        perms.forEach { (perm, state) ->
+                            val col = when (perm) {
+                                AccountPermission.BALANCE -> NonPlayerAccountMemberSchema.permBalance
+                                AccountPermission.WITHDRAW -> NonPlayerAccountMemberSchema.permWithdraw
+                                AccountPermission.DEPOSIT -> NonPlayerAccountMemberSchema.permDeposit
+                                AccountPermission.MODIFY_PERMISSIONS -> NonPlayerAccountMemberSchema.permModifyPerms
+                                AccountPermission.OWNER -> NonPlayerAccountMemberSchema.permOwner
+                                AccountPermission.TRANSFER_OWNERSHIP -> NonPlayerAccountMemberSchema.permTransferOwnership
+                                AccountPermission.INVITE_MEMBER -> NonPlayerAccountMemberSchema.permInviteMember
+                                AccountPermission.REMOVE_MEMBER -> NonPlayerAccountMemberSchema.permRemoveMember
+                                AccountPermission.DELETE -> NonPlayerAccountMemberSchema.permDelete
+                            }
+
+                            it[col] = state
+                        }
+                    }
+            }
+        }
     }
 
     override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            transaction {
+                if (!runBlocking { isMember(player) }) {
+                    return@transaction AccountPermission.entries.associateWith { false }
+                }
+
+                return@transaction NonPlayerAccountMemberSchema
+                    .join(
+                        otherTable = NonPlayerAccountSchema,
+                        joinType = JoinType.INNER,
+                        onColumn = NonPlayerAccountMemberSchema.accountId,
+                        otherColumn = NonPlayerAccountSchema.id
+                    )
+                    .selectAll()
+                    .where {
+                        (NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString()) and
+                            (NonPlayerAccountMemberSchema.memberId eq uuidToBytes(player))
+                    }
+                    .map {
+                        return@map mapOf<AccountPermission, Boolean?>(
+                            AccountPermission.BALANCE to it[NonPlayerAccountMemberSchema.permBalance],
+                            AccountPermission.WITHDRAW to it[NonPlayerAccountMemberSchema.permWithdraw],
+                            AccountPermission.DEPOSIT to it[NonPlayerAccountMemberSchema.permDeposit],
+                            AccountPermission.MODIFY_PERMISSIONS to it[NonPlayerAccountMemberSchema.permModifyPerms],
+                            AccountPermission.OWNER to it[NonPlayerAccountMemberSchema.permOwner],
+                            AccountPermission.TRANSFER_OWNERSHIP to it[NonPlayerAccountMemberSchema.permTransferOwnership],
+                            AccountPermission.INVITE_MEMBER to it[NonPlayerAccountMemberSchema.permInviteMember],
+                            AccountPermission.REMOVE_MEMBER to it[NonPlayerAccountMemberSchema.permRemoveMember],
+                            AccountPermission.DELETE to it[NonPlayerAccountMemberSchema.permDelete],
+                        )
+                    }
+                    .first()
+            }
+        }
     }
 
     override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            runBlocking {
+                getMemberIds()
+                    .associateWith { getPermissions(it) }
+            }
+        }
     }
 
     override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            runBlocking {
+                val perms = getPermissions(player)
+                return@runBlocking permissions.all { perms.getOrDefault(it, it.defaultValue)!! }
+            }
+        }
     }
 
     override suspend fun addMember(player: UUID) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            runBlocking {
+                if(isMember(player)) {
+                    return@runBlocking
+                }
+            }
+
+            transaction {
+                val accountId = NonPlayerAccountSchema
+                    .select(NonPlayerAccountSchema.id)
+                    .where { NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString() }
+                    .map { it[NonPlayerAccountSchema.id] }
+                    .first()
+
+                NonPlayerAccountMemberSchema
+                    .insert {
+                        it[NonPlayerAccountMemberSchema.accountId] = accountId
+                        it[memberId] = uuidToBytes(player)
+                        it[permBalance] = null
+                        it[permWithdraw] = null
+                        it[permDeposit] = null
+                        it[permModifyPerms] = null
+                        it[permOwner] = null
+                        it[permTransferOwnership] = null
+                        it[permInviteMember] = null
+                        it[permRemoveMember] = null
+                        it[permDelete] = null
+                    }
+            }
+        }
     }
 
     override suspend fun removeMember(player: UUID) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            runBlocking {
+                if(!isMember(player)) {
+                    return@runBlocking
+                }
+            }
+
+            transaction {
+                val accountId = NonPlayerAccountSchema
+                    .select(NonPlayerAccountSchema.id)
+                    .where { NonPlayerAccountSchema.namespacedKey eq namespacedKey.toString() }
+                    .map { it[NonPlayerAccountSchema.id] }
+                    .first()
+
+                NonPlayerAccountMemberSchema
+                    .deleteWhere {
+                        (NonPlayerAccountMemberSchema.accountId eq accountId) and
+                                (memberId eq uuidToBytes(player))
+                    }
+            }
+        }
     }
 
 }
