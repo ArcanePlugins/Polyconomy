@@ -4,7 +4,6 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.ExposedStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencyLocaleSchema
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.schema.CurrencySchema
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.math.BigDecimal
@@ -41,7 +40,7 @@ class CurrencyImpl(
 
             val currRow = CurrencySchema
                 .selectAll()
-                .where { (CurrencySchema.enabled eq true) and (CurrencySchema.name eq name) }
+                .where { CurrencySchema.name eq name }
                 .firstOrNull() ?: throw IllegalArgumentException("No enabled currency in database named ${name}")
 
             symbol = currRow[CurrencySchema.symbol]

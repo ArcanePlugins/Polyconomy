@@ -129,6 +129,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <!-- Databases - Exposed Core - Base framework for database operations -->
             <groupId>org.jetbrains.exposed</groupId>
             <artifactId>exposed-core</artifactId>
@@ -229,6 +235,7 @@
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
+                        <!-- can't relocate Kotlin when using reflection. yay!
                         <relocation>
                             <pattern>kotlin</pattern>
                             <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlin</shadedPattern>
@@ -237,6 +244,7 @@
                             <pattern>kotlinx</pattern>
                             <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlinx</shadedPattern>
                         </relocation>
+                        -->
                         <relocation>
                             <pattern>org.spongepowered.configurate</pattern>
                             <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.configurate
@@ -255,7 +263,11 @@
                             </excludes>
                         </filter>
                     </filters>
+                    <!--
+                    don't use me, I break Kotlin reflection and cause super weird errors <3
+                    ...can't you tell how much time I spent finding the culprit?
                     <minimizeJar>true</minimizeJar>
+                    -->
                 </configuration>
             </plugin>
         </plugins>

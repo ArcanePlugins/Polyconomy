@@ -2,7 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 
 import org.jetbrains.exposed.sql.Table
 
-object PlayerCacheSchema : Table() {
+object PlayerCacheSchema : Table("PlayerCache") {
     val playerUuid = binary("player_uuid", 16)
     val username = varchar("username", 255)
 

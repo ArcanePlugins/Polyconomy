@@ -7,7 +7,7 @@ primary-locale: "en_US" # TODO: Actually use this setting for something :)
 primary-currency: "dollar"
 
 storage:
-  implementation: "json"
+  implementation: "h2"
 
 advanced:
   minimum-balance: 0.0

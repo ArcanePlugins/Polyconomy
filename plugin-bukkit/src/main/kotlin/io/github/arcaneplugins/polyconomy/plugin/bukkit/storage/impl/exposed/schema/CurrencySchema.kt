@@ -2,9 +2,8 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 
-object CurrencySchema : IntIdTable("Currency", "id") {
+object CurrencySchema : IntIdTable("Currency") {
     val name = varchar("name", 255).uniqueIndex("currency_name_index")
-    val enabled = bool("enabled")
     val startingBalance = decimal("starting_balance", 18, 4)
     val symbol = varchar("symbol", 32)
     val amountFormat = varchar("amount_format", 255)

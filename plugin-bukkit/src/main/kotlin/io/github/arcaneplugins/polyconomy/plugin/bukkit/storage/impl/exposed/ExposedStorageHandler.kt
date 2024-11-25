@@ -32,7 +32,6 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.JoinType
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -57,8 +56,8 @@ abstract class ExposedStorageHandler(
 
     override fun connect() {
         db = initializeDb()
-        runBlocking { createTables() }
         connected = true
+        runBlocking { createTables() }
     }
 
     override fun disconnect() {
@@ -78,7 +77,7 @@ abstract class ExposedStorageHandler(
     private suspend fun createTables() {
         withContext(Dispatchers.IO) {
             transaction {
-                SchemaUtils.createMissingTablesAndColumns(
+                val tables = arrayOf(
                     AccountSchema,
                     AccountBalanceSchema,
                     AccountTransactionSchema,
@@ -91,6 +90,15 @@ abstract class ExposedStorageHandler(
                     VaultBankAccountSchema,
                     VaultBankAccountNonPlayerMemberSchema,
                 )
+
+                // create new tables if they don't already exist
+                SchemaUtils.create(*tables)
+
+                // create missing ones
+                //
+                // you can't run this before 'SchemaUtils#create' or it will try 'alter' nullable columns
+                // and make H2 very unhappy!
+                // SchemaUtils.createMissingTablesAndColumns(*tables)
 
                 val noCurrenciesRecorded = CurrencySchema
                     .selectAll()
@@ -118,8 +126,6 @@ abstract class ExposedStorageHandler(
                             }
                     }
                 }
-
-                TODO("Insert default currency and currencylocale values if needed")
             }
         }
     }
@@ -297,10 +303,7 @@ abstract class ExposedStorageHandler(
             transaction {
                 CurrencySchema
                     .select(CurrencySchema.name)
-                    .where {
-                        (CurrencySchema.name eq name) and
-                                (CurrencySchema.enabled eq true)
-                    }
+                    .where { CurrencySchema.name eq name }
                     .any()
             }
         }
@@ -325,7 +328,6 @@ abstract class ExposedStorageHandler(
             transaction {
                 CurrencySchema
                     .selectAll()
-                    .where { CurrencySchema.enabled eq true }
                     .map { CurrencyImpl(this@ExposedStorageHandler, it[CurrencySchema.name]) }
             }
         }

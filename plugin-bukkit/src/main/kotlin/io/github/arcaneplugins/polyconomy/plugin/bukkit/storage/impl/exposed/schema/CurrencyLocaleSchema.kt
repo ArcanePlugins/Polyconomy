@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 
-object CurrencyLocaleSchema : IntIdTable("id") {
+object CurrencyLocaleSchema : IntIdTable("CurrencyLocale") {
     val currencyId = reference("currency_id", CurrencySchema.id, onDelete = ReferenceOption.CASCADE)
     val locale = varchar("locale", 255)
     val displayNameSingular = varchar("display_name_singular", 255)

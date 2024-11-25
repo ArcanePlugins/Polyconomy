@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.sc
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.ReferenceOption
 
-object AccountTransactionSchema : IntIdTable("id") {
+object AccountTransactionSchema : IntIdTable("AccountTransaction") {
     val accountId = reference("account_id", AccountSchema.id, onDelete = ReferenceOption.CASCADE)
     val amount = decimal("amount", 18, 4)
     val currencyId = reference("currency_id", CurrencySchema.id, onDelete = ReferenceOption.CASCADE)
