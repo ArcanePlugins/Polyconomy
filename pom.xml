@@ -17,7 +17,20 @@
     <description>Parent module of Polyconomy's source.</description>
 
     <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <kotlin.version>2.0.21</kotlin.version>
+        <kotlin-coroutines-core.version>1.9.0</kotlin-coroutines-core.version>
+        <junit-jupiter-engine.version>5.11.3</junit-jupiter-engine.version>
+        <spigot-api.version>1.21.3-R0.1-SNAPSHOT</spigot-api.version>
+        <configurate.version>4.1.2</configurate.version>
+        <treasury-api.version>2.0.1</treasury-api.version>
+        <bstats.version>3.0.2</bstats.version>
+        <vaultunlocked.version>2.7</vaultunlocked.version>
+        <sqlite.version>3.47.0.0</sqlite.version>
+        <exposed.version>0.56.0</exposed.version>
     </properties>
 
 </project>
