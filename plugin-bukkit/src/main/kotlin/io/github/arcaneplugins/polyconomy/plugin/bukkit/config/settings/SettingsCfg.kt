@@ -25,4 +25,24 @@ class SettingsCfg(
         return BigDecimal.valueOf(rootNode.node("advanced", "minimum-balance").getDouble(0.0))
     }
 
+    fun getDbHost(): String {
+        return rootNode.node("storage", "database", "host").string!!
+    }
+
+    fun getDbPort(): String {
+        return rootNode.node("storage", "database", "port").string!!
+    }
+
+    fun getDbName(): String {
+        return rootNode.node("storage", "database", "name").string!!
+    }
+
+    fun getDbUser(): String {
+        return rootNode.node("storage", "database", "user").string!!
+    }
+
+    fun getDbPass(): String {
+        return rootNode.node("storage", "database", "pass").string!!
+    }
+
 }

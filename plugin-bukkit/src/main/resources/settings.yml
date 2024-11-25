@@ -9,6 +9,13 @@ primary-currency: "dollar"
 storage:
   implementation: "h2"
 
+  database:
+    host: "change me if using remote db - i'm the database host address e.g., 127.0.0.1"
+    port: "change me if using remote db - i'm the database host port e.g., 3306"
+    name: "change me if using remote db - i'm the name of the database e.g., Economy"
+    user: "change me if using remote db - i'm the username of the database e.g., Polyconomy"
+    pass: "change me if using remote db - i'm the password of the database e.g., solarwinds123"
+
 advanced:
   minimum-balance: 0.0
 

@@ -98,7 +98,7 @@ class PlayerAccountImpl(
                     .where { (PlayerAccountSchema.playerUuid eq uuidToBytes(uuid) and
                             (CurrencySchema.name eq currency.name)) }
                     .map { it[AccountBalanceSchema.balance] }
-                    .first()
+                    .firstOrNull() ?: BigDecimal.ZERO
             }
         }
     }

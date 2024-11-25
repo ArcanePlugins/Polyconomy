@@ -129,6 +129,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <!-- Databases - H2 -->
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
@@ -155,6 +156,13 @@
             <version>${exposed.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>${mariadb.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

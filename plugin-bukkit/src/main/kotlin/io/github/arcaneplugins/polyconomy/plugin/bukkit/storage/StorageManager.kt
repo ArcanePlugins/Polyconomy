@@ -5,6 +5,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STOR
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl.JsonStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl.YamlStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.typeImpl.H2StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.typeImpl.MariaDbStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.exposed.typeImpl.SqLiteStorageHandler
 
 class StorageManager(
@@ -17,6 +18,7 @@ class StorageManager(
         YamlStorageHandler(plugin),
         SqLiteStorageHandler(plugin),
         H2StorageHandler(plugin),
+        MariaDbStorageHandler(plugin),
 
         /* Remote Storage Handlers */
         // ...... TODO: MySQL/Redis/Postgres/etc

@@ -233,7 +233,7 @@ class NonPlayerAccountImpl(
                                 (CurrencySchema.name eq currency.name)
                     }
                     .map { it[AccountBalanceSchema.balance] }
-                    .first()
+                    .firstOrNull() ?: BigDecimal.ZERO
             }
         }
     }
