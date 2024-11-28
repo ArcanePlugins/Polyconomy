@@ -6,6 +6,7 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import java.math.BigDecimal
 import java.nio.file.Path
@@ -93,19 +94,123 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
-        TODO("Not yet implemented")
+        val existingAccount: PlayerAccount? = connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
+            statement.setBytes(1, uuidToBytes(uuid))
+            val rs = statement.executeQuery()
+
+            return@use if (rs.next()) {
+                PlayerAccount(
+                    uuid = uuid,
+                    name = rs.getString(1),
+                )
+            } else {
+                null
+            }
+        }
+
+        if (existingAccount != null) {
+            return existingAccount
+        }
+
+        val accountId: Long = connection.prepareStatement(H2Statements.createAccount).use { statement ->
+            statement.setString(1, name)
+            val rows = statement.executeUpdate()
+            if (rows == 0) {
+                throw java.lang.IllegalStateException("Unable to insert account with uuid=${uuid}, name=${name}")
+            }
+
+            val rs = statement.generatedKeys
+            if (rs.next()) {
+                return@use rs.getLong(1)
+            } else {
+                throw java.lang.IllegalStateException("Unable to get inserted account ID for uuid=${uuid}, name=${name}")
+            }
+        }
+
+        connection.prepareStatement(H2Statements.createPlayerAccount).use { statement ->
+            statement.setLong(1, accountId)
+            statement.setBytes(2, uuidToBytes(uuid))
+            val rows = statement.executeUpdate()
+            if (rows == 0) {
+                throw java.lang.IllegalStateException("Unable to insert player account with uuid=${uuid}, name=${name}")
+            }
+        }
+
+        return PlayerAccount(
+            uuid = uuid,
+            name = name,
+        )
     }
 
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
-        TODO("Not yet implemented")
+        val existingAccount: NonPlayerAccount? = connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
+            statement.setString(1, namespacedKey.toString())
+            val rs = statement.executeQuery()
+
+            return@use if (rs.next()) {
+                NonPlayerAccount(
+                    uuid = uuid,
+                    name = rs.getString(1),
+                )
+            } else {
+                null
+            }
+        }
+
+        if (existingAccount != null) {
+            return existingAccount
+        }
+
+        val accountId: Long = connection.prepareStatement(H2Statements.createAccount).use { statement ->
+            statement.setString(1, name)
+            val rows = statement.executeUpdate()
+            if (rows == 0) {
+                throw java.lang.IllegalStateException("Unable to insert account with namespacedKey=${namespacedKey}, name=${name}")
+            }
+
+            val rs = statement.generatedKeys
+            if (rs.next()) {
+                return@use rs.getLong(1)
+            } else {
+                throw java.lang.IllegalStateException("Unable to get inserted account ID for namespacedKey=${namespacedKey}, name=${name}")
+            }
+        }
+
+        connection.prepareStatement(H2Statements.createNonPlayerAccount).use { statement ->
+            statement.setLong(1, accountId)
+            statement.setString(2, namespacedKey.toString())
+            val rows = statement.executeUpdate()
+            if (rows == 0) {
+                throw java.lang.IllegalStateException("Unable to insert nonplayeraccount with namespacedKey=${namespacedKey}, name=${name}")
+            }
+        }
+
+        return NonPlayerAccount(
+            namespacedKey = namespacedKey,
+            name = name,
+        )
     }
 
     override suspend fun getPlayerAccountIds(): Collection<UUID> {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.getPlayerAccountIds).use { statement ->
+            val rs = statement.executeQuery()
+            val uuids = mutableSetOf<UUID>()
+            while (rs.next()) {
+                uuids.add(ByteUtil.bytesToUuid(rs.getBytes(1)))
+            }
+            return@use uuids.toSet() // makes it immutable
+        }
     }
 
     override suspend fun getNonPlayerAccountIds(): Collection<NamespacedKey> {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.getNonPlayerAccountIds).use { statement ->
+            val rs = statement.executeQuery()
+            val nsKeys = mutableSetOf<NamespacedKey>()
+            while (rs.next()) {
+                nsKeys.add(NamespacedKey.fromString(rs.getString(1)))
+            }
+            return@use nsKeys.toSet() // makes it immutable
+        }
     }
 
     override suspend fun getNonPlayerAccountsPlayerIsMemberof(uuid: UUID): Collection<NonPlayerAccount> {

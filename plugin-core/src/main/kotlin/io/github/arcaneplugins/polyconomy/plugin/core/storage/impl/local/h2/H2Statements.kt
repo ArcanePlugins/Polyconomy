@@ -13,7 +13,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS PlayerAccount (
-                    id          INT             NOT NULL,
+                    id          BIGINT          NOT NULL,
                     player_uuid BINARY(16)      NOT NULL UNIQUE,
                     PRIMARY KEY (id),
                     FOREIGN KEY id REFERENCES Account.id
@@ -22,7 +22,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS NonPlayerAccount (
-                    id              INT             NOT NULL,
+                    id              BIGINT          NOT NULL,
                     namespaced_key  VARCHAR(255)    NOT NULL UNIQUE,
                     PRIMARY KEY (id),
                     FOREIGN KEY id REFERENCES Account.id
@@ -31,7 +31,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS NonPlayerAccountMember (
-                    account_id                  INT             NOT NULL,
+                    account_id                  BIGINT          NOT NULL,
                     member_id                   BINARY(16)      NOT NULL,
                     perm_balance                BOOLEAN         NULL,
                     perm_withdraw               BOOLEAN         NULL,
@@ -49,7 +49,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS VaultBankAccount (
-                    account_id      INT             NOT NULL,
+                    account_id      BIGINT          NOT NULL,
                     owner_string    VARCHAR(255)    NOT NULL,
                     owner_uuid      BINARY(16)      NOT NULL,
                     PRIMARY KEY (account_id),
@@ -59,7 +59,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS VaultBankAccountNonPlayerMember (
-                    account_id      INT             NOT NULL,
+                    account_id      BIGINT          NOT NULL,
                     member_id_str   VARCHAR(255)    NOT NULL,
                     PRIMARY KEY (account_id, member_id_str),
                     FOREIGN KEY account_id REFERENCES VaultBankAccount.account_id
@@ -82,7 +82,7 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS CurrencyLocale (
-                    id                      INT             NOT NULL,
+                    id                      BIGINT          NOT NULL,
                     locale                  VARCHAR(255)    NOT NULL,
                     display_name_singular   VARCHAR(255)    NOT NULL,
                     display_name_plural     VARCHAR(255)    NOT NULL,
@@ -94,8 +94,8 @@ object H2Statements {
 
         """
                 CREATE TABLE IF NOT EXISTS AccountBalance (
-                    account_id              INT             NOT NULL,
-                    currency_id             INT             NOT NULL,
+                    account_id              BIGINT          NOT NULL,
+                    currency_id             BIGINT          NOT NULL,
                     amount                  DECIMAL(18, 4)  NOT NULL,
                     PRIMARY KEY (account_id, currency_id),
                     FOREIGN KEY account_id REFERENCES Account.id,
@@ -106,9 +106,9 @@ object H2Statements {
         """
                 CREATE TABLE IF NOT EXISTS AccountTransaction (
                     id                      IDENTITY        NOT NULL,
-                    account_id              INT             NOT NULL,
+                    account_id              BIGINT          NOT NULL,
                     amount                  DECIMAL(18, 4)  NOT NULL,
-                    currency_id             INT             NOT NULL,
+                    currency_id             BIGINT          NOT NULL,
                     cause                   SMALLINT        NOT NULL,
                     reason                  VARCHAR(1023)   NOT NULL,
                     importance              SMALLINT        NOT NULL,
@@ -145,6 +145,45 @@ object H2Statements {
         SELECT COUNT(*)
         FROM PlayerUsernameCache
         WHERE uuid = ?;
+    """.trimIndent()
+    
+    val getPlayerAccountName = """
+        SELECT name
+        FROM PlayerAccount
+        INNER JOIN Account ON Account.id = PlayerAccount.id
+        WHERE PlayerAccount.player_uuid = ?;
+    """.trimIndent()
+
+    val getNonPlayerAccountName = """
+        SELECT name
+        FROM NonPlayerAccount
+        INNER JOIN Account ON Account.id = NonPlayerAccount.id
+        WHERE NonPlayerAccount.namespaced_key = ?;
+    """.trimIndent()
+
+    val createAccount = """
+        INSERT INTO Account (name)
+        VALUES (?);
+    """.trimIndent()
+
+    val createPlayerAccount = """
+        INSERT INTO PlayerAccount (id, player_uuid)
+        VALUES (?, ?);
+    """.trimIndent()
+
+    val createNonPlayerAccount = """
+        INSERT INTO NonPlayerAccount (id, namespaced_key)
+        VALUES (?, ?);
+    """.trimIndent()
+
+    val getPlayerAccountIds = """
+        SELECT player_uuid
+        FROM PlayerAccount;
+    """.trimIndent()
+
+    val getNonPlayerAccountIds = """
+        SELECT namespaced_key
+        FROM NonPlayerAccount;
     """.trimIndent()
 
 }
