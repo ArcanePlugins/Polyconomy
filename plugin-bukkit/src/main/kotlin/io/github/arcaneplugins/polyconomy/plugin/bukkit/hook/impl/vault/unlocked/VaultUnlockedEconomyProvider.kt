@@ -7,6 +7,8 @@ import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy.VaultLegacyEconomyProvider
+import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault2.economy.Economy
 import net.milkbowl.vault2.economy.EconomyResponse
@@ -20,23 +22,16 @@ class VaultUnlockedEconomyProvider(
     plugin: Polyconomy,
 ) : VaultLegacyEconomyProvider(plugin), Economy {
 
-    /*
-    TODO Awaiting resolution of https://github.com/TheNewEconomy/VaultUnlockedAPI/issues/11 otherwise currency code
-        may break when using VaultUnlocked, since currencies are arbitrarily defined (until issue above is resolved).
-    */
-
     companion object {
-        const val NAMESPACE_FOR_STANDARD_ACCOUNTS = "vault-unlocked-standard"
-        const val NAMESPACE_FOR_SHARED_ACCOUNTS = "vault-unlocked-shared"
         private val vaultUnlockedCause = PluginCause(NamespacedKey("vault-unlocked", "cause"))
     }
 
     private fun vuNskForStdAccount(uuid: UUID): NamespacedKey {
-        return NamespacedKey(NAMESPACE_FOR_STANDARD_ACCOUNTS, uuid.toString())
+        return NamespacedKey(VU_NAMESPACE_FOR_STANDARD_ACCOUNTS, uuid.toString())
     }
 
     private fun vuNskForSharedAccount(uuid: UUID): NamespacedKey {
-        return NamespacedKey(NAMESPACE_FOR_SHARED_ACCOUNTS, uuid.toString())
+        return NamespacedKey(VU_NAMESPACE_FOR_SHARED_ACCOUNTS, uuid.toString())
     }
 
     private suspend fun getAccountByUuid(accountID: UUID, name: String? = accountID.toString()): Account {

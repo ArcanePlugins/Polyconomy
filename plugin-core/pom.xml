@@ -9,10 +9,11 @@
         <version>1.0.0-SNAPSHOT-1</version>
     </parent>
 
-    <artifactId>plugin-bukkit</artifactId>
+    <artifactId>plugin-core</artifactId>
     <version>1.0.0-SNAPSHOT-1</version>
 
-    <name>Polyconomy Plugin for Bukkit</name>
+    <name>Polyconomy Plugin Core</name>
+    <description>Provides code that is shared amongst platform implementations such as the Polyconomy Bukkit Plugin</description>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -20,24 +21,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <name>SpigotMC Repo</name>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-            <!-- required for dependencies [spigot-api] -->
-        </repository>
-        <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
-            <!-- required for dependencies [Treasury, VaultUnlocked] -->
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>io.github.arcaneplugins.polyconomy</groupId>
-            <artifactId>plugin-core</artifactId>
+            <artifactId>api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
@@ -55,12 +42,6 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
@@ -70,13 +51,6 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit-jupiter-engine.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <!-- SpigotMC API -->
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>${spigot-api.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Configs & Files - Configurate YAML -->
@@ -98,27 +72,6 @@
             <artifactId>configurate-extra-kotlin</artifactId>
             <version>${configurate.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <!-- Economy API - Treasury -->
-            <groupId>me.lokka30</groupId>
-            <artifactId>treasury-api</artifactId>
-            <version>${treasury-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- Metrics - bStats -->
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>${bstats.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <!-- Economy API - Vault Unlocked -->
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultUnlockedAPI</artifactId>
-            <version>${vaultunlocked.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Databases - SQLite JDBC Driver -->
@@ -221,45 +174,6 @@
                 </executions>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <relocations>
-                        <relocation>
-                            <pattern>kotlin</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlin</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>kotlinx</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.kotlinx</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.spongepowered.configurate</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.configurate
-                            </shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.bstats</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.bstats</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.sqlite</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.sqlite</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.h2</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.h2</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.mariadb</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.mariadb</shadedPattern>
-                        </relocation>
-                    </relocations>
-                    <filters>
-                        <filter>
-                            <artifact>*:*</artifact>
-                            <excludes>
-                                <exclude>META-INF/MANIFEST.MF</exclude>
-                            </excludes>
-                        </filter>
-                    </filters>
                     <minimizeJar>true</minimizeJar>
                 </configuration>
             </plugin>

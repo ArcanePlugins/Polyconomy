@@ -1,18 +1,19 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage
+package io.github.arcaneplugins.polyconomy.plugin.core.storage
 
 import io.github.arcaneplugins.polyconomy.api.Economy
 import java.util.*
 
 abstract class StorageHandler(
     val id: String,
+    val manager: StorageManager,
 ) : Economy {
 
-    var connected: Boolean = false
+    var connected = false
         protected set
 
-    abstract fun connect()
+    abstract fun startup()
 
-    abstract fun disconnect()
+    abstract fun shutdown()
 
     abstract suspend fun playerCacheGetName(uuid: UUID): String?
 

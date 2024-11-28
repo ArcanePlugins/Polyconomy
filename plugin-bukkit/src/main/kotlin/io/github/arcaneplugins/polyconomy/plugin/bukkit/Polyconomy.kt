@@ -8,11 +8,10 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.ExecutionManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.DescribedThrowable
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
@@ -31,7 +30,7 @@ instance of this class may be replaced by Bukkit's plugin manager during runtime
 class Polyconomy : JavaPlugin() {
 
     val debugManager = DebugManager(this)
-    val storageManager = StorageManager(this)
+    lateinit var storageManager: StorageManager
     val commandManager = CommandManager(this)
     val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
@@ -75,8 +74,12 @@ class Polyconomy : JavaPlugin() {
     override fun onEnable() {
         try {
             loadConfigs()
-            ExecutionManager.startup()
-            storageManager.load()
+            storageManager = StorageManager(
+                dataFolder = dataFolder,
+                minimumBalance = settings.getMinimumBalance(),
+                primaryCurrencyId = settings.getPrimaryCurrencyId()
+            )
+            storageManager.startup(settings.getStorageImplementation())
             listenerManager.load()
             hookManager.registerAll()
             commandManager.load()
@@ -104,8 +107,7 @@ class Polyconomy : JavaPlugin() {
         try {
             commandManager.disable()
             hookManager.unregisterAll()
-            ExecutionManager.shutdown()
-            storageManager.disconnect()
+            storageManager.shutdown()
         } catch (_: DescribedThrowable) {
             // error that's been described already - already disabling, no action needed.
             return
@@ -122,7 +124,7 @@ class Polyconomy : JavaPlugin() {
      * Performs an internal 'soft reload':
      *
      * This reloads the entire hook and configuration system, and all systems within those (i.e.,
-     * storage management, economy management, and so on). It also restarts the [ExecutionManager].
+     * storage management, economy management, and so on).
      *
      * This method is called by Polyconomy's 'reload' subcommand so that administrators can easily
      * apply changes to their configuration during runtime, saving them minutes of each interruption
@@ -135,13 +137,11 @@ class Polyconomy : JavaPlugin() {
         try {
             /* soft-disabling */
             hookManager.unregisterAll()
-            ExecutionManager.shutdown()
-            storageManager.disconnect()
+            storageManager.shutdown()
 
             /* re-loading */
             loadConfigs()
-            ExecutionManager.startup()
-            storageManager.load()
+            storageManager.startup(settings.getStorageImplementation())
             hookManager.registerAll()
             commandManager.reload()
         } catch (ex: Exception) {
@@ -185,12 +185,6 @@ class Polyconomy : JavaPlugin() {
     }
 
     fun loadConfigs() {
-        if (storageManager.connected()) {
-            debugLog(DebugCategory.CONFIG_MANAGER) { "Storage manager was connected - disconnecting." }
-            storageManager.disconnect()
-            debugLog(DebugCategory.CONFIG_MANAGER) { "Disconnected storage manager; continuing." }
-        }
-
         try {
             configs.forEach { config ->
                 debugLog(DebugCategory.CONFIG_MANAGER) { "Loading config ${config.name}." }

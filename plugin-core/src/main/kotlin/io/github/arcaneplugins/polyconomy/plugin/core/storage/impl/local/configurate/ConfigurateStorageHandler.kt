@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate
+package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate
 
 import io.github.arcaneplugins.polyconomy.api.account.AccountPermission
 import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction
@@ -13,32 +13,27 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.NonPlayerCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.PlayerCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.STORAGE_CONFIGURATE
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.unlocked.VaultUnlockedEconomyProvider
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
 import org.spongepowered.configurate.ScopedConfigurationNode
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
-import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.text.DecimalFormat
 import java.time.Instant
 import java.time.temporal.Temporal
 import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.createDirectories
 import kotlin.io.path.createFile
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
 
 abstract class ConfigurateStorageHandler(
-    val plugin: Polyconomy,
+    val absolutePath: Path,
+    manager: StorageManager,
     id: String,
-    fileExtension: String,
-) : StorageHandler(id) {
-
-    private val relativePath: Path = Path("data${File.separator}data.${fileExtension}")
+) : StorageHandler(id, manager) {
 
     private lateinit var rootNode: ScopedConfigurationNode<*>
 
@@ -52,55 +47,34 @@ abstract class ConfigurateStorageHandler(
     protected abstract fun buildLoader(): AbstractConfigurationLoader<out ScopedConfigurationNode<*>>
 
     private fun read() {
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Reading data." }
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Absolute path: ${absolutePath()}" }
         createIfNotExists()
         rootNode = loader.load()
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Read data." }
     }
 
     private fun write() {
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Writing data." }
         loader.save(rootNode)
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Written data." }
-    }
-
-    protected fun absolutePath(): Path {
-        return Path(
-            "${plugin.dataFolder.absolutePath}${File.separator}${relativePath}"
-        )
     }
 
     private fun createIfNotExists() {
-        val exists: Boolean = absolutePath().exists()
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Data file exists: ${if (exists) "Yes" else "No"}" }
+        val exists: Boolean = absolutePath.exists()
         if (exists) return
 
-        plugin.debugLog(STORAGE_CONFIGURATE) { "File doesn't exist; creating." }
-        absolutePath().parent.createDirectories()
-        absolutePath().createFile()
-        plugin.debugLog(STORAGE_CONFIGURATE) { "File created." }
+        absolutePath.createParentDirectories()
+        absolutePath.createFile()
     }
 
-    override fun connect() {
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Connecting." }
+    override fun startup() {
 
         if (connected)
             throw IllegalStateException("Attempted to connect whilst already connected")
 
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Checking if file has not been created yet." }
         createIfNotExists()
-        plugin.debugLog(STORAGE_CONFIGURATE) { "File present; continuing." }
 
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Initialising root node: reading data." }
         read()
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Initialised root node." }
 
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check: ensuring at least 1 currency is available." }
         if (rootNode.node("currency").virtual()
             || rootNode.node("currency").childrenList().isEmpty()
         ) {
-            plugin.logger.info { "New installation or misconfigured currency list in the database; applying default 'dollar' currency." }
             val currencyNode = rootNode.node("currency", "dollar")
 
             with(currencyNode) {
@@ -117,56 +91,33 @@ abstract class ConfigurateStorageHandler(
 
             write()
         }
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Initial currency check complete." }
 
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Caching currencies." }
         currencyCache.clear()
         for ((currencyIdUnfmt, currencyNode) in rootNode.node("currency").childrenMap()) {
-            plugin.debugLog(STORAGE_CONFIGURATE) { "Scanning node with key: ${currencyNode.key()}." }
             val currencyId = currencyIdUnfmt.toString().lowercase(Locale.ROOT)
 
-            plugin.debugLog(STORAGE_CONFIGURATE) { "Found currency ${currencyId}." }
-
             if (!currencyNode.node("enabled").getBoolean(false)) {
-                plugin.debugLog(STORAGE_CONFIGURATE) { "Currency ${currencyId} is not enabled, skipping." }
                 continue
             }
 
-            plugin.debugLog(STORAGE_CONFIGURATE) { "Constructing object for ${currencyId} and adding to cache." }
             currencyCache.add(
                 CurrencyImpl(currencyId, this)
             )
         }
+
         if (currencyCache.isEmpty()) {
-            throw ThrowableUtil.explainHelpfully(
-                plugin = plugin,
-                throwable = IllegalStateException("No currencies loaded"),
-                otherInfo = "You have not configured any currencies to load!",
-                otherContext = "Loading configurate data",
-                printTrace = false,
-            )
+            throw java.lang.IllegalStateException("You have no currencies configured!")
         }
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Loading primary currency ID." }
-        val primaryCurrencyId = plugin.settings.getPrimaryCurrencyId()
+
+        val primaryCurrencyId = manager.primaryCurrencyId
         primaryCurrency = currencyCache.find { it.name == primaryCurrencyId }
-            ?: throw ThrowableUtil.explainHelpfully(
-                plugin = plugin,
-                throwable = IllegalArgumentException(primaryCurrencyId),
-                otherInfo = "The primary currency ID you have specified (${primaryCurrencyId}) does not match any valid and enabled currency (${currencyCache.size} candidates)",
-                otherContext = "Loading configurate data",
-                printTrace = false,
-            )
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Cached currencies." }
+            ?: throw IllegalArgumentException("The primary currency ID you have specified (${primaryCurrencyId}) does not match any valid and enabled currency (${currencyCache.size} candidates)")
 
         connected = true
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Connected." }
     }
 
-    override fun disconnect() {
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Disconnecting." }
-
+    override fun shutdown() {
         if (!connected) {
-            plugin.debugLog(STORAGE_CONFIGURATE) { "Attempted to disconnect, but is already disconnected." }
             return
         }
 
@@ -175,8 +126,6 @@ abstract class ConfigurateStorageHandler(
         connection being closed with the operating system.
          */
         connected = false
-
-        plugin.debugLog(STORAGE_CONFIGURATE) { "Disconnected." }
     }
 
     override suspend fun playerCacheGetName(uuid: UUID): String? {
@@ -344,8 +293,8 @@ abstract class ConfigurateStorageHandler(
     override suspend fun getVaultUnlockedUuidNameMap(): Map<UUID, String> {
         return getNonPlayerAccountIds()
             .filter {
-                it.namespace == VaultUnlockedEconomyProvider.NAMESPACE_FOR_STANDARD_ACCOUNTS ||
-                        it.namespace == VaultUnlockedEconomyProvider.NAMESPACE_FOR_SHARED_ACCOUNTS
+                it.namespace == VU_NAMESPACE_FOR_STANDARD_ACCOUNTS ||
+                        it.namespace == VU_NAMESPACE_FOR_SHARED_ACCOUNTS
             }
             .map { getOrCreateNonPlayerAccount(it, null) }
             .associate { UUID.fromString(it.namespacedKey.key) to (it.getName() ?: "") }
@@ -385,7 +334,7 @@ abstract class ConfigurateStorageHandler(
                 val oldBalance: BigDecimal = getBalance(transaction.currency)
                 val newBalance: BigDecimal = let {
                     val value = transaction.resultingBalance(oldBalance)
-                    val minBal = storageHandler.plugin.settings.getMinimumBalance()
+                    val minBal = storageHandler.manager.minimumBalance
 
                     return@let if (value < minBal) {
                         throw IllegalArgumentException(

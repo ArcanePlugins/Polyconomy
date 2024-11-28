@@ -9,6 +9,7 @@
     <modules>
         <module>plugin-bukkit</module>
         <module>api</module>
+        <module>plugin-core</module>
     </modules>
     <groupId>io.github.arcaneplugins.polyconomy</groupId>
     <version>1.0.0-SNAPSHOT-1</version>
@@ -30,7 +31,6 @@
         <bstats.version>3.0.2</bstats.version>
         <vaultunlocked.version>2.7</vaultunlocked.version>
         <sqlite.version>3.43.0.0</sqlite.version>
-        <exposed.version>0.56.0</exposed.version>
         <h2.version>2.2.220</h2.version>
         <mariadb.version>3.2.0</mariadb.version>
     </properties>

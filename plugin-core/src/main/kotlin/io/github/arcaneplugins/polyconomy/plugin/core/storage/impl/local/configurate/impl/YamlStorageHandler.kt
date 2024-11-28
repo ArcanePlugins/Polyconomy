@@ -1,23 +1,25 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.impl
+package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.impl
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.impl.configurate.ConfigurateStorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.ConfigurateStorageHandler
 import org.spongepowered.configurate.ScopedConfigurationNode
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
+import java.nio.file.Path
 
 class YamlStorageHandler(
-    plugin: Polyconomy,
+    absolutePath: Path,
+    manager: StorageManager,
 ) : ConfigurateStorageHandler(
-    plugin = plugin,
-    fileExtension = "yml",
+    absolutePath = absolutePath,
+    manager = manager,
     id = "yaml",
 ) {
 
     override fun buildLoader(): AbstractConfigurationLoader<out ScopedConfigurationNode<*>> {
         return YamlConfigurationLoader
             .builder()
-            .path(absolutePath())
+            .path(absolutePath)
             .build()
     }
 
