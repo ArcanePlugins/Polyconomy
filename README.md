@@ -2,9 +2,18 @@
 
 # Polyconomy
 
-The *ultimate* virtual economy service provider for Minecraft servers and proxies.
+Polyconomy is a **work in progress** economy core for your Minecraft server.
 
-It's reliable, robust, powerful, performant, featureful, and free.
+It has the goal of being reliable, robust, powerful, performant, featureful, and free.
+
+The plugin is in very early development. Although somewhat functional, you should not use it in its current state.
+
+We're slowly but surely building up a to-do list of what needs to be
+done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).
+
+You are highly encouraged to discuss and partake in Polyconomy's development: join
+the [ArcanePlugins Discord guild](https://discord.gg/HqZwdcJ). Please select 'other lokka30 plugins' role on join and
+use the channel under the same name to chat.
 
 ***
 
@@ -23,23 +32,15 @@ It's reliable, robust, powerful, performant, featureful, and free.
 
 ***
 
-## ⚠️ Pre-Alpha Notice ⚠️
-
-Polyconomy is currently in very early development. It is not usable in its current state. **Most of the links in this
-file are non-functional!**
-
-We're slowly but surely building up a to-do list of what needs to be
-done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).
-
-You are highly encouraged to discuss and partake in Polyconomy's development: join
-the [ArcanePlugins Discord guild](https://discord.gg/HqZwdcJ). Please select 'other lokka30 plugins' role on join and
-use the channel under the same name to chat.
-
-</div>
-
-***
-
 ## About
+
+<details>
+
+<summary>I'm hungry for more info!</summary>
+
+### Please note, this is written in the context of the plugin being complete and released in the future. Some things may be out of date as well, but the core concepts are the same.
+
+<div align="left">
 
 ### What is Polyconomy's purpose?
 
@@ -93,13 +94,14 @@ Polyconomy is libre software, licensed under [GNU AGPL v3](LICENSE.md), which se
 proprietary software which takes them away. Polyconomy is a community project; you are strongly encouraged to discuss
 and partake in the development of the plugin - embrace the open-source spirit!
 
-## Installation
+</div>
 
-**Before you install Polyconomy, [make sure your server/proxy is compatible]().**
-Then, follow the [super simple installation guide](). :)
+</details>
 
 ## License
 
-[![GNU AGPL v3 Free Software](https://www.gnu.org/graphics/agplv3-88x31.png)](https://www.gnu.org/licenses/agpl-3.0.html)
+[![GNU AGPL v3 Free Software](https://www.gnu.org/graphics/agplv3-88x31.png)](LICENSE.md)
 
 By using the software, you accept the [license](LICENSE.md).
+
+</div>
