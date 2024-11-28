@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.util
+package io.github.arcaneplugins.polyconomy.plugin.core.util
 
 import java.nio.ByteBuffer
 import java.util.*

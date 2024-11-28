@@ -7,7 +7,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy.VaultLegacyEconomyProvider
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.unlocked.VaultUnlockedEconomyProvider
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.ClassUtil
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ClassUtil
 import org.bukkit.Bukkit
 import org.bukkit.plugin.ServicePriority
 import net.milkbowl.vault.economy.Economy as EconomyLegacy

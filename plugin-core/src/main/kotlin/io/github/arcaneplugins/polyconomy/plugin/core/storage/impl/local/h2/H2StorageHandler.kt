@@ -6,10 +6,12 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
+import java.time.Instant
 import java.util.*
 
 class H2StorageHandler(
@@ -51,28 +53,43 @@ class H2StorageHandler(
 
     private fun createTables() {
         connection.createStatement().use { statement ->
-            statement.executeUpdate(
-                """
-                    CREATE TABLE IF NOT EXISTS Account (
-                        id   IDENTITY     NOT NULL,
-                        name VARCHAR(255) NOT NULL,
-                    );
-                """.trimIndent()
-            )
+            H2Statements.createTablesStatements.forEach(statement::addBatch)
+            statement.executeBatch()
         }
-        TODO("")
+
     }
 
     override suspend fun playerCacheGetName(uuid: UUID): String? {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.getUsernameByUuid).use { statement ->
+            statement.setBytes(1, uuidToBytes(uuid))
+            val rs = statement.executeQuery()
+            return@use if (rs.next()) {
+                rs.getString("username")
+            } else {
+                null
+            }
+        }
     }
 
     override suspend fun playerCacheSetName(uuid: UUID, name: String) {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.setUsernameForUuid).use { statement ->
+            statement.setBytes(1, uuidToBytes(uuid))
+            statement.setString(2, name)
+            statement.setLong(3, Instant.now().epochSecond)
+            statement.executeUpdate()
+        }
     }
 
     override suspend fun playerCacheIsPlayer(uuid: UUID): Boolean {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.isPlayerCached).use { statement ->
+            statement.setBytes(1, uuidToBytes(uuid))
+            val rs = statement.executeQuery()
+            return@use if (rs.next()) {
+                rs.getInt(1) > 0
+            } else {
+                false
+            }
+        }
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
@@ -95,15 +112,15 @@ class H2StorageHandler(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getPrimaryCurrency(): Currency {
+    override suspend fun getPrimaryCurrency(): io.github.arcaneplugins.polyconomy.api.currency.Currency {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCurrency(name: String): Currency? {
+    override suspend fun getCurrency(name: String): io.github.arcaneplugins.polyconomy.api.currency.Currency? {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCurrencies(): Collection<Currency> {
+    override suspend fun getCurrencies(): Collection<io.github.arcaneplugins.polyconomy.api.currency.Currency> {
         TODO("Not yet implemented")
     }
 
@@ -117,7 +134,7 @@ class H2StorageHandler(
         displayNameSingularLocaleMap: Map<Locale, String>,
         displayNamePluralLocaleMap: Map<Locale, String>,
         decimalLocaleMap: Map<Locale, String>,
-    ): Currency {
+    ): io.github.arcaneplugins.polyconomy.api.currency.Currency {
         TODO("Not yet implemented")
     }
 
