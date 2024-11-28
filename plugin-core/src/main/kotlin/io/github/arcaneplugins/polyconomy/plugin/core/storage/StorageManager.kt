@@ -31,7 +31,7 @@ class StorageManager(
     lateinit var handler: StorageHandler
 
     fun startup(
-        handlerImplId: String
+        handlerImplId: String,
     ) {
         handler = availableHandlers.firstOrNull { it.id.equals(handlerImplId, ignoreCase = true) }
             ?: throw IllegalArgumentException("There is no available storage handler matching an ID of ${handlerImplId}. (Did you make a typo?)")

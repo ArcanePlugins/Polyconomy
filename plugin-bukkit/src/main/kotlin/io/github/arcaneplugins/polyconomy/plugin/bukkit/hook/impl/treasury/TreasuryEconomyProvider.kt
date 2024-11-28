@@ -5,7 +5,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapp
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtCurrency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyFromTreasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyToTreasury
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.common.NamespacedKey
 import me.lokka30.treasury.api.common.misc.TriState

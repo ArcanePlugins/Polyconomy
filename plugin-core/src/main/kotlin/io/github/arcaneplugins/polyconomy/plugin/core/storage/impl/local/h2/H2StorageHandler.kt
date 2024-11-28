@@ -112,15 +112,15 @@ class H2StorageHandler(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getPrimaryCurrency(): io.github.arcaneplugins.polyconomy.api.currency.Currency {
+    override suspend fun getPrimaryCurrency(): Currency {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCurrency(name: String): io.github.arcaneplugins.polyconomy.api.currency.Currency? {
+    override suspend fun getCurrency(name: String): Currency? {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getCurrencies(): Collection<io.github.arcaneplugins.polyconomy.api.currency.Currency> {
+    override suspend fun getCurrencies(): Collection<Currency> {
         TODO("Not yet implemented")
     }
 
@@ -134,7 +134,7 @@ class H2StorageHandler(
         displayNameSingularLocaleMap: Map<Locale, String>,
         displayNamePluralLocaleMap: Map<Locale, String>,
         decimalLocaleMap: Map<Locale, String>,
-    ): io.github.arcaneplugins.polyconomy.api.currency.Currency {
+    ): Currency {
         TODO("Not yet implemented")
     }
 

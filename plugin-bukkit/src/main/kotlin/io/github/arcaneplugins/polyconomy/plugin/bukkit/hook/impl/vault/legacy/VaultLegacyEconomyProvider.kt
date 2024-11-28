@@ -11,6 +11,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.storage.StorageHandler
+import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault.economy.Economy
 import net.milkbowl.vault.economy.EconomyResponse
