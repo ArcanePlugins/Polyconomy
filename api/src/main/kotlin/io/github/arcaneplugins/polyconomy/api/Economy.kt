@@ -27,7 +27,7 @@ interface Economy {
 
     suspend fun getNonPlayerAccountIds(): Collection<NamespacedKey>
 
-    suspend fun getNonPlayerAccountsPlayerIsMemberof(
+    suspend fun getNonPlayerAccountsPlayerIsMemberOf(
         uuid: UUID,
     ): Collection<NonPlayerAccount>
 

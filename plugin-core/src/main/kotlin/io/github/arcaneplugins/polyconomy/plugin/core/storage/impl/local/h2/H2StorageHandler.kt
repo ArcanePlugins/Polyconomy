@@ -8,6 +8,7 @@ import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
@@ -94,15 +95,14 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
+        val account = PlayerAccount(uuid)
+
         val existingAccount: PlayerAccount? = connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
             statement.setBytes(1, uuidToBytes(uuid))
             val rs = statement.executeQuery()
 
             return@use if (rs.next()) {
-                PlayerAccount(
-                    uuid = uuid,
-                    name = rs.getString(1),
-                )
+                account
             } else {
                 null
             }
@@ -136,22 +136,18 @@ class H2StorageHandler(
             }
         }
 
-        return PlayerAccount(
-            uuid = uuid,
-            name = name,
-        )
+        return account
     }
 
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
+        val account = NonPlayerAccount(namespacedKey)
+
         val existingAccount: NonPlayerAccount? = connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
             statement.setString(1, namespacedKey.toString())
             val rs = statement.executeQuery()
 
             return@use if (rs.next()) {
-                NonPlayerAccount(
-                    uuid = uuid,
-                    name = rs.getString(1),
-                )
+                account
             } else {
                 null
             }
@@ -185,10 +181,9 @@ class H2StorageHandler(
             }
         }
 
-        return NonPlayerAccount(
-            namespacedKey = namespacedKey,
-            name = name,
-        )
+        account.setName(name)
+
+        return account
     }
 
     override suspend fun getPlayerAccountIds(): Collection<UUID> {
@@ -213,12 +208,22 @@ class H2StorageHandler(
         }
     }
 
-    override suspend fun getNonPlayerAccountsPlayerIsMemberof(uuid: UUID): Collection<NonPlayerAccount> {
-        TODO("Not yet implemented")
+    override suspend fun getNonPlayerAccountsPlayerIsMemberOf(uuid: UUID): Collection<NonPlayerAccount> {
+        return connection.prepareStatement(H2Statements.getNonPlayerAccountsPlayerIsMemberOf).use { statement ->
+            statement.setBytes(1, uuidToBytes(uuid))
+            val rs = statement.executeQuery()
+            val accounts = mutableSetOf<NonPlayerAccount>()
+            while (rs.next()) {
+                val nsKey = NamespacedKey.fromString(rs.getString(1))
+                accounts.add(NonPlayerAccount(nsKey))
+            }
+            return@use accounts.toSet() // makes it immutable
+        }
     }
 
     override suspend fun getPrimaryCurrency(): Currency {
-        TODO("Not yet implemented")
+        return getCurrency(manager.primaryCurrencyId)
+            ?: throw IllegalArgumentException("Unable to get primary currency by ID of '${manager.primaryCurrencyId}': currency does not exist in the database (is there a typo, or was the currency created at all?)")
     }
 
     override suspend fun getCurrency(name: String): Currency? {

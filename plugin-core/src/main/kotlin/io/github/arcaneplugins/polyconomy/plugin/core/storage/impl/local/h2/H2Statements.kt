@@ -186,4 +186,10 @@ object H2Statements {
         FROM NonPlayerAccount;
     """.trimIndent()
 
+    val getNonPlayerAccountsPlayerIsMemberOf = """
+        SELECT namespaced_key
+        FROM NonPlayerAccount
+        INNER JOIN NonPlayerAccountMember ON NonPlayerAccountMember.member_id = ?;
+    """.trimIndent()
+
 }

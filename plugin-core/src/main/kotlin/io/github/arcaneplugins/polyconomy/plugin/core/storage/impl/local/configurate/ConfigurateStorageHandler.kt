@@ -185,7 +185,7 @@ abstract class ConfigurateStorageHandler(
             }
     }
 
-    override suspend fun getNonPlayerAccountsPlayerIsMemberof(uuid: UUID): Collection<NonPlayerAccount> {
+    override suspend fun getNonPlayerAccountsPlayerIsMemberOf(uuid: UUID): Collection<NonPlayerAccount> {
         val list = mutableListOf<NonPlayerAccount>()
 
         for (namespaceNode in rootNode.node("account", "non-player").childrenList()) {
