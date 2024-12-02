@@ -1,5 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2
 
+import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey
+
 object H2Statements {
 
     val createTablesStatements = listOf(
@@ -200,6 +202,40 @@ object H2Statements {
     val getCurrencyNames = """
         SELECT name
         FROM Currency;
+    """.trimIndent()
+
+    val insertCurrency = """
+        INSERT INTO Currency (name, starting_balance, symbol, amount_format, presentation_format, conversion_rate)
+        VALUES               (?,    ?,                ?,      ?,             ?,                   ?);
+    """.trimIndent()
+
+    val insertCurrencyLocale = """
+        INSERT INTO CurrencyLocale (id, locale, display_name_singular, display_name_plural, decimal)
+        VALUES                     (?,  ?,      ?,                     ?,                   ?);
+    """.trimIndent()
+
+    val deleteCurrency = """
+        DELETE FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val getVaultBankAccountIds = """
+        SELECT namespaced_key
+        FROM NonPlayerAccount
+        INNER JOIN VaultBankAccount on VaultBankAccount.account_id = NonPlayerAccount.id;
+    """.trimIndent()
+
+    val getPlayerAccountUuidAndNames = """
+        SELECT PlayerAccount.player_uuid, Account.name
+        FROM PlayerAccount
+        INNER JOIN Account on Account.id = PlayerAccount.id;
+    """.trimIndent()
+
+    val getVaultUnlockedNonPlayerAccounts = """
+        SELECT NonPlayerAccount.namespaced_key, Account.name
+        FROM NonPlayerAccount
+        INNER JOIN Account on Account.id = NonPlayerAccount.id
+        WHERE Account.name LIKE '${StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS}:%';
     """.trimIndent()
 
 }
