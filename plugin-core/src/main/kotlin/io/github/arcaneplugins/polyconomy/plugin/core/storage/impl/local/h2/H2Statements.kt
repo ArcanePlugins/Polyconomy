@@ -70,7 +70,6 @@ object H2Statements {
                 CREATE TABLE IF NOT EXISTS Currency (
                     id                  IDENTITY        NOT NULL,
                     name                VARCHAR(255)    NOT NULL UNIQUE,
-                    enabled             BOOLEAN         NOT NULL,
                     starting_balance    DECIMAL(18, 4)  NOT NULL,
                     symbol              VARCHAR(32)     NOT NULL,
                     amount_format       VARCHAR(255)    NOT NULL,
@@ -190,6 +189,17 @@ object H2Statements {
         SELECT namespaced_key
         FROM NonPlayerAccount
         INNER JOIN NonPlayerAccountMember ON NonPlayerAccountMember.member_id = ?;
+    """.trimIndent()
+
+    val getCurrencyByName = """
+        SELECT id
+        FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val getCurrencyNames = """
+        SELECT name
+        FROM Currency;
     """.trimIndent()
 
 }

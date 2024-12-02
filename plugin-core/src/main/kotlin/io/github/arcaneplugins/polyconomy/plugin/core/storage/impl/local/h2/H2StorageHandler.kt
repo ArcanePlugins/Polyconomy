@@ -8,7 +8,6 @@ import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
@@ -95,7 +94,7 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
-        val account = PlayerAccount(uuid)
+        val account = H2PlayerAccount(uuid)
 
         val existingAccount: PlayerAccount? = connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
             statement.setBytes(1, uuidToBytes(uuid))
@@ -140,7 +139,7 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
-        val account = NonPlayerAccount(namespacedKey)
+        val account = H2NonPlayerAccount(namespacedKey)
 
         val existingAccount: NonPlayerAccount? = connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
             statement.setString(1, namespacedKey.toString())
@@ -215,7 +214,7 @@ class H2StorageHandler(
             val accounts = mutableSetOf<NonPlayerAccount>()
             while (rs.next()) {
                 val nsKey = NamespacedKey.fromString(rs.getString(1))
-                accounts.add(NonPlayerAccount(nsKey))
+                accounts.add(getOrCreateNonPlayerAccount(nsKey, name = null))
             }
             return@use accounts.toSet() // makes it immutable
         }
@@ -227,11 +226,25 @@ class H2StorageHandler(
     }
 
     override suspend fun getCurrency(name: String): Currency? {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
+            statement.setString(1, name)
+            return@use if (statement.executeQuery().next()) {
+                H2Currency(name)
+            } else {
+                null
+            }
+        }
     }
 
     override suspend fun getCurrencies(): Collection<Currency> {
-        TODO("Not yet implemented")
+        return connection.prepareStatement(H2Statements.getCurrencyNames).use { statement ->
+            val rs = statement.executeQuery()
+            val currencies = mutableSetOf<Currency>()
+            while (rs.next()) {
+                currencies.add(H2Currency(name = rs.getString(1)))
+            }
+            return@use currencies.toSet()
+        }
     }
 
     override suspend fun registerCurrency(
