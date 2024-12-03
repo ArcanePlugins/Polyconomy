@@ -9,7 +9,8 @@ import java.time.temporal.Temporal
 import java.util.*
 
 class H2PlayerAccount(
-    uuid: UUID
+    uuid: UUID,
+    val handler: H2StorageHandler,
 ) : PlayerAccount(uuid) {
 
     override suspend fun getName(): String? {

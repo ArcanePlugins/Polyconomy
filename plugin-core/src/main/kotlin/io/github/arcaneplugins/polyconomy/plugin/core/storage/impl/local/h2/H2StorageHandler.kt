@@ -26,7 +26,8 @@ class H2StorageHandler(
         const val PASSWORD = "Polyconomy"
     }
 
-    private lateinit var connection: Connection
+    lateinit var connection: Connection
+        private set
 
     override fun startup() {
         if (connected) {
@@ -94,7 +95,7 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
-        val account = H2PlayerAccount(uuid)
+        val account = H2PlayerAccount(uuid, this)
 
         val existingAccount: PlayerAccount? = connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
             statement.setBytes(1, uuidToBytes(uuid))
@@ -139,7 +140,7 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
-        val account = H2NonPlayerAccount(namespacedKey)
+        val account = H2NonPlayerAccount(namespacedKey, this)
 
         val existingAccount: NonPlayerAccount? = connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
             statement.setString(1, namespacedKey.toString())
@@ -229,7 +230,7 @@ class H2StorageHandler(
         return connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
             statement.setString(1, name)
             return@use if (statement.executeQuery().next()) {
-                H2Currency(name)
+                H2Currency(name, this)
             } else {
                 null
             }
@@ -241,7 +242,7 @@ class H2StorageHandler(
             val rs = statement.executeQuery()
             val currencies = mutableSetOf<Currency>()
             while (rs.next()) {
-                currencies.add(H2Currency(name = rs.getString(1)))
+                currencies.add(H2Currency(name = rs.getString(1), this))
             }
             return@use currencies.toSet()
         }
@@ -259,7 +260,7 @@ class H2StorageHandler(
         decimalLocaleMap: Map<Locale, String>,
     ): Currency {
         if (hasCurrency(name)) {
-            return H2Currency(name)
+            return H2Currency(name, this)
         }
 
         val id: Long = connection.prepareStatement(H2Statements.insertCurrency).use { statement ->
@@ -307,7 +308,7 @@ class H2StorageHandler(
             }
         }
 
-        return H2Currency(name)
+        return H2Currency(name, this)
     }
 
     override suspend fun unregisterCurrency(currency: Currency) {

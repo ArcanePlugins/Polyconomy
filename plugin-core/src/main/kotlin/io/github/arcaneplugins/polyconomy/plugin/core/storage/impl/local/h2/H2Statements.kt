@@ -91,7 +91,7 @@ object H2Statements {
                     PRIMARY KEY (id, locale),
                     FOREIGN KEY id REFERENCES Currency.id
                 );
-            """.trimIndent(),
+        """.trimIndent(),
 
         """
                 CREATE TABLE IF NOT EXISTS AccountBalance (
@@ -236,6 +236,51 @@ object H2Statements {
         FROM NonPlayerAccount
         INNER JOIN Account on Account.id = NonPlayerAccount.id
         WHERE Account.name LIKE '${StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS}:%';
+    """.trimIndent()
+
+    val getSymbolForCurrency = """
+        SELECT symbol
+        FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val getDecimalForCurrencyWithLocale = """
+        SELECT decimal
+        FROM CurrencyLocale
+        INNER JOIN Currency ON Currency.id = CurrencyLocale.id
+        WHERE Currency.name = ?;
+    """.trimIndent()
+
+    val getLocaleDecimalPairsForCurrency = """
+        SELECT locale, decimal
+        FROM CurrencyLocale
+        INNER JOIN Currency ON Currency.id = CurrencyLocale.id
+        WHERE Currency.name = ?;
+    """.trimIndent()
+
+    val getDisplayNamesForCurrencyWithLocale = """
+        SELECT display_name_singular, display_name_plural
+        FROM CurrencyLocale
+        INNER JOIN Currency ON Currency.id = CurrencyLocale.id
+        WHERE Currency.name = ?;
+    """.trimIndent()
+
+    val getStartingBalanceForCurrency = """
+        SELECT starting_balance
+        FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val getConversionRateForCurrency = """
+        SELECT conversion_rate
+        FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val getStringFormatsForCurrency = """
+        SELECT amount_format, presentation_format
+        FROM Currency
+        WHERE name = ?;
     """.trimIndent()
 
 }

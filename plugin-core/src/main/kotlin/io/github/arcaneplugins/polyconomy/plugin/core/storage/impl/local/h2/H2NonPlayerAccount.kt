@@ -10,7 +10,8 @@ import java.time.temporal.Temporal
 import java.util.*
 
 class H2NonPlayerAccount(
-    namespacedKey: NamespacedKey
+    namespacedKey: NamespacedKey,
+    val handler: H2StorageHandler,
 ) : NonPlayerAccount(
     namespacedKey
 ) {
