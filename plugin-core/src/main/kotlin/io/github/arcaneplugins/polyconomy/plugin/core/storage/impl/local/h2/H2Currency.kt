@@ -59,7 +59,11 @@ class H2Currency(
             val rs = statement.executeQuery()
             return@use if (rs.next()) {
                 rs.getString(
-                    if (plural) { 2 } else { 1 }
+                    if (plural) {
+                        2
+                    } else {
+                        1
+                    }
                 )
             } else {
                 throw IllegalStateException("Unable to get decimal for currency ${name} and locale ${locale} in database: no results")
@@ -119,10 +123,14 @@ class H2Currency(
         replaceSuppliedIfContains("%amount%") { DecimalFormat(amountFormat).format(amount) }
         replaceSuppliedIfContains(".") { runBlocking { getDecimal(locale) } }
         replaceSuppliedIfContains("%symbol%") { runBlocking { getSymbol() } }
-        replaceSuppliedIfContains("%display-name%") { runBlocking { getDisplayName(
-            plural = amount != BigDecimal.ZERO,
-            locale = locale,
-        ) } }
+        replaceSuppliedIfContains("%display-name%") {
+            runBlocking {
+                getDisplayName(
+                    plural = amount != BigDecimal.ZERO,
+                    locale = locale,
+                )
+            }
+        }
 
         return intermediaryFormat
     }

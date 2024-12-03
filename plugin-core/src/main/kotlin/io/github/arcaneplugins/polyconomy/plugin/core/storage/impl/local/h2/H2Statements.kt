@@ -147,7 +147,7 @@ object H2Statements {
         FROM PlayerUsernameCache
         WHERE uuid = ?;
     """.trimIndent()
-    
+
     val getPlayerAccountName = """
         SELECT name
         FROM PlayerAccount

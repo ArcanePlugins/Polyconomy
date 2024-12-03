@@ -97,16 +97,17 @@ class H2StorageHandler(
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
         val account = H2PlayerAccount(uuid, this)
 
-        val existingAccount: PlayerAccount? = connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            val rs = statement.executeQuery()
+        val existingAccount: PlayerAccount? =
+            connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                val rs = statement.executeQuery()
 
-            return@use if (rs.next()) {
-                account
-            } else {
-                null
+                return@use if (rs.next()) {
+                    account
+                } else {
+                    null
+                }
             }
-        }
 
         if (existingAccount != null) {
             return existingAccount
@@ -142,16 +143,17 @@ class H2StorageHandler(
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
         val account = H2NonPlayerAccount(namespacedKey, this)
 
-        val existingAccount: NonPlayerAccount? = connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
-            statement.setString(1, namespacedKey.toString())
-            val rs = statement.executeQuery()
+        val existingAccount: NonPlayerAccount? =
+            connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                val rs = statement.executeQuery()
 
-            return@use if (rs.next()) {
-                account
-            } else {
-                null
+                return@use if (rs.next()) {
+                    account
+                } else {
+                    null
+                }
             }
-        }
 
         if (existingAccount != null) {
             return existingAccount
