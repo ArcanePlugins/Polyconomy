@@ -8,6 +8,8 @@ import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.bytesToUuid
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
@@ -59,6 +61,20 @@ class H2StorageHandler(
             statement.executeBatch()
         }
 
+    }
+
+    suspend fun getCurrencyDbId(name: String): Long {
+        return withContext(Dispatchers.IO) {
+            return@withContext connection.prepareStatement(H2Statements.getCurrencyDbId).use { statement ->
+                statement.setString(1, name)
+                val rs = statement.executeQuery()
+                return@use if (rs.next()) {
+                    rs.getLong(1)
+                } else {
+                    throw IllegalStateException("Unable to retrieve currency DB ID for CurrencyName = ${name}")
+                }
+            }
+        }
     }
 
     override suspend fun playerCacheGetName(uuid: UUID): String? {

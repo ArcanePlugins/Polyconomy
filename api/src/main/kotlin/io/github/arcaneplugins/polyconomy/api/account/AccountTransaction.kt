@@ -15,6 +15,12 @@ data class AccountTransaction(
     val timestamp: Instant,
 ) {
 
+    init {
+        if (amount < BigDecimal.ZERO) {
+            throw IllegalArgumentException("Transaction amount can't be less than zero")
+        }
+    }
+
     suspend fun resultingBalance(oldBalance: BigDecimal): BigDecimal {
         return when (type) {
             TransactionType.SET -> amount

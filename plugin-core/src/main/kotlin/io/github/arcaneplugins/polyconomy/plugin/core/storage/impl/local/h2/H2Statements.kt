@@ -18,7 +18,7 @@ object H2Statements {
                     id          BIGINT          NOT NULL,
                     player_uuid BINARY(16)      NOT NULL UNIQUE,
                     PRIMARY KEY (id),
-                    FOREIGN KEY id REFERENCES Account.id
+                    FOREIGN KEY id REFERENCES Account.id ON DELETE CASCADE
                 );
             """.trimIndent(),
 
@@ -27,7 +27,7 @@ object H2Statements {
                     id              BIGINT          NOT NULL,
                     namespaced_key  VARCHAR(255)    NOT NULL UNIQUE,
                     PRIMARY KEY (id),
-                    FOREIGN KEY id REFERENCES Account.id
+                    FOREIGN KEY id REFERENCES Account.id ON DELETE CASCADE
                 );
             """.trimIndent(),
 
@@ -45,7 +45,7 @@ object H2Statements {
                     perm_remove_member          BOOLEAN         NULL,
                     perm_delete                 BOOLEAN         NULL,
                     PRIMARY KEY (account_id, member_id),
-                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id
+                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id ON DELETE CASCADE
                 );
             """.trimIndent(),
 
@@ -55,7 +55,7 @@ object H2Statements {
                     owner_string    VARCHAR(255)    NOT NULL,
                     owner_uuid      BINARY(16)      NOT NULL,
                     PRIMARY KEY (account_id),
-                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id
+                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id ON DELETE CASCADE
                 );
             """.trimIndent(),
 
@@ -64,7 +64,7 @@ object H2Statements {
                     account_id      BIGINT          NOT NULL,
                     member_id_str   VARCHAR(255)    NOT NULL,
                     PRIMARY KEY (account_id, member_id_str),
-                    FOREIGN KEY account_id REFERENCES VaultBankAccount.account_id
+                    FOREIGN KEY account_id REFERENCES VaultBankAccount.account_id ON DELETE CASCADE
                 );
             """.trimIndent(),
 
@@ -89,46 +89,47 @@ object H2Statements {
                     display_name_plural     VARCHAR(255)    NOT NULL,
                     decimal                 VARCHAR(32)     NOT NULL,
                     PRIMARY KEY (id, locale),
-                    FOREIGN KEY id REFERENCES Currency.id
+                    FOREIGN KEY id REFERENCES Currency.id ON DELETE CASCADE
                 );
         """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS AccountBalance (
-                    account_id              BIGINT          NOT NULL,
-                    currency_id             BIGINT          NOT NULL,
-                    amount                  DECIMAL(18, 4)  NOT NULL,
-                    PRIMARY KEY (account_id, currency_id),
-                    FOREIGN KEY account_id REFERENCES Account.id,
-                    FOREIGN KEY currency_id REFERENCES Currency.id
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS AccountBalance (
+                account_id              BIGINT          NOT NULL,
+                currency_id             BIGINT          NOT NULL,
+                amount                  DECIMAL(18, 4)  NOT NULL,
+                PRIMARY KEY (account_id, currency_id),
+                FOREIGN KEY account_id REFERENCES Account.id ON DELETE CASCADE,
+                FOREIGN KEY currency_id REFERENCES Currency.id ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS AccountTransaction (
-                    id                      IDENTITY        NOT NULL,
-                    account_id              BIGINT          NOT NULL,
-                    amount                  DECIMAL(18, 4)  NOT NULL,
-                    currency_id             BIGINT          NOT NULL,
-                    cause                   SMALLINT        NOT NULL,
-                    reason                  VARCHAR(1023)   NOT NULL,
-                    importance              SMALLINT        NOT NULL,
-                    type                    SMALLINT        NOT NULL,
-                    timestamp               BIGINT          NOT NULL,
-                    PRIMARY KEY (id),
-                    FOREIGN KEY account_id REFERENCES Account.id,
-                    FOREIGN KEY currency_id REFERENCES Currency.id
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS AccountTransaction (
+                id                      IDENTITY        NOT NULL,
+                account_id              BIGINT          NOT NULL,
+                amount                  DECIMAL(18, 4)  NOT NULL,
+                currency_id             BIGINT          NOT NULL,
+                cause                   SMALLINT        NOT NULL,
+                cause_data              VARCHAR(255)    NULL,
+                reason                  VARCHAR(1023)   NOT NULL,
+                importance              SMALLINT        NOT NULL,
+                type                    SMALLINT        NOT NULL,
+                timestamp               BIGINT          NOT NULL,
+                PRIMARY KEY (id),
+                FOREIGN KEY account_id REFERENCES Account.id ON DELETE CASCADE,
+                FOREIGN KEY currency_id REFERENCES Currency.id ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS PlayerUsernameCache (
-                    uuid                    BINARY(16)      NOT NULL,
-                    username                VARCHAR(32)     NOT NULL,
-                    last_updated            BIGINT          NOT NULL,
-                    PRIMARY KEY (uuid)
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS PlayerUsernameCache (
+                uuid                    BINARY(16)      NOT NULL,
+                username                VARCHAR(32)     NOT NULL,
+                last_updated            BIGINT          NOT NULL,
+                PRIMARY KEY (uuid)
+            );
+        """.trimIndent(),
     )
 
     val getUsernameByUuid = """
@@ -281,6 +282,70 @@ object H2Statements {
         SELECT amount_format, presentation_format
         FROM Currency
         WHERE name = ?;
+    """.trimIndent()
+
+    val getNameOfPlayerAccount = """
+        SELECT name
+        FROM Account
+        INNER JOIN PlayerAccount ON Account.id = PlayerAccount.id
+        WHERE player_uuid = ?;
+    """.trimIndent()
+
+    val setNameOfPlayerAccount = """
+        UPDATE Account
+        SET name = ?
+        INNER JOIN PlayerAccount ON Account.id = PlayerAccount.id
+        WHERE player_uuid = ?;
+    """.trimIndent()
+
+    val getBalanceOfPlayerAccount = """
+        SELECT amount
+        FROM AccountBalance
+        INNER JOIN PlayerAccount ON PlayerAccount.id = AccountBalance.account_id
+        INNER JOIN Currency ON Currency.id = AccountBalance.currency_id
+        WHERE PlayerAccount.player_uuid = ? AND Currency.name = ?;
+    """.trimIndent()
+
+    val insertTransaction = """
+        INSERT INTO AccountTransaction
+            (account_id, amount, currency_id, cause, cause_data, reason, importance, type, timestamp)
+        VALUES
+            (?,          ?,      ?,           ?,     ?,          ?,      ?,          ?,    ?);
+    """.trimIndent()
+
+    val getPlayerAccountId = """
+        SELECT id
+        FROM Account
+        INNER JOIN PlayerAccount ON PlayerAccount.player_uuid = ?;
+    """.trimIndent()
+
+    val getNonPlayerAccountId = """
+        SELECT id
+        FROM Account
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.namespaced_key = ?;
+    """.trimIndent()
+
+    val getCurrencyDbId = """
+        SELECT id
+        FROM Currency
+        WHERE name = ?;
+    """.trimIndent()
+
+    val setAccountBalance = """
+        MERGE INTO AccountBalance
+        VALUES (?, ?, ?);
+    """.trimIndent()
+
+    val deleteAccount = """
+        DELETE FROM Account
+        WHERE id = ?;
+    """.trimIndent()
+
+    val getHeldCurrencies = """
+        SELECT Currency.name
+        FROM AccountBalance
+        INNER JOIN Currency ON Currency.id = AccountBalance.currency_id
+        WHERE AccountBalance.account_id = ?;
     """.trimIndent()
 
 }

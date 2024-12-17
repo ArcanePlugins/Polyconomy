@@ -427,42 +427,6 @@ abstract class ConfigurateStorageHandler(
                     }
             }
 
-            override suspend fun getMemberIds(): Collection<UUID> {
-                return Collections.singletonList(uuid)
-            }
-
-            override suspend fun isMember(player: UUID): Boolean {
-                return player == uuid
-            }
-
-            override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-                throw IllegalStateException("Unable to set permissions on a player account")
-            }
-
-            override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-                return if (player == uuid) {
-                    AccountPermission.entries.associateWith { true }
-                } else {
-                    emptyMap()
-                }
-            }
-
-            override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-                return mapOf(uuid to getPermissions(uuid))
-            }
-
-            override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-                return player == uuid
-            }
-
-            override suspend fun addMember(player: UUID) {
-                throw IllegalStateException("Unable to add members to a player account")
-            }
-
-            override suspend fun removeMember(player: UUID) {
-                throw IllegalStateException("Unable to remove members from a player account")
-            }
-
         }
 
         private class NonPlayerAccountImpl(

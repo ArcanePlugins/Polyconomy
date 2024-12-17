@@ -21,6 +21,10 @@ interface Account {
         amount: BigDecimal,
         currency: Currency,
     ): Boolean {
+        if (amount < BigDecimal.ZERO) {
+            throw IllegalArgumentException("Amount parameter cannot be less than zero")
+        }
+
         return getBalance(currency) >= amount
     }
 
@@ -31,6 +35,11 @@ interface Account {
         importance: TransactionImportance,
         reason: String?,
     ) {
+        if (amount < BigDecimal.ZERO) {
+            deposit(amount, currency, cause, importance, reason)
+            return
+        }
+
         makeTransaction(
             AccountTransaction(
                 amount = amount,
@@ -51,6 +60,11 @@ interface Account {
         importance: TransactionImportance,
         reason: String?,
     ) {
+        if (amount < BigDecimal.ZERO) {
+            withdraw(amount, currency, cause, importance, reason)
+            return
+        }
+
         makeTransaction(
             AccountTransaction(
                 amount = amount,

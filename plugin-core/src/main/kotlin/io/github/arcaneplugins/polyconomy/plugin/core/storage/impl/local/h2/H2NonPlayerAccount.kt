@@ -15,6 +15,20 @@ class H2NonPlayerAccount(
 ) : NonPlayerAccount(
     namespacedKey
 ) {
+
+    // TODO Use
+    private fun dbId(): Long {
+        return handler.connection.prepareStatement(H2Statements.getNonPlayerAccountId).use { statement ->
+            statement.setString(1, namespacedKey.toString())
+            val rs = statement.executeQuery()
+            return@use if (rs.next()) {
+                rs.getLong(1)
+            } else {
+                throw IllegalStateException("Unable to retrieve DB ID")
+            }
+        }
+    }
+
     override suspend fun isVaultBankAccount(): Boolean {
         TODO("Not yet implemented")
     }
