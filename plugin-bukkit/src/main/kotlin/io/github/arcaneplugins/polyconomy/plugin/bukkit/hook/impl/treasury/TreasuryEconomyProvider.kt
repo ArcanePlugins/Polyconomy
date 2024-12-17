@@ -26,7 +26,7 @@ class TreasuryEconomyProvider(
     val accountAccessor = PtAccountAccessor(plugin, this)
 
     fun storageHandler(): StorageHandler {
-        return plugin.storageManager.currentHandler!!
+        return plugin.storageManager.handler
     }
 
     suspend fun getPolyCurrency(currency: Currency): io.github.arcaneplugins.polyconomy.api.currency.Currency? {

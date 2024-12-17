@@ -30,7 +30,7 @@ open class VaultLegacyEconomyProvider(
 
     private val vaultLegacyCause = PluginCause(NamespacedKey("vault-legacy", "cause"))
 
-    protected fun storageHandler(): StorageHandler = plugin.storageManager.currentHandler!!
+    protected fun storageHandler(): StorageHandler = plugin.storageManager.handler
 
     private fun toVaultLegacyNsKey(str: String?) = NamespacedKey("vault-legacy", str ?: "null")
 

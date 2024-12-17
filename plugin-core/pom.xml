@@ -175,6 +175,16 @@
                 </executions>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <!-- purposely not relocating Kotlin here so we don't
+                    have duplicate runtimes in the plugin JARs -->
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                     <minimizeJar>true</minimizeJar>
                 </configuration>
             </plugin>
