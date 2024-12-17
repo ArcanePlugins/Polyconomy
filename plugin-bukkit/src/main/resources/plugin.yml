@@ -25,7 +25,15 @@ softdepend:
   - "Treasury"
   - "Vault"
 
-# Handled via Maven filtration.
+libraries:
+  - "org.spongepowered:configurate-yaml:${configurate.version}"
+  - "org.spongepowered:configurate-gson:${configurate.version}"
+  - "org.spongepowered:configurate-extra-kotlin:${configurate.version}"
+  - "org.xerial:sqlite-jdbc:${sqlite.version}"
+  - "com.h2database:h2:${h2.version}"
+  - "org.mariadb.jdbc:mariadb-java-client:${mariadb.version}"
+
+  # Handled via Maven filtration.
 version: "${project.version}"
 
 website: "https://github.com/ArcanePlugins/Polyconomy/"

@@ -9,11 +9,13 @@ import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.bytesToUuid
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
+import java.sql.Statement
 import java.time.Instant
 import java.util.*
 
@@ -24,8 +26,8 @@ class H2StorageHandler(
 
     companion object {
         const val URI_PREFIX = "jdbc:h2:file:"
-        const val USERNAME = "Polyconomy"
-        const val PASSWORD = "Polyconomy"
+        const val USERNAME = ""
+        const val PASSWORD = ""
     }
 
     lateinit var connection: Connection
@@ -36,6 +38,9 @@ class H2StorageHandler(
             throw IllegalStateException("Already connected to the database")
         }
 
+        // Load driver into classpath
+        Class.forName("org.h2.Driver")
+
         val uri: String = URI_PREFIX + absolutePath.toString()
 
         connection = DriverManager.getConnection(uri, USERNAME, PASSWORD)
@@ -43,6 +48,7 @@ class H2StorageHandler(
         connected = true
 
         createTables()
+        insertDefaults()
     }
 
     override fun shutdown() {
@@ -57,10 +63,37 @@ class H2StorageHandler(
 
     private fun createTables() {
         connection.createStatement().use { statement ->
-            H2Statements.createTablesStatements.forEach(statement::addBatch)
-            statement.executeBatch()
+            H2Statements.createTablesStatements.forEach(statement::executeUpdate)
+        }
+    }
+
+    private fun insertDefaults() {
+        insertDefaultCurrencyIfNoCurrencies()
+    }
+
+    private fun insertDefaultCurrencyIfNoCurrencies() {
+        val anyCurrencyExists: Boolean = connection.prepareStatement(H2Statements.getCurrencyNames).use { statement ->
+            val rs = statement.executeQuery()
+            return@use rs.next()
         }
 
+        if (anyCurrencyExists) {
+            return
+        }
+
+        return runBlocking {
+            registerCurrency(
+                name = Currency.DEFAULT_NAME,
+                startingBalance = Currency.DEFAULT_STARTING_BALANCE.toBigDecimal(),
+                symbol = Currency.DEFAULT_SYMBOL,
+                amountFormat = Currency.DEFAULT_AMOUNT_FORMAT,
+                presentationFormat = Currency.DEFAULT_PRESENTATION_FORMAT,
+                conversionRate = Currency.DEFAULT_CONVERSION_RATE.toBigDecimal(),
+                displayNameSingularLocaleMap = mapOf(Locale.ENGLISH to Currency.DEFAULT_DISPLAY_NAME_SINGULAR),
+                displayNamePluralLocaleMap = mapOf(Locale.ENGLISH to Currency.DEFAULT_DISPLAY_NAME_PLURAL),
+                decimalLocaleMap = mapOf(Locale.ENGLISH to Currency.DEFAULT_DECIMAL),
+            )
+        }
     }
 
     suspend fun getCurrencyDbId(name: String): Long {
@@ -129,7 +162,10 @@ class H2StorageHandler(
             return existingAccount
         }
 
-        val accountId: Long = connection.prepareStatement(H2Statements.createAccount).use { statement ->
+        val accountId: Long = connection.prepareStatement(
+            H2Statements.createAccount,
+            Statement.RETURN_GENERATED_KEYS,
+        ).use { statement ->
             statement.setString(1, name)
             val rows = statement.executeUpdate()
             if (rows == 0) {
@@ -175,7 +211,10 @@ class H2StorageHandler(
             return existingAccount
         }
 
-        val accountId: Long = connection.prepareStatement(H2Statements.createAccount).use { statement ->
+        val accountId: Long = connection.prepareStatement(
+            H2Statements.createAccount,
+            Statement.RETURN_GENERATED_KEYS,
+        ).use { statement ->
             statement.setString(1, name)
             val rows = statement.executeUpdate()
             if (rows == 0) {
@@ -281,14 +320,17 @@ class H2StorageHandler(
             return H2Currency(name, this)
         }
 
-        val id: Long = connection.prepareStatement(H2Statements.insertCurrency).use { statement ->
+        val id: Long = connection.prepareStatement(
+            H2Statements.insertCurrency,
+            Statement.RETURN_GENERATED_KEYS,
+        ).use { statement ->
             statement.setString(1, name)
             statement.setBigDecimal(2, startingBalance)
             statement.setString(3, symbol)
             statement.setString(4, amountFormat)
             statement.setString(5, presentationFormat)
             statement.setBigDecimal(6, conversionRate)
-            statement.executeQuery()
+            statement.executeUpdate()
 
             val rs = statement.generatedKeys
 
@@ -323,6 +365,7 @@ class H2StorageHandler(
                 statement.setString(3, getStrValueInLocaleMap(locale, displayNameSingularLocaleMap))
                 statement.setString(4, getStrValueInLocaleMap(locale, displayNamePluralLocaleMap))
                 statement.setString(5, getStrValueInLocaleMap(locale, decimalLocaleMap))
+                statement.executeUpdate()
             }
         }
 

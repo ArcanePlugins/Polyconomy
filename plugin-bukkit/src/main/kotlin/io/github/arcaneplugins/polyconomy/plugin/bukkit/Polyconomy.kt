@@ -57,12 +57,14 @@ class Polyconomy : JavaPlugin() {
             // described throwable happened here - disable plugin
             return
         } catch (ex: Exception) {
-            throw ThrowableUtil.explainHelpfully(
+            ThrowableUtil.explainHelpfully(
                 this,
                 ex,
                 otherInfo = "Issues during initialisation are sometimes caused by incompatible server software / versions.",
                 action = "initialising"
             )
+
+            throw ex
         }
     }
 
@@ -84,17 +86,29 @@ class Polyconomy : JavaPlugin() {
             hookManager.registerAll()
             commandManager.load()
             metricsManager.load()
+
+            // TODO remove below H2 debugging .....
+            //if (storageManager.handler.id == "h2") {
+            //    logger.warning("=== RUNNING DEBUGGING H2 WEB SERVER ===")
+            //    server.scheduler.runTaskAsynchronously(this) { _ ->
+            //        org.h2.tools.Server.startWebServer((storageManager.handler as H2StorageHandler).connection)
+            //    }
+            //    logger.warning("=== RUNNING DEBUGGING H2 WEB SERVER ===")
+            //}
+            // TODO remove above H2 debugging ^^^^^
         } catch (_: DescribedThrowable) {
             // error that's been described already - disable plugin
             isEnabled = false
             return
         } catch (ex: Exception) {
-            throw ThrowableUtil.explainHelpfully(
+            ThrowableUtil.explainHelpfully(
                 this,
                 ex,
                 otherInfo = "Issues during startup are often caused by user configuration errors.",
                 action = "enabling"
             )
+
+            throw ex
         }
     }
 

@@ -3,12 +3,14 @@ package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2
 import io.github.arcaneplugins.polyconomy.api.account.AccountTransaction
 import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
+import io.github.arcaneplugins.polyconomy.api.account.TransactionType
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.time.Instant
 import java.time.temporal.Temporal
 import java.util.*
 
@@ -19,16 +21,17 @@ class H2PlayerAccount(
 
     override suspend fun getName(): String? {
         return withContext(Dispatchers.IO) {
-            return@withContext handler.connection.prepareStatement(H2Statements.getNameOfPlayerAccount).use { statement ->
-                statement.setBytes(1, uuidToBytes(uuid))
-                val rs = statement.executeQuery()
+            return@withContext handler.connection.prepareStatement(H2Statements.getNameOfPlayerAccount)
+                .use { statement ->
+                    statement.setBytes(1, uuidToBytes(uuid))
+                    val rs = statement.executeQuery()
 
-                return@use if (rs.next()) {
-                    rs.getString(1)
-                } else {
-                    null
+                    return@use if (rs.next()) {
+                        rs.getString(1)
+                    } else {
+                        null
+                    }
                 }
-            }
         }
     }
 
@@ -62,7 +65,18 @@ class H2PlayerAccount(
             if (bal != null) {
                 return@withContext bal
             }
-            resetBalance(currency, ServerCause, TransactionImportance.HIGH, "Generated as required")
+            makeBlindTransaction(
+                transaction = AccountTransaction(
+                    amount = currency.getStartingBalance(),
+                    cause = ServerCause,
+                    importance = TransactionImportance.HIGH,
+                    reason = "Generated as required",
+                    currency = currency,
+                    timestamp = Instant.now(),
+                    type = TransactionType.RESET,
+                ),
+                previousBalance = BigDecimal.ZERO
+            )
             bal = getter()
 
             return@withContext bal
@@ -83,25 +97,33 @@ class H2PlayerAccount(
     }
 
     override suspend fun makeTransaction(transaction: AccountTransaction) {
+        makeBlindTransaction(transaction, getBalance(transaction.currency))
+    }
+
+    // makes a transaction without automatically fetching current balance.
+    // this is important when initially setting the balance via a transaction as the account's balance won't exist yet!
+    private suspend fun makeBlindTransaction(
+        transaction: AccountTransaction,
+        previousBalance: BigDecimal
+    ) {
         withContext(Dispatchers.IO) {
-            val previousBalance = getBalance(transaction.currency)
             val resultingBalance = transaction.resultingBalance(previousBalance)
             val accountDbId = dbId()
             val currencyDbId = handler.getCurrencyDbId(transaction.currency.name)
 
             handler.connection.prepareStatement(H2Statements.setAccountBalance).use { statement ->
                 statement.setLong(1, accountDbId)
-                statement.setBigDecimal(2, transaction.amount)
-                statement.setLong(3, currencyDbId)
+                statement.setLong(2, currencyDbId)
+                statement.setBigDecimal(3, resultingBalance)
                 statement.executeUpdate()
             }
 
             handler.connection.prepareStatement(H2Statements.insertTransaction).use { statement ->
                 statement.setLong(1, accountDbId)
-                statement.setLong(2, currencyDbId)
-                statement.setBigDecimal(3, resultingBalance)
+                statement.setBigDecimal(2, resultingBalance)
+                statement.setLong(3, currencyDbId)
                 statement.setShort(4, transaction.cause.type.ordinal.toShort())
-                statement.setString(5, transaction.cause.data.toString())
+                statement.setString(5, transaction.cause.data.toString().take(255))
                 statement.setString(6, transaction.reason)
                 statement.setShort(7, transaction.importance.ordinal.toShort())
                 statement.setShort(8, transaction.type.ordinal.toShort())

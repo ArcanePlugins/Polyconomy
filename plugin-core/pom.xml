@@ -58,21 +58,21 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Configs & Files - Configurate JSON -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-gson</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Configs & Files - Configurate Kotlin Extras -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-extra-kotlin</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Databases - SQLite JDBC Driver -->
@@ -86,14 +86,14 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Databases - MariaDB -->
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
             <version>${mariadb.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -185,7 +185,7 @@
                             </excludes>
                         </filter>
                     </filters>
-                    <minimizeJar>true</minimizeJar>
+                    <minimizeJar>false</minimizeJar> <!-- TODO does this break stuff? -->
                 </configuration>
             </plugin>
         </plugins>

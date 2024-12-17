@@ -7,6 +7,19 @@ abstract class Currency(
     val name: String,
 ) {
 
+    companion object {
+        const val DEFAULT_NAME = "dollar"
+        const val DEFAULT_SYMBOL = "$"
+        const val DEFAULT_DECIMAL = "."
+        const val DEFAULT_DISPLAY_NAME_SINGULAR = "Dollar"
+        const val DEFAULT_DISPLAY_NAME_PLURAL = "Dollars"
+        const val DEFAULT_STARTING_BALANCE = 50.0
+        const val DEFAULT_CONVERSION_RATE = 1.0
+        const val DEFAULT_AMOUNT_FORMAT = "#,##0.00"
+        const val DEFAULT_PRESENTATION_FORMAT = "%amount% %display-name%"
+        // TODO: Configurate storage implementation should reference these constants ^ instead of just declaring them as needed
+    }
+
     abstract suspend fun getSymbol(): String
 
     abstract suspend fun getDecimal(locale: Locale): String

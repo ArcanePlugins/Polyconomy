@@ -37,7 +37,7 @@ class H2Currency(
                 return@use if (rs.next()) {
                     rs.getString(1)
                 } else {
-                    throw IllegalStateException("Unable to get decimal for currency ${name} and locale ${locale} in database: no results")
+                    getLocaleDecimalMap().entries.first().value
                 }
             }
         }
@@ -46,6 +46,7 @@ class H2Currency(
     override suspend fun getLocaleDecimalMap(): Map<Locale, String> {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getLocaleDecimalPairsForCurrency).use { statement ->
+                statement.setString(1, name)
                 val rs = statement.executeQuery()
                 val map = mutableMapOf<Locale, String>()
 
@@ -63,7 +64,9 @@ class H2Currency(
 
     override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
         return withContext(Dispatchers.IO) {
-            handler.connection.prepareStatement(H2Statements.getDisplayNamesForCurrencyWithLocale).use { statement ->
+            var dn: String? = handler.connection.prepareStatement(
+                H2Statements.getDisplayNamesForCurrencyWithLocale
+            ).use { statement ->
                 statement.setString(1, locale.toLanguageTag())
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
@@ -75,7 +78,35 @@ class H2Currency(
                         }
                     )
                 } else {
-                    throw IllegalStateException("Unable to get decimal for currency ${name} and locale ${locale} in database: no results")
+                    null
+                }
+            }
+
+            // if result found, let's use that
+            if (dn != null) {
+                return@withContext dn
+            }
+
+            // fallback to system default locale
+            if (locale != Locale.getDefault()) {
+                return@withContext getDisplayName(plural, Locale.getDefault())
+            }
+
+            // finally, fallback on whatever's the first entry that pops up from DB
+            return@withContext handler.connection.prepareStatement(
+                H2Statements.getDisplayNamesForCurrency
+            ).use { statement ->
+                val rs = statement.executeQuery()
+                return@use if (rs.next()) {
+                    rs.getString(
+                        if (plural) {
+                            2
+                        } else {
+                            1
+                        }
+                    )
+                } else {
+                    throw IllegalStateException("Unable to find any display name locale records for ${name}")
                 }
             }
         }
@@ -90,6 +121,7 @@ class H2Currency(
     override suspend fun getStartingBalance(): BigDecimal {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getStartingBalanceForCurrency).use { statement ->
+                statement.setString(1, name)
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
                     rs.getBigDecimal(1)
@@ -103,6 +135,7 @@ class H2Currency(
     override suspend fun getConversionRate(): BigDecimal {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getConversionRateForCurrency).use { statement ->
+                statement.setString(1, name)
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
                     rs.getBigDecimal(1)
@@ -119,6 +152,7 @@ class H2Currency(
             val presentationFormat: String // init later
 
             handler.connection.prepareStatement(H2Statements.getStringFormatsForCurrency).use { statement ->
+                statement.setString(1, name)
                 val rs = statement.executeQuery()
                 if (!rs.next()) {
                     throw IllegalStateException("Unable to get string formats for currency ${name}: no results")

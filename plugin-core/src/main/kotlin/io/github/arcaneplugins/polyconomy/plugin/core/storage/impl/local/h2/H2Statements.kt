@@ -6,67 +6,67 @@ object H2Statements {
 
     val createTablesStatements = listOf(
         """
-                CREATE TABLE IF NOT EXISTS Account (
-                    id      IDENTITY        NOT NULL,
-                    name    VARCHAR(255)    NOT NULL,
-                    PRIMARY KEY (id)
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS Account (
+                id      IDENTITY        NOT NULL,
+                name    VARCHAR(255)    NOT NULL,
+                PRIMARY KEY (id)
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS PlayerAccount (
-                    id          BIGINT          NOT NULL,
-                    player_uuid BINARY(16)      NOT NULL UNIQUE,
-                    PRIMARY KEY (id),
-                    FOREIGN KEY id REFERENCES Account.id ON DELETE CASCADE
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS PlayerAccount (
+                id          BIGINT          NOT NULL,
+                player_uuid BINARY(16)      NOT NULL UNIQUE,
+                PRIMARY KEY (id),
+                FOREIGN KEY (id) REFERENCES Account(id) ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS NonPlayerAccount (
-                    id              BIGINT          NOT NULL,
-                    namespaced_key  VARCHAR(255)    NOT NULL UNIQUE,
-                    PRIMARY KEY (id),
-                    FOREIGN KEY id REFERENCES Account.id ON DELETE CASCADE
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS NonPlayerAccount (
+                id              BIGINT          NOT NULL,
+                namespaced_key  VARCHAR(255)    NOT NULL UNIQUE,
+                PRIMARY KEY (id),
+                FOREIGN KEY (id) REFERENCES Account(id) ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS NonPlayerAccountMember (
-                    account_id                  BIGINT          NOT NULL,
-                    member_id                   BINARY(16)      NOT NULL,
-                    perm_balance                BOOLEAN         NULL,
-                    perm_withdraw               BOOLEAN         NULL,
-                    perm_deposit                BOOLEAN         NULL,
-                    perm_modify_perms           BOOLEAN         NULL,
-                    perm_owner                  BOOLEAN         NULL,
-                    perm_transfer_ownership     BOOLEAN         NULL,
-                    perm_invite_member          BOOLEAN         NULL,
-                    perm_remove_member          BOOLEAN         NULL,
-                    perm_delete                 BOOLEAN         NULL,
-                    PRIMARY KEY (account_id, member_id),
-                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id ON DELETE CASCADE
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS NonPlayerAccountMember (
+                account_id                  BIGINT          NOT NULL,
+                member_id                   BINARY(16)      NOT NULL,
+                perm_balance                BOOLEAN         NULL,
+                perm_withdraw               BOOLEAN         NULL,
+                perm_deposit                BOOLEAN         NULL,
+                perm_modify_perms           BOOLEAN         NULL,
+                perm_owner                  BOOLEAN         NULL,
+                perm_transfer_ownership     BOOLEAN         NULL,
+                perm_invite_member          BOOLEAN         NULL,
+                perm_remove_member          BOOLEAN         NULL,
+                perm_delete                 BOOLEAN         NULL,
+                PRIMARY KEY (account_id, member_id),
+                FOREIGN KEY (account_id) REFERENCES NonPlayerAccount(id) ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS VaultBankAccount (
-                    account_id      BIGINT          NOT NULL,
-                    owner_string    VARCHAR(255)    NOT NULL,
-                    owner_uuid      BINARY(16)      NOT NULL,
-                    PRIMARY KEY (account_id),
-                    FOREIGN KEY account_id REFERENCES NonPlayerAccount.id ON DELETE CASCADE
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS VaultBankAccount (
+                account_id      BIGINT          NOT NULL,
+                owner_string    VARCHAR(255)    NOT NULL,
+                owner_uuid      BINARY(16)      NOT NULL,
+                PRIMARY KEY (account_id),
+                FOREIGN KEY (account_id) REFERENCES NonPlayerAccount(id) ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
-                CREATE TABLE IF NOT EXISTS VaultBankAccountNonPlayerMember (
-                    account_id      BIGINT          NOT NULL,
-                    member_id_str   VARCHAR(255)    NOT NULL,
-                    PRIMARY KEY (account_id, member_id_str),
-                    FOREIGN KEY account_id REFERENCES VaultBankAccount.account_id ON DELETE CASCADE
-                );
-            """.trimIndent(),
+            CREATE TABLE IF NOT EXISTS VaultBankAccountNonPlayerMember (
+                account_id      BIGINT          NOT NULL,
+                member_id_str   VARCHAR(255)    NOT NULL,
+                PRIMARY KEY (account_id, member_id_str),
+                FOREIGN KEY (account_id) REFERENCES VaultBankAccount(account_id) ON DELETE CASCADE
+            );
+        """.trimIndent(),
 
         """
                 CREATE TABLE IF NOT EXISTS Currency (
@@ -89,7 +89,7 @@ object H2Statements {
                     display_name_plural     VARCHAR(255)    NOT NULL,
                     decimal                 VARCHAR(32)     NOT NULL,
                     PRIMARY KEY (id, locale),
-                    FOREIGN KEY id REFERENCES Currency.id ON DELETE CASCADE
+                    FOREIGN KEY (id) REFERENCES Currency(id) ON DELETE CASCADE
                 );
         """.trimIndent(),
 
@@ -99,8 +99,8 @@ object H2Statements {
                 currency_id             BIGINT          NOT NULL,
                 amount                  DECIMAL(18, 4)  NOT NULL,
                 PRIMARY KEY (account_id, currency_id),
-                FOREIGN KEY account_id REFERENCES Account.id ON DELETE CASCADE,
-                FOREIGN KEY currency_id REFERENCES Currency.id ON DELETE CASCADE
+                FOREIGN KEY (account_id) REFERENCES Account(id) ON DELETE CASCADE,
+                FOREIGN KEY (currency_id) REFERENCES Currency(id) ON DELETE CASCADE
             );
         """.trimIndent(),
 
@@ -112,13 +112,13 @@ object H2Statements {
                 currency_id             BIGINT          NOT NULL,
                 cause                   SMALLINT        NOT NULL,
                 cause_data              VARCHAR(255)    NULL,
-                reason                  VARCHAR(1023)   NOT NULL,
+                reason                  VARCHAR(1023)   NULL,
                 importance              SMALLINT        NOT NULL,
                 type                    SMALLINT        NOT NULL,
                 timestamp               BIGINT          NOT NULL,
                 PRIMARY KEY (id),
-                FOREIGN KEY account_id REFERENCES Account.id ON DELETE CASCADE,
-                FOREIGN KEY currency_id REFERENCES Currency.id ON DELETE CASCADE
+                FOREIGN KEY (account_id) REFERENCES Account(id) ON DELETE CASCADE,
+                FOREIGN KEY (currency_id) REFERENCES Currency(id) ON DELETE CASCADE
             );
         """.trimIndent(),
 
@@ -266,6 +266,12 @@ object H2Statements {
         WHERE Currency.name = ?;
     """.trimIndent()
 
+    val getDisplayNamesForCurrency = """
+        SELECT display_name_singular, display_name_plural
+        FROM CurrencyLocale
+        INNER JOIN Currency ON Currency.id = CurrencyLocale.id;
+    """.trimIndent()
+
     val getStartingBalanceForCurrency = """
         SELECT starting_balance
         FROM Currency
@@ -314,21 +320,21 @@ object H2Statements {
     """.trimIndent()
 
     val getPlayerAccountId = """
-        SELECT id
+        SELECT Account.id
         FROM Account
         INNER JOIN PlayerAccount ON PlayerAccount.player_uuid = ?;
     """.trimIndent()
 
     val getNonPlayerAccountId = """
-        SELECT id
+        SELECT Account.id
         FROM Account
         INNER JOIN NonPlayerAccount ON NonPlayerAccount.namespaced_key = ?;
     """.trimIndent()
 
     val getCurrencyDbId = """
-        SELECT id
+        SELECT Currency.id
         FROM Currency
-        WHERE name = ?;
+        WHERE Currency.name = ?;
     """.trimIndent()
 
     val setAccountBalance = """
