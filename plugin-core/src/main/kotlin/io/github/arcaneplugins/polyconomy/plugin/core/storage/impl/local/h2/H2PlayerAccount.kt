@@ -5,6 +5,8 @@ import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.api.account.TransactionType
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
+import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
+import io.github.arcaneplugins.polyconomy.api.util.cause.CauseType
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
@@ -104,7 +106,7 @@ class H2PlayerAccount(
     // this is important when initially setting the balance via a transaction as the account's balance won't exist yet!
     private suspend fun makeBlindTransaction(
         transaction: AccountTransaction,
-        previousBalance: BigDecimal
+        previousBalance: BigDecimal,
     ) {
         withContext(Dispatchers.IO) {
             val resultingBalance = transaction.resultingBalance(previousBalance)
@@ -136,6 +138,7 @@ class H2PlayerAccount(
     override suspend fun deleteAccount() {
         withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.deleteAccount).use { statement ->
+                statement.setLong(1, dbId())
                 statement.executeUpdate()
             }
         }
@@ -166,7 +169,42 @@ class H2PlayerAccount(
         dateFrom: Temporal,
         dateTo: Temporal,
     ): List<AccountTransaction> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(
+                H2Statements.getTransactionHistoryForPlayerAccount
+            ).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                statement.setLong(2, Instant.from(dateFrom).epochSecond)
+                statement.setLong(3, Instant.from(dateTo).epochSecond)
+                val rs = statement.executeQuery()
+                val history = mutableListOf<AccountTransaction>()
+                while (rs.next()) {
+                    val amount = rs.getBigDecimal(1)
+                    val currency = H2Currency(rs.getString(2), handler)
+                    val cause = Cause.serialize(
+                        type = CauseType.entries[rs.getShort(3).toInt()],
+                        data = rs.getString(4),
+                    )
+                    val reason: String? = rs.getString(5)
+                    val importance = TransactionImportance.entries[rs.getShort(6).toInt()]
+                    val type = TransactionType.entries[rs.getShort(7).toInt()]
+                    val timestamp = Instant.ofEpochSecond(rs.getLong(8))
+
+                    history.add(
+                        AccountTransaction(
+                            amount,
+                            currency,
+                            cause,
+                            reason,
+                            importance,
+                            type,
+                            timestamp,
+                        )
+                    )
+                }
+                return@use history
+            }
+        }
     }
 
 }

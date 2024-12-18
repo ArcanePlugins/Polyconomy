@@ -297,11 +297,25 @@ object H2Statements {
         WHERE player_uuid = ?;
     """.trimIndent()
 
+    val getNameOfNonPlayerAccount = """
+        SELECT name
+        FROM Account
+        INNER JOIN NonPlayerAccount ON Account.id = NonPlayerAccount.id
+        WHERE namespaced_key = ?;
+    """.trimIndent()
+
     val setNameOfPlayerAccount = """
         UPDATE Account
         SET name = ?
         INNER JOIN PlayerAccount ON Account.id = PlayerAccount.id
         WHERE player_uuid = ?;
+    """.trimIndent()
+
+    val setNameOfNonPlayerAccount = """
+        UPDATE Account
+        SET name = ?
+        INNER JOIN NonPlayerAccount ON Account.id = NonPlayerAccount.id
+        WHERE namespaced_key = ?;
     """.trimIndent()
 
     val getBalanceOfPlayerAccount = """
@@ -352,6 +366,24 @@ object H2Statements {
         FROM AccountBalance
         INNER JOIN Currency ON Currency.id = AccountBalance.currency_id
         WHERE AccountBalance.account_id = ?;
+    """.trimIndent()
+
+    val getTransactionHistoryForPlayerAccount = """
+        SELECT amount, Currency.name, cause, cause_data, reason, importance, type, timestamp
+        FROM AccountTransaction
+        INNER JOIN PlayerAccount ON AccountTransaction.account_id = PlayerAccount.id
+        INNER JOIN Currency ON AccountTransaction.currency_id = Currency.id
+        WHERE PlayerAccount.player_uuid = ? AND timestamp >= ? AND timestamp <= ?
+        ORDER BY timestamp ASC;
+    """.trimIndent()
+
+    val getTransactionHistoryForNonPlayerAccount = """
+        SELECT amount, Currency.name, cause, cause_data, reason, importance, type, timestamp
+        FROM AccountTransaction
+        INNER JOIN NonPlayerAccount ON AccountTransaction.account_id = NonPlayerAccount.id
+        INNER JOIN Currency ON AccountTransaction.currency_id = Currency.id
+        WHERE NonPlayerAccount.namespaced_key = ? AND timestamp >= ? AND timestamp <= ?
+        ORDER BY timestamp ASC;
     """.trimIndent()
 
 }
