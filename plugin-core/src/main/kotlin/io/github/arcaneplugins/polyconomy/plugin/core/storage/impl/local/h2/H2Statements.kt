@@ -52,8 +52,8 @@ object H2Statements {
         """
             CREATE TABLE IF NOT EXISTS VaultBankAccount (
                 account_id      BIGINT          NOT NULL,
-                owner_string    VARCHAR(255)    NOT NULL,
-                owner_uuid      BINARY(16)      NOT NULL,
+                owner_string    VARCHAR(255)    NULL,
+                owner_uuid      BINARY(16)      NULL,
                 PRIMARY KEY (account_id),
                 FOREIGN KEY (account_id) REFERENCES NonPlayerAccount(id) ON DELETE CASCADE
             );
@@ -384,6 +384,27 @@ object H2Statements {
         INNER JOIN Currency ON AccountTransaction.currency_id = Currency.id
         WHERE NonPlayerAccount.namespaced_key = ? AND timestamp >= ? AND timestamp <= ?
         ORDER BY timestamp ASC;
+    """.trimIndent()
+
+    val isVaultBankAccount = """
+        SELECT account_id
+        FROM VaultBankAccount
+        INNER JOIN NonPlayerAccount on NonPlayerAccount.id = VaultBankAccount.account_id
+        WHERE NonPlayerAccount.namespaced_key = ?;
+    """.trimIndent()
+
+    val isLegacyVaultBankOwner = """
+        SELECT owner_string
+        FROM VaultBankAccount
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = VaultBankAccount.account_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND VaultBankAccount.owner_string = ?;
+    """.trimIndent()
+
+    val isVaultBankOwner = """
+        SELECT owner_uuid
+        FROM VaultBankAccount
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = VaultBankAccount.account_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND VaultBankAccount.owner_uuid = ?;
     """.trimIndent()
 
 }

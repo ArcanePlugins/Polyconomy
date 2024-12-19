@@ -9,6 +9,7 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
 import io.github.arcaneplugins.polyconomy.api.util.cause.CauseType
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -37,16 +38,40 @@ class H2NonPlayerAccount(
     }
 
     override suspend fun isVaultBankAccount(): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            return@withContext handler.connection.prepareStatement(H2Statements.isVaultBankAccount).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                val rs = statement.executeQuery()
+                return@use rs.next()
+            }
+        }
     }
 
     @Suppress("OVERRIDE_DEPRECATION")
     override suspend fun isLegacyVaultBankOwner(memberId: NamespacedKey): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            return@withContext handler.connection.prepareStatement(
+                H2Statements.isLegacyVaultBankOwner
+            ).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setString(2, memberId.toString())
+                val rs = statement.executeQuery()
+                return@use rs.next()
+            }
+        }
     }
 
     override suspend fun isVaultBankOwner(memberId: UUID): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            return@withContext handler.connection.prepareStatement(
+                H2Statements.isVaultBankOwner
+            ).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setBytes(2, uuidToBytes(memberId))
+                val rs = statement.executeQuery()
+                return@use rs.next()
+            }
+        }
     }
 
     @Suppress("OVERRIDE_DEPRECATION")
