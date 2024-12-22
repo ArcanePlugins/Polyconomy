@@ -326,6 +326,14 @@ object H2Statements {
         WHERE PlayerAccount.player_uuid = ? AND Currency.name = ?;
     """.trimIndent()
 
+    val getBalanceOfNonPlayerAccount = """
+        SELECT amount
+        FROM AccountBalance
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = AccountBalance.account_id
+        INNER JOIN Currency ON Currency.id = AccountBalance.currency_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND Currency.name = ?;
+    """.trimIndent()
+
     val insertTransaction = """
         INSERT INTO AccountTransaction
             (account_id, amount, currency_id, cause, cause_data, reason, importance, type, timestamp)
