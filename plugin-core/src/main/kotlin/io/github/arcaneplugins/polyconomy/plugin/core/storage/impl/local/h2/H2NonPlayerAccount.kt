@@ -24,7 +24,6 @@ class H2NonPlayerAccount(
     namespacedKey
 ) {
 
-    // TODO Use
     private fun dbId(): Long {
         return handler.connection.prepareStatement(H2Statements.getNonPlayerAccountId).use { statement ->
             statement.setString(1, namespacedKey.toString())
@@ -76,15 +75,34 @@ class H2NonPlayerAccount(
 
     @Suppress("OVERRIDE_DEPRECATION")
     override suspend fun isLegacyVaultBankMember(memberId: NamespacedKey): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.isLegacyVaultBankMember).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setString(2, memberId.toString())
+                val rs = statement.executeQuery()
+                return@use rs.next()
+            }
+        }
     }
 
     override suspend fun setLegacyVaultBankOwner(ownerId: NamespacedKey) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.setLegacyVaultBankOwner).use { statement ->
+                statement.setString(1, ownerId.toString())
+                statement.setString(2, namespacedKey.toString())
+                statement.executeUpdate()
+            }
+        }
     }
 
     override suspend fun setVaultBankOwner(ownerId: UUID) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.setVaultBankOwner).use { statement ->
+                statement.setBytes(1, uuidToBytes(ownerId))
+                statement.setString(2, namespacedKey.toString())
+                statement.executeUpdate()
+            }
+        }
     }
 
     override suspend fun getName(): String? {

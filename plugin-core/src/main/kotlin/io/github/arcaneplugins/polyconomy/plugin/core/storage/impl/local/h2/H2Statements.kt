@@ -407,4 +407,48 @@ object H2Statements {
         WHERE NonPlayerAccount.namespaced_key = ? AND VaultBankAccount.owner_uuid = ?;
     """.trimIndent()
 
+    val isLegacyVaultBankMember = """
+        SELECT member_id_str
+        FROM VaultBankAccountNonPlayerMember
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = VaultBankAccountNonPlayerMember.account_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND VaultBankAccountNonPlayerMember.member_id_str = ?;
+    """.trimIndent()
+
+    /*
+    old:
+        UPDATE VaultBankAccount
+        SET owner_string = ?
+        INNER JOIN NonPlayerAccount ON VaultBankAccount.account_id = NonPlayerAccount.id
+        WHERE NonPlayerAccount.namespaced_key = ?;
+     */
+    val setLegacyVaultBankOwner = """
+        MERGE INTO VaultBankAccount (account_id, owner_string)
+        VALUES (
+            (
+                SELECT account_id
+                FROM NonPlayerAccount
+                WHERE NonPlayerAccount.namespaced_key = ?
+            ),
+            ?
+        );
+    """.trimIndent()
+
+    /*
+    UPDATE VaultBankAccount
+        SET owner_uuid = ?
+        INNER JOIN NonPlayerAccount ON VaultBankAccount.account_id = NonPlayerAccount.id
+        WHERE NonPlayerAccount.namespaced_key = ?;
+     */
+    val setVaultBankOwner = """
+        MERGE INTO VaultBankAccount (account_id, owner_uuid)
+        VALUES (
+            (
+                SELECT account_id
+                FROM NonPlayerAccount
+                WHERE NonPlayerAccount.namespaced_key = ?
+            ),
+            ?
+        );
+    """.trimIndent()
+
 }
