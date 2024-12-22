@@ -9,10 +9,12 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.Cause
 import io.github.arcaneplugins.polyconomy.api.util.cause.CauseType
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.sql.Types
 import java.time.Instant
 import java.time.temporal.Temporal
 import java.util.*
@@ -212,34 +214,118 @@ class H2NonPlayerAccount(
     }
 
     override suspend fun getMemberIds(): Collection<UUID> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.getNonPlayerAccountMemberIds).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                val rs = statement.executeQuery()
+                val ids = mutableSetOf<UUID>()
+                while (rs.next()) {
+                    ids.add(
+                        ByteUtil.bytesToUuid(
+                            rs.getBytes(1)
+                        )
+                    )
+                }
+                ids
+            }
+        }
     }
 
     override suspend fun isMember(player: UUID): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.isMemberOfNonPlayerAccount).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setBytes(2, uuidToBytes(player))
+                return@use statement.executeQuery().next()
+            }
+        }
     }
 
     override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
-        TODO("Not yet implemented")
+        withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(
+                H2Statements.setPermissionsOfNonPlayerAccountMember
+            ).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setBytes(2, uuidToBytes(player))
+                listOf(
+                    AccountPermission.BALANCE,
+                    AccountPermission.WITHDRAW,
+                    AccountPermission.DEPOSIT,
+                    AccountPermission.MODIFY_PERMISSIONS,
+                    AccountPermission.OWNER,
+                    AccountPermission.TRANSFER_OWNERSHIP,
+                    AccountPermission.INVITE_MEMBER,
+                    AccountPermission.REMOVE_MEMBER,
+                    AccountPermission.DELETE,
+                ).forEachIndexed { index, perm ->
+                    val state: Boolean? = perms[perm]
+                    if (state != null) {
+                        statement.setBoolean(index + 3, state)
+                    } else {
+                        statement.setNull(index + 3, Types.BOOLEAN)
+                    }
+                }
+
+                statement.executeUpdate()
+            }
+        }
     }
 
     override suspend fun getPermissions(player: UUID): Map<AccountPermission, Boolean?> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(
+                H2Statements.getPermissionsOfNonPlayerAccountMember
+            ).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setBytes(2, uuidToBytes(player))
+                val rs = statement.executeQuery()
+                if (!rs.next()) {
+                    throw IllegalStateException("${player} is not a member of ${namespacedKey}")
+                }
+                return@use mapOf(
+                    AccountPermission.BALANCE to rs.getBoolean(3),
+                    AccountPermission.WITHDRAW to rs.getBoolean(4),
+                    AccountPermission.DEPOSIT to rs.getBoolean(5),
+                    AccountPermission.MODIFY_PERMISSIONS to rs.getBoolean(6),
+                    AccountPermission.OWNER to rs.getBoolean(7),
+                    AccountPermission.TRANSFER_OWNERSHIP to rs.getBoolean(8),
+                    AccountPermission.INVITE_MEMBER to rs.getBoolean(9),
+                    AccountPermission.REMOVE_MEMBER to rs.getBoolean(10),
+                    AccountPermission.DELETE to rs.getBoolean(11),
+                )
+            }
+        }
     }
 
     override suspend fun getPermissionsMap(): Map<UUID, Map<AccountPermission, Boolean?>> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            getMemberIds().associateWith { getPermissions(it) }
+        }
     }
 
     override suspend fun hasPermissions(player: UUID, permissions: Collection<AccountPermission>): Boolean {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            val perms = getPermissions(player)
+            permissions.all { perms[it] ?: it.defaultValue }
+        }
     }
 
     override suspend fun addMember(player: UUID) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            setPermissions(player, Collections.emptyMap())
+        }
     }
 
     override suspend fun removeMember(player: UUID) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(
+                H2Statements.deleteMemberOfNonPlayerAccount
+            ).use { statement ->
+                statement.setString(1, namespacedKey.toString())
+                statement.setBytes(2, uuidToBytes(player))
+                statement.executeUpdate()
+            }
+        }
     }
 }

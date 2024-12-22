@@ -451,4 +451,45 @@ object H2Statements {
         );
     """.trimIndent()
 
+    val getNonPlayerAccountMemberIds = """
+        SELECT member_id
+        FROM NonPlayerAccountMember
+        INNER JOIN NonPlayerAccount.id ON NonPlayerAccountMember.account_id
+        WHERE NonPlayerAccount.namespaced_key = ?;
+    """.trimIndent()
+
+    val isMemberOfNonPlayerAccount = """
+        SELECT member_id
+        FROM NonPlayerAccountMember
+        INNER JOIN NonPlayerAccount.id ON NonPlayerAccountMember.account_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND NonPlayerAccountMember.member_id = ?;
+    """.trimIndent()
+
+    val setPermissionsOfNonPlayerAccountMember = """
+        MERGE INTO NonPlayerAccountMember
+        VALUES (
+            (
+                SELECT account_id
+                FROM NonPlayerAccount
+                WHERE NonPlayerAccount.namespaced_key = ?
+            ), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        );
+    """.trimIndent()
+
+    val getPermissionsOfNonPlayerAccountMember = """
+        SELECT *
+        FROM NonPlayerAccountMember
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = NonPlayerAccountMember.account_id
+        WHERE NonPlayerAccount.namespaced_key = ? AND NonPlayerAccountMember.member_id = ?;
+    """.trimIndent()
+
+    val deleteMemberOfNonPlayerAccount = """
+        DELETE FROM NonPlayerAccountMember
+        WHERE account_id = (
+            SELECT account_id
+            FROM NonPlayerAccount
+            WHERE NonPlayerAccount.namespaced_key = ?
+        ) AND member_id = ?;
+    """.trimIndent()
+
 }
