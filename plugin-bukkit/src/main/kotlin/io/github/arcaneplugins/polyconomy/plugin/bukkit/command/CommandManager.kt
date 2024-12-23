@@ -29,11 +29,6 @@ class CommandManager(
         CommandAPI.onDisable()
     }
 
-    fun reload() {
-        disable()
-        load()
-    }
-
     private fun registerCommands() {
         listOf(
             BalanceCommand,

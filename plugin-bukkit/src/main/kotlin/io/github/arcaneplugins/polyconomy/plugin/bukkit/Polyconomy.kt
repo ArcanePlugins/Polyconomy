@@ -156,7 +156,6 @@ class Polyconomy : JavaPlugin() {
             loadConfigs()
             storageManager.startup(settings.getStorageImplementation())
             hookManager.registerAll()
-            commandManager.reload()
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,
