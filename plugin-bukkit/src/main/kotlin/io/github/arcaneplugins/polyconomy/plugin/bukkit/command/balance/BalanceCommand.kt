@@ -10,8 +10,11 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
 import kotlinx.coroutines.runBlocking
+import net.md_5.bungee.api.ChatColor
+import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object BalanceCommand: InternalCmd {
@@ -42,7 +45,13 @@ object BalanceCommand: InternalCmd {
                     ).getBalance(currency)
                 }
 
-                sender.sendMessage("The balance of player '${targetPlayer.name}' is '${balance}' (currency: '${currency.name}').")
+                val balanceFmt = runBlocking {
+                    currency.format(balance, Locale.getDefault())
+                }
+
+                sender.spigot().sendMessage(ComponentBuilder(
+                    "Player '${targetPlayer.name}' has '${balanceFmt}' (currency: '${currency.name}')."
+                ).color(ChatColor.GREEN).build())
             })
     }
 
