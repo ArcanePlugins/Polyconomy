@@ -185,7 +185,7 @@
                             </excludes>
                         </filter>
                     </filters>
-                    <minimizeJar>false</minimizeJar> <!-- TODO does this break stuff? -->
+                    <minimizeJar>false</minimizeJar> <!-- TODO does this break anything? -->
                 </configuration>
             </plugin>
         </plugins>

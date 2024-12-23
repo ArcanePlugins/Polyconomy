@@ -55,12 +55,6 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
@@ -119,27 +113,6 @@
             <artifactId>VaultUnlockedAPI</artifactId>
             <version>${vaultunlocked.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- Databases - SQLite JDBC Driver -->
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>${sqlite.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <!-- Databases - H2 -->
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <!-- Databases - MariaDB -->
-            <groupId>org.mariadb.jdbc</groupId>
-            <artifactId>mariadb-java-client</artifactId>
-            <version>${mariadb.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>dev.jorel</groupId>
@@ -252,7 +225,7 @@
                             </excludes>
                         </filter>
                     </filters>
-                    <minimizeJar>false</minimizeJar>
+                    <minimizeJar>true</minimizeJar>
                 </configuration>
             </plugin>
         </plugins>
