@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Prompt user for the new version
+read -r -p "Enter the new version (e.g., 1.2.3-SNAPSHOT-4): " VERSION
+
+# Set the new version using versions-maven-plugin
+echo "Setting version to $VERSION..."
+mvn versions:set -DnewVersion="$VERSION"
+
+# Prompt user to commit or revert changes
+read -r -p "Do you want to commit the changes? (y/n): " CONFIRM
+
+if [[ "$CONFIRM" == "y" || "$CONFIRM" == "Y" ]]; then
+    echo "Committing the changes..."
+    mvn versions:commit
+    echo "Changes committed successfully."
+elif [[ "$CONFIRM" == "n" || "$CONFIRM" == "N" ]]; then
+    echo "Reverting the changes..."
+    mvn versions:revert
+    echo "Changes reverted."
+else
+    echo "Invalid input. No action taken."
+fi
