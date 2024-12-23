@@ -10,6 +10,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.CauseType
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.time.Instant
@@ -63,26 +64,27 @@ class H2PlayerAccount(
                 }
             }
 
-            var bal = getter()
+            val bal = getter()
             if (bal != null) {
                 return@withContext bal
             }
-            makeBlindTransaction(
-                transaction = AccountTransaction(
-                    amount = currency.getStartingBalance(),
-                    cause = ServerCause,
-                    importance = TransactionImportance.HIGH,
-                    reason = "Generated as required",
-                    currency = currency,
-                    timestamp = Instant.now(),
-                    type = TransactionType.RESET,
-                ),
-                previousBalance = BigDecimal.ZERO
-            )
-            bal = getter()
+            val startingBal = currency.getStartingBalance()
+            runBlocking {
+                makeBlindTransaction(
+                    transaction = AccountTransaction(
+                        amount = startingBal,
+                        cause = ServerCause,
+                        importance = TransactionImportance.HIGH,
+                        reason = "Generated as required",
+                        currency = currency,
+                        timestamp = Instant.now(),
+                        type = TransactionType.RESET,
+                    ),
+                    previousBalance = BigDecimal.ZERO
+                )
+            }
 
-            return@withContext bal
-                ?: throw IllegalStateException("Unable to get balance record even after resetting it")
+            startingBal
         }
     }
 
