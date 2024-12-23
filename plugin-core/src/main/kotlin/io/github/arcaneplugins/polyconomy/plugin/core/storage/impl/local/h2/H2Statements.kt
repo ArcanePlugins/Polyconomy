@@ -8,7 +8,7 @@ object H2Statements {
         """
             CREATE TABLE IF NOT EXISTS Account (
                 id      IDENTITY        NOT NULL,
-                name    VARCHAR(255)    NOT NULL,
+                name    VARCHAR(255)    NULL,
                 PRIMARY KEY (id)
             );
         """.trimIndent(),
