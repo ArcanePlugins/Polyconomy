@@ -12,7 +12,7 @@
         <module>plugin-core</module>
     </modules>
     <groupId>io.github.arcaneplugins.polyconomy</groupId>
-    <version>1.0.0-SNAPSHOT-1</version>
+    <version>0.1.0</version>
 
     <name>Polyconomy</name>
     <description>Parent module of Polyconomy's source.</description>
