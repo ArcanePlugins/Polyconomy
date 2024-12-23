@@ -16,6 +16,7 @@ import java.nio.file.Path
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.Statement
+import java.sql.Types
 import java.time.Instant
 import java.util.*
 
@@ -166,7 +167,11 @@ class H2StorageHandler(
             H2Statements.createAccount,
             Statement.RETURN_GENERATED_KEYS,
         ).use { statement ->
-            statement.setString(1, name)
+            if (name == null) {
+                statement.setNull(1, Types.VARCHAR)
+            } else {
+                statement.setString(1, name)
+            }
             val rows = statement.executeUpdate()
             if (rows == 0) {
                 throw IllegalStateException("Unable to insert account with uuid=${uuid}, name=${name}")
