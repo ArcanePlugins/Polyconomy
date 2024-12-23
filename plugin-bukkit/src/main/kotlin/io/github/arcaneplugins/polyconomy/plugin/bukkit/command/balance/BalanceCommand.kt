@@ -50,7 +50,7 @@ object BalanceCommand: InternalCmd {
                 }
 
                 sender.spigot().sendMessage(ComponentBuilder(
-                    "Player '${targetPlayer.name}' has '${balanceFmt}' (currency: '${currency.name}')."
+                    "Player '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' has '${balanceFmt}' (currency: '${currency.name}')."
                 ).color(ChatColor.GREEN).build())
             })
     }
