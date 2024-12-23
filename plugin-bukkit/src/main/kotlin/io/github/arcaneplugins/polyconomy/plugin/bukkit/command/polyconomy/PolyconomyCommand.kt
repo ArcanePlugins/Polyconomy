@@ -10,7 +10,14 @@ object PolyconomyCommand: InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("polyconomy")
             .withPermission(PolyPermission.COMMAND_POLYCONOMY.toString())
-            .withSubcommand(VersionSubcommand.build(plugin))
+            .withSubcommands(
+                *listOf(
+                    ReloadSubcommand,
+                    VersionSubcommand,
+                ).map {
+                    it.build(plugin)
+                }.toTypedArray()
+            )
     }
 
 }

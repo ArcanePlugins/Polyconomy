@@ -4,8 +4,9 @@ import java.util.*
 
 enum class PolyPermission {
 
+    COMMAND_BALANCE,
     COMMAND_POLYCONOMY,
-    COMMAND_POLYCONOMY_BALANCE,
+    COMMAND_POLYCONOMY_RELOAD,
     COMMAND_POLYCONOMY_VERSION;
 
     override fun toString(): String {

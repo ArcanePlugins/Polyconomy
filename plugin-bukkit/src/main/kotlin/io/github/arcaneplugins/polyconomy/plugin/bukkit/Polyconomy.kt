@@ -144,7 +144,6 @@ class Polyconomy : JavaPlugin() {
      * apply changes to their configuration during runtime, saving them minutes of each interruption
      * where they would otherwise restart their server after each config adjustment.
      */
-    //TODO use function for the reload subcommand once implemented.
     @Suppress("unused")
     fun softReload() {
         logger.info("Reloading Polyconomy v${description.version}")
