@@ -15,8 +15,8 @@
     <name>Polyconomy Plugin for Bukkit</name>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -141,7 +141,12 @@
             <version>${mariadb.version}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>dev.jorel</groupId>
+            <artifactId>commandapi-bukkit-shade</artifactId>
+            <version>9.7.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -233,6 +238,10 @@
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>dev.jorel.commandapi</pattern>
+                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.commandapi</shadedPattern>
                         </relocation>
                     </relocations>
                     <filters>
