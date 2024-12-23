@@ -1,25 +1,46 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command
 
+import dev.jorel.commandapi.CommandAPI
+import dev.jorel.commandapi.CommandAPIBukkitConfig
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.balance.BalanceCommand
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.PolyconomyCommand
 
 class CommandManager(
     val plugin: Polyconomy,
 ) {
 
     fun init() {
-        //TODO implement onLoad for CommandAPI
+        CommandAPI.onLoad(
+            CommandAPIBukkitConfig(plugin)
+                .silentLogs(true)
+                .verboseOutput(false)
+                .usePluginNamespace()
+        )
     }
 
     fun load() {
-        //TODO implement onEnable for CommandAPI
+        CommandAPI.onEnable()
+
+        registerCommands()
     }
 
     fun disable() {
-        //TODO implement onDisable for CommandAPI
+        CommandAPI.onDisable()
     }
 
     fun reload() {
-        //TODO implement reload for CommandAPI
+        disable()
+        load()
+    }
+
+    private fun registerCommands() {
+        listOf(
+            BalanceCommand,
+            PolyconomyCommand,
+        ).forEach {
+            it.build(plugin).register(plugin)
+        }
     }
 
 }
