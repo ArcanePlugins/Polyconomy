@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand
 
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.executors.CommandExecutor
@@ -12,6 +12,7 @@ object VersionSubcommand: InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("version")
+            .withAliases("about", "info", "ver")
             .withPermission(PolyPermission.COMMAND_POLYCONOMY_VERSION.toString())
             .executes(CommandExecutor { sender, _ ->
                 val pdf = plugin.description

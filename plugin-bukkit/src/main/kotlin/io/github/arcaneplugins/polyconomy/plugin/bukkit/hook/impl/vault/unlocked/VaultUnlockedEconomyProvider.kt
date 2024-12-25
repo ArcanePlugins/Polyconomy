@@ -24,6 +24,12 @@ class VaultUnlockedEconomyProvider(
 
     companion object {
         private val vaultUnlockedCause = PluginCause(NamespacedKey("vault-unlocked", "cause"))
+
+        enum class VuAccountType {
+            PLAYER,
+            NON_PLAYER_STANDARD,
+            NON_PLAYER_SHARED,
+        }
     }
 
     private fun vuNskForStdAccount(uuid: UUID): NamespacedKey {
@@ -34,15 +40,59 @@ class VaultUnlockedEconomyProvider(
         return NamespacedKey(VU_NAMESPACE_FOR_SHARED_ACCOUNTS, uuid.toString())
     }
 
-    private suspend fun getAccountByUuid(accountID: UUID, name: String? = accountID.toString()): Account {
-        val isPlayer = Bukkit.getOnlinePlayers().any { it.uniqueId == accountID } ||
-                storageHandler().playerCacheIsPlayer(accountID) ||
-                Bukkit.getOfflinePlayer(accountID).hasPlayedBefore()
+    private suspend fun getAccountTypeByUuid(
+        isPlayer: Boolean?,
+        accountId: UUID,
+    ): VuAccountType {
+        if (isPlayer == true) {
+            return VuAccountType.PLAYER
+        }
 
-        return if (isPlayer) {
-            storageHandler().getOrCreatePlayerAccount(accountID, name)
+        if (Bukkit.getOnlinePlayers().any { it.uniqueId == accountId } ||
+            storageHandler().hasPlayerAccount(accountId) ||
+            storageHandler().playerCacheIsPlayer(accountId)
+        ) {
+            return VuAccountType.PLAYER
+        }
+
+        if (storageHandler().hasNonPlayerAccount(vuNskForStdAccount(accountId))) {
+            return VuAccountType.NON_PLAYER_STANDARD
+        }
+
+        if (storageHandler().hasNonPlayerAccount(vuNskForSharedAccount(accountId))) {
+            return VuAccountType.NON_PLAYER_SHARED
+        }
+
+        return if (try {
+                Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()
+            } catch (ignored: Exception) {
+                false
+            }
+        ) {
+            VuAccountType.PLAYER
         } else {
-            storageHandler().getOrCreateNonPlayerAccount(vuNskForStdAccount(accountID), name)
+            VuAccountType.NON_PLAYER_STANDARD
+        }
+    }
+
+    private suspend fun getAccountByUuid(
+        isPlayer: Boolean?,
+        accountId: UUID,
+        name: String? = accountId.toString(),
+    ): Account {
+        return when (getAccountTypeByUuid(isPlayer, accountId)) {
+            VuAccountType.PLAYER -> storageHandler().getOrCreatePlayerAccount(accountId, name)
+            VuAccountType.NON_PLAYER_STANDARD -> storageHandler().getOrCreateNonPlayerAccount(
+                vuNskForStdAccount(
+                    accountId
+                ), name
+            )
+
+            VuAccountType.NON_PLAYER_SHARED -> storageHandler().getOrCreateNonPlayerAccount(
+                vuNskForSharedAccount(
+                    accountId
+                ), name
+            )
         }
     }
 
@@ -156,22 +206,36 @@ class VaultUnlockedEconomyProvider(
         }
     }
 
+    @Deprecated(message = "Does not identify player vs non-player accounts")
     override fun createAccount(
         accountID: UUID,
         name: String,
     ): Boolean {
         return runBlocking {
-            getAccountByUuid(accountID, name)
+            getAccountByUuid(null, accountID, name)
             true
         }
     }
 
+    override fun createAccount(accountID: UUID, name: String, player: Boolean): Boolean {
+        return runBlocking {
+            getAccountByUuid(player, accountID, name)
+            true
+        }
+    }
+
+    @Deprecated(message = "Does not identify player vs non-player accounts")
     override fun createAccount(
         accountID: UUID,
         name: String,
         worldName: String,
     ): Boolean {
+        @Suppress("DEPRECATION")
         return createAccount(accountID, name)
+    }
+
+    override fun createAccount(accountID: UUID, name: String, worldName: String, player: Boolean): Boolean {
+        return createAccount(accountID, name, player)
     }
 
     override fun getUUIDNameMap(): Map<UUID, String> {
@@ -181,10 +245,10 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun getAccountName(
-        accountID: UUID,
+        accountId: UUID,
     ): Optional<String> {
         return runBlocking {
-            Optional.ofNullable(getAccountByUuid(accountID).getName())
+            Optional.ofNullable(getAccountByUuid(null, accountId).getName())
         }
     }
 
@@ -209,7 +273,7 @@ class VaultUnlockedEconomyProvider(
         name: String,
     ): Boolean {
         return runBlocking {
-            getAccountByUuid(accountID, name).setName(name)
+            getAccountByUuid(null, accountID, name).setName(name)
             true
         }
     }
@@ -227,7 +291,7 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
     ): Boolean {
         return runBlocking {
-            getAccountByUuid(accountID).deleteAccount()
+            getAccountByUuid(null, accountID).deleteAccount()
             true
         }
     }
@@ -256,7 +320,7 @@ class VaultUnlockedEconomyProvider(
         accountID: UUID,
     ): BigDecimal {
         return runBlocking {
-            getAccountByUuid(accountID).getBalance(primaryCurrency())
+            getAccountByUuid(null, accountID).getBalance(primaryCurrency())
         }
     }
 
@@ -275,7 +339,7 @@ class VaultUnlockedEconomyProvider(
         currency: String,
     ): BigDecimal {
         return runBlocking {
-            getAccountByUuid(accountID).getBalance(storageHandler().getCurrency(currency)!!)
+            getAccountByUuid(null, accountID).getBalance(storageHandler().getCurrency(currency)!!)
         }
     }
 
@@ -285,7 +349,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): Boolean {
         return runBlocking {
-            getAccountByUuid(accountID).has(amount, primaryCurrency())
+            getAccountByUuid(null, accountID).has(amount, primaryCurrency())
         }
     }
 
@@ -306,7 +370,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): Boolean {
         return runBlocking {
-            getAccountByUuid(accountID).has(amount, storageHandler().getCurrency(currency)!!)
+            getAccountByUuid(null, accountID).has(amount, storageHandler().getCurrency(currency)!!)
         }
     }
 
@@ -316,7 +380,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): EconomyResponse {
         return runBlocking {
-            getAccountByUuid(accountID).withdraw(
+            getAccountByUuid(null, accountID).withdraw(
                 amount,
                 primaryCurrency(),
                 vaultUnlockedCause,
@@ -350,7 +414,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): EconomyResponse {
         return runBlocking {
-            getAccountByUuid(accountID).withdraw(
+            getAccountByUuid(null, accountID).withdraw(
                 amount,
                 storageHandler().getCurrency(currency)!!,
                 vaultUnlockedCause,
@@ -373,7 +437,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): EconomyResponse {
         return runBlocking {
-            getAccountByUuid(accountID).deposit(
+            getAccountByUuid(null, accountID).deposit(
                 amount,
                 primaryCurrency(),
                 vaultUnlockedCause,
@@ -407,7 +471,7 @@ class VaultUnlockedEconomyProvider(
         amount: BigDecimal,
     ): EconomyResponse {
         return runBlocking {
-            getAccountByUuid(accountID).deposit(
+            getAccountByUuid(null, accountID).deposit(
                 amount,
                 storageHandler().getCurrency(currency)!!,
                 vaultUnlockedCause,

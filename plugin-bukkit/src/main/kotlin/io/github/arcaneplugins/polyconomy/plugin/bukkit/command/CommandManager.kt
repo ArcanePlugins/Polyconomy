@@ -4,6 +4,7 @@ import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPIBukkitConfig
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.balance.BalanceCommand
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.pay.PayCommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.PolyconomyCommand
 
 class CommandManager(
@@ -32,6 +33,7 @@ class CommandManager(
     private fun registerCommands() {
         listOf(
             BalanceCommand,
+            PayCommand,
             PolyconomyCommand,
         ).forEach {
             it.build(plugin).register(plugin)

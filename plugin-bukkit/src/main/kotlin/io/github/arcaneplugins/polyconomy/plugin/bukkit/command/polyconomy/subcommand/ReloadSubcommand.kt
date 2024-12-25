@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand
 
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.executors.CommandExecutor
@@ -13,6 +13,7 @@ object ReloadSubcommand: InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("reload")
+            .withAliases("rl")
             .withPermission(PolyPermission.COMMAND_POLYCONOMY_RELOAD.toString())
             .executes(CommandExecutor { sender, _ ->
                 sender.spigot().sendMessage(ComponentBuilder(

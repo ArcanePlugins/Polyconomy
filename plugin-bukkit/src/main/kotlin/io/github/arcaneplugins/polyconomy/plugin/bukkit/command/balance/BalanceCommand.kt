@@ -22,6 +22,7 @@ object BalanceCommand: InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("balance")
             .withPermission(PolyPermission.COMMAND_BALANCE.toString())
+            .withAliases("bal")
             .withOptionalArguments(OfflinePlayerArgument("player"), CustomArguments.currencyArgument(plugin, "currency"))
             .executes(CommandExecutor { sender, args ->
                 //todo translatability
