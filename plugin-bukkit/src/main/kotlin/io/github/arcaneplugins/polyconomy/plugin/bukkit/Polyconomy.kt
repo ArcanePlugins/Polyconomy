@@ -9,6 +9,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.scheduling.TaskManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.DescribedThrowable
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
@@ -35,6 +36,7 @@ class Polyconomy : JavaPlugin() {
     val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
     val metricsManager = MetricsManager(this)
+    val taskManager = TaskManager(this)
 
     val settings = SettingsCfg(this)
     val messages = MessagesCfg(this)
@@ -86,16 +88,7 @@ class Polyconomy : JavaPlugin() {
             hookManager.registerAll()
             commandManager.load()
             metricsManager.load()
-
-            // TODO remove below H2 debugging .....
-            //if (storageManager.handler.id == "h2") {
-            //    logger.warning("=== RUNNING DEBUGGING H2 WEB SERVER ===")
-            //    server.scheduler.runTaskAsynchronously(this) { _ ->
-            //        org.h2.tools.Server.startWebServer((storageManager.handler as H2StorageHandler).connection)
-            //    }
-            //    logger.warning("=== RUNNING DEBUGGING H2 WEB SERVER ===")
-            //}
-            // TODO remove above H2 debugging ^^^^^
+            taskManager.start()
         } catch (_: DescribedThrowable) {
             // error that's been described already - disable plugin
             isEnabled = false
@@ -119,6 +112,7 @@ class Polyconomy : JavaPlugin() {
      */
     override fun onDisable() {
         try {
+            taskManager.stop()
             commandManager.disable()
             hookManager.unregisterAll()
             storageManager.shutdown()
@@ -149,6 +143,7 @@ class Polyconomy : JavaPlugin() {
         logger.info("Reloading Polyconomy v${description.version}")
         try {
             /* soft-disabling */
+            taskManager.stop()
             hookManager.unregisterAll()
             storageManager.shutdown()
 
@@ -156,6 +151,7 @@ class Polyconomy : JavaPlugin() {
             loadConfigs()
             storageManager.startup(settings.getStorageImplementation())
             hookManager.registerAll()
+            taskManager.start()
         } catch (ex: Exception) {
             throw ThrowableUtil.explainHelpfully(
                 this,

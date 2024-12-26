@@ -1,6 +1,9 @@
 package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2
 
+import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 object H2Statements {
 
@@ -499,5 +502,24 @@ object H2Statements {
             WHERE NonPlayerAccount.namespaced_key = ?
         ) AND member_id = ?;
     """.trimIndent()
+
+    fun purgeOldTransactionsStatement(): String {
+        val lowOrdinal = TransactionImportance.LOW.ordinal
+        val medOrdinal = TransactionImportance.MEDIUM.ordinal
+
+        val currentTimestamp = Instant.now().epochSecond
+        val threeMonthsInSeconds = TimeUnit.SECONDS.convert(
+            91,
+            TimeUnit.DAYS
+        )
+        val minTimestampLow = currentTimestamp - threeMonthsInSeconds
+        val minTimestampMed = currentTimestamp - (threeMonthsInSeconds * 2)
+
+        return """
+            DELETE FROM AccountTransaction
+            WHERE (importance = ${lowOrdinal} AND timestamp < ${minTimestampLow}) OR
+                  (importance = ${medOrdinal} AND timestamp < ${minTimestampMed});
+        """.trimIndent()
+    }
 
 }

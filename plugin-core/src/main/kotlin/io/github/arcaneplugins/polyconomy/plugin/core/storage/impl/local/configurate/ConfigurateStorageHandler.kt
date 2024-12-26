@@ -748,4 +748,8 @@ abstract class ConfigurateStorageHandler(
         }
     }
 
+    override suspend fun purgeOldTransactions() {
+        TODO("Not yet implemented")
+    }
+
 }

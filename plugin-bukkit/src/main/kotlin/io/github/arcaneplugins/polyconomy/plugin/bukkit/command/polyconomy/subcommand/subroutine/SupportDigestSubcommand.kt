@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand
+package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine
 
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.executors.CommandExecutor

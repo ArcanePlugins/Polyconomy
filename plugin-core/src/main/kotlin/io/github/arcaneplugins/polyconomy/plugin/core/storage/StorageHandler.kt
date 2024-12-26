@@ -21,4 +21,10 @@ abstract class StorageHandler(
 
     abstract suspend fun playerCacheIsPlayer(uuid: UUID): Boolean
 
+    suspend fun cleanup() {
+        purgeOldTransactions()
+    }
+
+    abstract suspend fun purgeOldTransactions()
+
 }

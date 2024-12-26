@@ -11,6 +11,7 @@ import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.uuidToBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import org.h2.tools.Server
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.sql.Connection
@@ -33,6 +34,10 @@ class H2StorageHandler(
 
     lateinit var connection: Connection
         private set
+
+    fun startDebugServer() {
+        Server.startWebServer(connection)
+    }
 
     override fun startup() {
         if (connected) {
@@ -141,6 +146,12 @@ class H2StorageHandler(
             } else {
                 false
             }
+        }
+    }
+
+    override suspend fun purgeOldTransactions() {
+        return connection.prepareStatement(H2Statements.purgeOldTransactionsStatement()).use { statement ->
+            statement.executeUpdate()
         }
     }
 

@@ -34,14 +34,6 @@ class VaultHook(
     }
 
     override fun register() {
-        @Suppress("DEPRECATION")
-        plugin.server.servicesManager.register(
-            EconomyLegacy::class.java,
-            VaultLegacyEconomyProvider(plugin),
-            plugin,
-            ServicePriority.Highest
-        )
-
         if (isVaultUnlocked()) {
             plugin.server.servicesManager.register(
                 EconomyUnlocked::class.java,
@@ -50,6 +42,14 @@ class VaultHook(
                 ServicePriority.Highest
             )
         }
+
+        @Suppress("DEPRECATION")
+        plugin.server.servicesManager.register(
+            EconomyLegacy::class.java,
+            VaultLegacyEconomyProvider(plugin),
+            plugin,
+            ServicePriority.Highest
+        )
     }
 
     override fun unregister() {
