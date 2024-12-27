@@ -15,8 +15,8 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
-import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
-import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
 import org.spongepowered.configurate.ScopedConfigurationNode
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import java.math.BigDecimal

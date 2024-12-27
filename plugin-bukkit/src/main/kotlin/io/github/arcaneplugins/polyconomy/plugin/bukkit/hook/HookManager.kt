@@ -1,7 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.HOOK_MANAGER
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory.HOOK_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.TreasuryHook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.VaultHook
 

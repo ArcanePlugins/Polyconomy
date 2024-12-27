@@ -1,23 +1,22 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.Config
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.messages.MessagesCfg
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings.SettingsCfg
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.scheduling.TaskManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.DescribedThrowable
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
+import io.github.arcaneplugins.polyconomy.plugin.core.Platform
+import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
+import io.github.arcaneplugins.polyconomy.plugin.core.config.messages.MessagesCfg
+import io.github.arcaneplugins.polyconomy.plugin.core.config.settings.SettingsCfg
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
-import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.function.Supplier
+import java.nio.file.Path
+import java.util.logging.Logger
 
 /**
 Welcome to Polyconomy's main class.
@@ -28,23 +27,23 @@ disabling, and soft-reloading of the plugin.
 Being the main class of the plugin, this is instantiated by Bukkit's plugin management system. An
 instance of this class may be replaced by Bukkit's plugin manager during runtime.
  */
-class Polyconomy : JavaPlugin() {
+class Polyconomy : JavaPlugin(), Platform {
 
-    val debugManager = DebugManager(this)
-    lateinit var storageManager: StorageManager
+    override val debugManager = DebugManager(this)
+    override lateinit var storageManager: StorageManager
     val commandManager = CommandManager(this)
     val hookManager = HookManager(this)
     val listenerManager = ListenerManager(this)
     val metricsManager = MetricsManager(this)
     val taskManager = TaskManager(this)
-
-    val settings = SettingsCfg(this)
-    val messages = MessagesCfg(this)
-
-    val configs: LinkedHashSet<Config> = linkedSetOf(
+    override val settings = SettingsCfg(this)
+    override val messages = MessagesCfg(this)
+    override val configs: LinkedHashSet<Config> = linkedSetOf(
         settings,
         messages,
     )
+    override val logger: Logger
+        get() = super.getLogger()
 
     /**
      * Implements [JavaPlugin.onLoad].
@@ -164,34 +163,6 @@ class Polyconomy : JavaPlugin() {
         logger.info("Plugin reloaded successfully.")
     }
 
-    /**
-     * Logs the given message if the given [DebugCategory] is enabled.
-     *
-     * **Note:** Under normal circumstances, this method will not log any debug categories until
-     * the DebugHandler has loaded the enabled categories from the Settings config. You can
-     * forcefully allow debug logs to happen at any point after [Polyconomy.onLoad] is called
-     * by programatically modifying [DebugManager.enabledCategories].
-     *
-     * @param cat Debug category associated with the message being supplied
-     * @param msg Supplier of the message which will be accessed if the category is enabled
-     */
-    @Suppress("unused")
-    fun debugLog(cat: DebugCategory, msg: Supplier<Any>) {
-        if (debugManager.enabled(cat)) {
-            return
-        }
-
-        val output = "[DEBUG: ${cat}] ${msg.get()}"
-
-        logger.info(output)
-
-        if (debugManager.enabled(DebugCategory.DEBUG_BROADCAST_OPS)) {
-            Bukkit.getOnlinePlayers()
-                .filter(Player::isOp)
-                .forEach { it.sendMessage("${ChatColor.DARK_GRAY}${output}") }
-        }
-    }
-
     fun loadConfigs() {
         try {
             configs.forEach { config ->
@@ -214,6 +185,10 @@ class Polyconomy : JavaPlugin() {
                 otherContext = "Loading configs"
             )
         }
+    }
+
+    override fun dataFolder(): Path {
+        return dataFolder.toPath()
     }
 
 }

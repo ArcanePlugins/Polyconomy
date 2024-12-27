@@ -7,8 +7,8 @@ import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
 import io.github.arcaneplugins.polyconomy.api.util.cause.PluginCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.vault.legacy.VaultLegacyEconomyProvider
-import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
-import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
+import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
 import kotlinx.coroutines.runBlocking
 import net.milkbowl.vault2.economy.Economy
 import net.milkbowl.vault2.economy.EconomyResponse

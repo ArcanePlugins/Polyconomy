@@ -1,4 +1,4 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.debug
+package io.github.arcaneplugins.polyconomy.plugin.core.debug
 
 enum class DebugCategory {
 
@@ -8,14 +8,6 @@ enum class DebugCategory {
      * @since v0.1.0
      */
     HOOK_TREASURY,
-
-    /**
-     *  If enabled, all debug logs are broadcasted to online
-     *  players who are server operators ('*opped*' using `/op`).
-     *
-     *  @since v0.1.0
-     */
-    DEBUG_BROADCAST_OPS,
 
     /**
      * Reports activity in `YamlStorageHandler`

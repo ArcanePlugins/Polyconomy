@@ -1,17 +1,20 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.config
+package io.github.arcaneplugins.polyconomy.plugin.core.config
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
+import io.github.arcaneplugins.polyconomy.plugin.core.Platform
+import io.github.arcaneplugins.polyconomy.plugin.core.util.FileUtil
 import org.spongepowered.configurate.CommentedConfigurationNode
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
+import kotlin.io.path.name
 
 abstract class Config(
-    val plugin: Polyconomy,
+    val plugin: Platform,
     val name: String,
-    val relativePath: Path,
+    val resourcePath: Path,
 ) {
 
     private lateinit var loader: YamlConfigurationLoader
@@ -48,13 +51,16 @@ abstract class Config(
      * If the file doesn't exist on the disk, the default version of the file is written.
      */
     private fun createIfNotExists() {
-        if (absolutePath().exists()) return
-        plugin.saveResource(relativePath.toString(), false)
+        if (absolutePath().exists()) {
+            return
+        }
+
+        FileUtil.saveResource(resourcePath.name, plugin.dataFolder().absolutePathString())
     }
 
     fun absolutePath(): Path {
         return Path(
-            "${plugin.dataFolder.absolutePath}${File.separator}${relativePath}"
+            "${plugin.dataFolder().absolutePathString()}${File.separator}${resourcePath}"
         )
     }
 

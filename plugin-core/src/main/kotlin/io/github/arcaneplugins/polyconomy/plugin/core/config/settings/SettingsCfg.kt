@@ -1,17 +1,17 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.config.settings
+package io.github.arcaneplugins.polyconomy.plugin.core.config.settings
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.Config
+import io.github.arcaneplugins.polyconomy.plugin.core.Platform
+import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
 
 class SettingsCfg(
-    plugin: Polyconomy,
+    plugin: Platform,
 ) : Config(
     plugin = plugin,
     name = "Settings",
-    relativePath = Path("settings.yml")
+    resourcePath = Path("settings.yml")
 ) {
     override fun load() {
         read()

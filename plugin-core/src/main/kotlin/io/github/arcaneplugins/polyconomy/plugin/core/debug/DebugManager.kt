@@ -1,11 +1,11 @@
-package io.github.arcaneplugins.polyconomy.plugin.bukkit.debug
+package io.github.arcaneplugins.polyconomy.plugin.core.debug
 
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.debug.DebugCategory.DEBUG_MANAGER
+import io.github.arcaneplugins.polyconomy.plugin.core.Platform
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory.DEBUG_MANAGER
 import java.util.*
 
 class DebugManager(
-    val plugin: Polyconomy,
+    val plugin: Platform,
 ) {
 
     private val enabledCategories: EnumSet<DebugCategory> = EnumSet.noneOf(DebugCategory::class.java)

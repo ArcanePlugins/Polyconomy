@@ -2,7 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2
 
 import io.github.arcaneplugins.polyconomy.api.account.TransactionImportance
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
-import io.github.arcaneplugins.polyconomy.plugin.core.util.StdKey
+import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore
 import java.time.Instant
 
 object H2Statements {
@@ -239,7 +239,7 @@ object H2Statements {
         SELECT NonPlayerAccount.namespaced_key, Account.name
         FROM NonPlayerAccount
         INNER JOIN Account on Account.id = NonPlayerAccount.id
-        WHERE Account.name LIKE '${StdKey.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS}:%';
+        WHERE Account.name LIKE '${KeyStore.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS}:%';
     """.trimIndent()
 
     val getSymbolForCurrency = """
