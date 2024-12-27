@@ -355,7 +355,7 @@ abstract class ConfigurateStorageHandler(
                     transactionNextIdNode.set(0)
                 }
                 val transactionNextId = accountNode().node("transaction", "next-id").int
-                val transactionNode = accountNode().node("transaction", transactionNextId.toString())
+                val transactionNode = accountNode().node("transaction", transactionNextId)
                 with(transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
                     node("currency").set(transaction.currency.name)
@@ -380,8 +380,8 @@ abstract class ConfigurateStorageHandler(
             override suspend fun getHeldCurrencies(): Collection<Currency> {
                 return accountNode()
                     .node("balance")
-                    .childrenList()
-                    .map { storageHandler.getCurrency(it.key().toString()) }
+                    .childrenMap()
+                    .map { storageHandler.getCurrency(it.key.toString()) }
             }
 
             override suspend fun getTransactionHistory(
@@ -394,35 +394,35 @@ abstract class ConfigurateStorageHandler(
 
                 return accountNode()
                     .node("transaction")
-                    .childrenList()
+                    .childrenMap()
                     .filter {
                         // only get transaction IDs here, as `next-id` key is a str key, skip.
-                        it.key() != "next-id"
+                        it.key != "next-id"
                     }
                     .filter {
                         // skip invalid currency
-                        storageHandler.hasCurrency(it.node("currency").string!!)
+                        storageHandler.hasCurrency(it.value.node("currency").string!!)
                     }
                     .filter {
                         // make sure it's within the timeframe search
-                        it.node("timestamp").long in dateFromEpoch..dateToEpoch
+                        it.value.node("timestamp").long in dateFromEpoch..dateToEpoch
                     }
                     .map {
-                        val causeData = it.node("cause", "data").string!!
+                        val causeData = it.value.node("cause", "data").string!!
 
                         AccountTransaction(
-                            amount = BigDecimal.valueOf(it.node("amount").double),
-                            currency = storageHandler.getCurrency(it.node("currency").string!!),
-                            cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
+                            amount = BigDecimal.valueOf(it.value.node("amount").double),
+                            currency = storageHandler.getCurrency(it.value.node("currency").string!!),
+                            cause = when (CauseType.valueOf(it.value.node("cause", "type").string!!)) {
                                 CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
                                 CauseType.NON_PLAYER -> NonPlayerCause(NamespacedKey.fromString(causeData))
                                 CauseType.PLUGIN -> PluginCause(NamespacedKey.fromString(causeData))
                                 CauseType.SERVER -> ServerCause
                             },
-                            importance = TransactionImportance.valueOf(it.node("importance").string!!),
-                            timestamp = Instant.ofEpochSecond(it.node("timestamp").long),
-                            type = TransactionType.valueOf(it.node("type").string!!),
-                            reason = it.node("reason").string
+                            importance = TransactionImportance.valueOf(it.value.node("importance").string!!),
+                            timestamp = Instant.ofEpochSecond(it.value.node("timestamp").long),
+                            type = TransactionType.valueOf(it.value.node("type").string!!),
+                            reason = it.value.node("reason").string
                         )
                     }
             }
@@ -506,7 +506,7 @@ abstract class ConfigurateStorageHandler(
                     transactionNextIdNode.set(0)
                 }
                 val transactionNextId = accountNode().node("transaction", "next-id").int
-                val transactionNode = accountNode().node("transaction", transactionNextId.toString())
+                val transactionNode = accountNode().node("transaction", transactionNextId)
                 with(transactionNode) {
                     node("amount").set(transaction.amount.toDouble())
                     node("currency").set(transaction.currency.name)
@@ -536,8 +536,8 @@ abstract class ConfigurateStorageHandler(
             override suspend fun getHeldCurrencies(): Collection<Currency> {
                 return accountNode()
                     .node("balance")
-                    .childrenList()
-                    .map { storageHandler.getCurrency(it.key().toString()) }
+                    .childrenMap()
+                    .map { storageHandler.getCurrency(it.key.toString()) }
             }
 
             override suspend fun getTransactionHistory(
@@ -550,35 +550,35 @@ abstract class ConfigurateStorageHandler(
 
                 return accountNode()
                     .node("transaction")
-                    .childrenList()
+                    .childrenMap()
                     .filter {
                         // only get transaction IDs here, as `next-id` key is a str key, skip.
-                        it.key() is Int
+                        it.key is Int
                     }
                     .filter {
                         // skip invalid currency
-                        storageHandler.hasCurrency(it.node("currency").string!!)
+                        storageHandler.hasCurrency(it.value.node("currency").string!!)
                     }
                     .filter {
                         // make sure it's within the timeframe search
-                        it.node("timestamp").long in dateFromEpoch..dateToEpoch
+                        it.value.node("timestamp").long in dateFromEpoch..dateToEpoch
                     }
                     .map {
-                        val causeData = it.node("cause", "data").string!!
+                        val causeData = it.value.node("cause", "data").string!!
 
                         AccountTransaction(
-                            amount = BigDecimal.valueOf(it.node("amount").double),
-                            currency = storageHandler.getCurrency(it.node("currency").string!!),
-                            cause = when (CauseType.valueOf(it.node("cause", "type").string!!)) {
+                            amount = BigDecimal.valueOf(it.value.node("amount").double),
+                            currency = storageHandler.getCurrency(it.value.node("currency").string!!),
+                            cause = when (CauseType.valueOf(it.value.node("cause", "type").string!!)) {
                                 CauseType.PLAYER -> PlayerCause(uuid = UUID.fromString(causeData))
                                 CauseType.NON_PLAYER -> NonPlayerCause(NamespacedKey.fromString(causeData))
                                 CauseType.PLUGIN -> PluginCause(NamespacedKey.fromString(causeData))
                                 CauseType.SERVER -> ServerCause
                             },
-                            importance = TransactionImportance.valueOf(it.node("importance").string!!),
-                            timestamp = Instant.ofEpochSecond(it.node("timestamp").long),
-                            type = TransactionType.valueOf(it.node("type").string!!),
-                            reason = it.node("reason").string
+                            importance = TransactionImportance.valueOf(it.value.node("importance").string!!),
+                            timestamp = Instant.ofEpochSecond(it.value.node("timestamp").long),
+                            type = TransactionType.valueOf(it.value.node("type").string!!),
+                            reason = it.value.node("reason").string
                         )
                     }
             }
@@ -586,13 +586,13 @@ abstract class ConfigurateStorageHandler(
             override suspend fun getMemberIds(): Collection<UUID> {
                 return accountNode()
                     .node("member")
-                    .childrenList()
-                    .map { UUID.fromString(it.key() as String) }
+                    .childrenMap()
+                    .map { UUID.fromString(it.key as String) }
             }
 
             override suspend fun isMember(player: UUID): Boolean {
                 val memberNode = accountNode().node("member", player.toString())
-                return !memberNode.virtual() && memberNode.childrenList().all { it.boolean }
+                return !memberNode.virtual() && memberNode.childrenMap().all { it.value.boolean }
             }
 
             override suspend fun setPermissions(player: UUID, perms: Map<AccountPermission, Boolean?>) {
@@ -749,7 +749,62 @@ abstract class ConfigurateStorageHandler(
     }
 
     override suspend fun purgeOldTransactions() {
-        TODO("Not yet implemented")
+        val currentTimestamp = Instant.now()
+        val minTimestampLow = currentTimestamp.minusSeconds(baseTransactionAgePeriod).epochSecond
+        val minTimestampMed = currentTimestamp.minusSeconds(baseTransactionAgePeriod * 2).epochSecond
+
+        /*
+        Players
+         */
+        rootNode
+            .node("account", "player")
+            .childrenMap()
+            .flatMap { (_, playerAccNode) ->
+                return@flatMap playerAccNode.node("transaction").childrenMap().filter { (transactionKey, transactionNode) ->
+
+                    if (transactionKey !is Int) {
+                        return@filter false
+                    }
+
+                    val importance = TransactionImportance.valueOf(transactionNode.node("importance").string!!)
+                    val timestamp = transactionNode.node("timestamp").long
+
+                    return@filter when (importance) {
+                        TransactionImportance.HIGH -> false
+                        TransactionImportance.MEDIUM -> timestamp < minTimestampMed
+                        TransactionImportance.LOW -> timestamp < minTimestampLow
+                    }
+                }.values
+            }.iterator().forEach { node ->
+                node.parent()?.removeChild(node.key())
+            }
+
+        /*
+        Non-Players
+         */
+        getNonPlayerAccountIds().forEach { nsKey ->
+            rootNode
+                .node("account", "non-player", nsKey.namespace, nsKey.key, "transaction")
+                .childrenMap().filter { (_, transactionNode) ->
+
+                    if (transactionNode.key() == "next-id") {
+                        return@filter false
+                    }
+
+                    val importance = TransactionImportance.valueOf(transactionNode.node("importance").string!!)
+                    val timestamp = transactionNode.node("timestamp").long
+
+                    return@filter when (importance) {
+                        TransactionImportance.HIGH -> false
+                        TransactionImportance.MEDIUM -> timestamp < minTimestampMed
+                        TransactionImportance.LOW -> timestamp < minTimestampLow
+                    }
+                }.values.iterator().forEach { node ->
+                    node.parent()?.removeChild(node.key())
+                }
+        }
+
+        write()
     }
 
 }

@@ -17,7 +17,7 @@ storage:
     pass: "change me if using remote db - i'm the password of the database e.g., solarwinds123"
     cleanup-task:
       run: true
-      period: 1 # minutes
+      period: 60 # minutes
 
 
 advanced:

@@ -12,7 +12,7 @@ account:
           cause:
             type: <Cause>
             data: <String>
-          timestamp: <Long ; epoch milliseconds>
+          timestamp: <Long ; epoch seconds>
           type: <PolyTransactionType>
           reason: <String?>
           amount: <Double>

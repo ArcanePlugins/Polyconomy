@@ -2,11 +2,19 @@ package io.github.arcaneplugins.polyconomy.plugin.core.storage
 
 import io.github.arcaneplugins.polyconomy.api.Economy
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 abstract class StorageHandler(
     val id: String,
     val manager: StorageManager,
 ) : Economy {
+
+    companion object {
+        val baseTransactionAgePeriod = TimeUnit.SECONDS.convert(
+            91,
+            TimeUnit.DAYS
+        ) // 3 months
+    }
 
     var connected = false
         protected set
