@@ -78,11 +78,31 @@ interface Account {
         )
     }
 
+    suspend fun setBalance(
+        amount: BigDecimal,
+        currency: Currency,
+        cause: Cause,
+        importance: TransactionImportance,
+        reason: String?,
+    ) {
+        makeTransaction(
+            AccountTransaction(
+                amount = amount,
+                cause = cause,
+                currency = currency,
+                importance = importance,
+                type = TransactionType.SET,
+                reason = reason,
+                timestamp = Instant.now()
+            )
+        )
+    }
+
     suspend fun resetBalance(
         currency: Currency,
         cause: Cause,
         importance: TransactionImportance,
-        reason: String,
+        reason: String?,
     ) {
         makeTransaction(
             AccountTransaction(

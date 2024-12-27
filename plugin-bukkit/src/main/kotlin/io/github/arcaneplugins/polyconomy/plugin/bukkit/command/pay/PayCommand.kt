@@ -36,8 +36,16 @@ object PayCommand: InternalCmd {
 
                 val targetPlayer = args.get("player") as OfflinePlayer
 
+                if (sender.uniqueId == targetPlayer.uniqueId) {
+                    throw CommandAPI.failWithString("You can't pay yourself.")
+                }
+
                 val amount = args.get("amount") as Double
                 val amountBd = amount.toBigDecimal()
+
+                if (amount <= 0) {
+                    throw CommandAPI.failWithString("Amount must be greater than zero.")
+                }
 
                 val currency = args.getOptional("currency").getOrNull() as Currency?
                     ?: runBlocking {
@@ -90,8 +98,12 @@ object PayCommand: InternalCmd {
                     currency.format(amount.toBigDecimal(), Locale.getDefault())
                 }
 
+                val newBalance = runBlocking {
+                    currency.format(senderAccount.getBalance(currency), Locale.getDefault())
+                }
+
                 sender.spigot().sendMessage(ComponentBuilder(
-                    "Paid '${amountFmt}' to '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' (currency: '${currency.name}')."
+                    "Paid '${amountFmt}' to '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' (currency: '${currency.name}'). Your new balance is '${newBalance}'."
                 ).color(ChatColor.GREEN).build())
             })
     }

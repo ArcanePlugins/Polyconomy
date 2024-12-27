@@ -5,6 +5,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.DbCleanupSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.H2ServerSubcommand
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.ListAccountsSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.SupportDigestSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.SupportZipSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
@@ -17,6 +18,7 @@ object SubroutineSubcommand : InternalCmd {
             .withSubcommands(
                 DbCleanupSubcommand.build(plugin),
                 H2ServerSubcommand.build(plugin),
+                ListAccountsSubcommand.build(plugin),
                 SupportDigestSubcommand.build(plugin),
                 SupportZipSubcommand.build(plugin),
             )

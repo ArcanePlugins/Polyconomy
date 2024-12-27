@@ -15,7 +15,7 @@ class DbServerTask(val plugin: Polyconomy) : BukkitRunnable(), Task {
     }
 
     override fun start() {
-        run()
+        runTaskAsynchronously(plugin)
         running = true
     }
 

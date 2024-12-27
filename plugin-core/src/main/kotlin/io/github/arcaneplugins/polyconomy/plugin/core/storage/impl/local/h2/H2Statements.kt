@@ -347,13 +347,15 @@ object H2Statements {
     val getPlayerAccountId = """
         SELECT Account.id
         FROM Account
-        INNER JOIN PlayerAccount ON PlayerAccount.player_uuid = ?;
+        INNER JOIN PlayerAccount ON PlayerAccount.id = Account.id
+        WHERE PlayerAccount.player_uuid = ?;
     """.trimIndent()
 
     val getNonPlayerAccountId = """
         SELECT Account.id
         FROM Account
-        INNER JOIN NonPlayerAccount ON NonPlayerAccount.namespaced_key = ?;
+        INNER JOIN NonPlayerAccount ON NonPlayerAccount.id = Account.id
+        WHERE NonPlayerAccount.namespaced_key = ?;
     """.trimIndent()
 
     val getCurrencyDbId = """

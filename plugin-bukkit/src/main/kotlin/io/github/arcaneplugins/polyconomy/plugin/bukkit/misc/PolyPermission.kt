@@ -5,6 +5,7 @@ import java.util.*
 enum class PolyPermission {
 
     COMMAND_BALANCE,
+    COMMAND_BALANCETOP,
     COMMAND_PAY,
     COMMAND_POLYCONOMY,
     COMMAND_POLYCONOMY_BACKUP,
