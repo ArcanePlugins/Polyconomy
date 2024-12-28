@@ -67,10 +67,12 @@ object BalancetopCommand : InternalCmd {
                             .append("\nNo results to display on this page.")
                             .color(ChatColor.GRAY)
                             .italic(true)
+                            .bold(false)
                     } else {
                         baltop.forEach { (username, balance) ->
                             compBldr.append("\n -> ")
                                 .color(ChatColor.DARK_GRAY)
+                                .bold(false)
                                 .append("${username}: ${runBlocking { currency.format(balance, locale) }}")
                                 .color(ChatColor.GRAY)
                         }
