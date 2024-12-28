@@ -1,6 +1,8 @@
 package io.github.arcaneplugins.polyconomy.plugin.core.storage
 
 import io.github.arcaneplugins.polyconomy.api.Economy
+import io.github.arcaneplugins.polyconomy.api.currency.Currency
+import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -34,5 +36,11 @@ abstract class StorageHandler(
     }
 
     abstract suspend fun purgeOldTransactions()
+
+    abstract suspend fun baltop(
+        page: Int,
+        pageSize: Int,
+        currency: Currency,
+    ): Map<String, BigDecimal>
 
 }

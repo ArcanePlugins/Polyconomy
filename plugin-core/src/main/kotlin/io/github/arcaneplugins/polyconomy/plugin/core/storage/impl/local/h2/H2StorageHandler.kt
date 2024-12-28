@@ -155,6 +155,27 @@ class H2StorageHandler(
         }
     }
 
+    override suspend fun baltop(page: Int, pageSize: Int, currency: Currency): Map<String, BigDecimal> {
+        return withContext(Dispatchers.IO) {
+            val offset = (page - 1) * pageSize
+            val results = mutableMapOf<String, BigDecimal>()
+
+            connection.prepareStatement(H2Statements.getBaltop).use { statement ->
+                statement.setString(1, currency.name)
+                statement.setInt(2, pageSize)
+                statement.setInt(3, offset)
+                val rs = statement.executeQuery()
+                while (rs.next()) {
+                    val username = rs.getString(1)
+                    val balance = rs.getBigDecimal(2)
+                    results[username] = balance
+                }
+            }
+
+            return@withContext results
+        }
+    }
+
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
         val account = H2PlayerAccount(uuid, this)
 

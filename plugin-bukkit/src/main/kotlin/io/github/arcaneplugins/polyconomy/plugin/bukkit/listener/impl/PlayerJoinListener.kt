@@ -27,6 +27,7 @@ class PlayerJoinListener(
             with(plugin.storageManager.handler) {
                 playerCacheSetName(player.uniqueId, player.name)
                 getOrCreatePlayerAccount(player.uniqueId, player.name)
+                    .setName(player.name)
             }
         }
     }

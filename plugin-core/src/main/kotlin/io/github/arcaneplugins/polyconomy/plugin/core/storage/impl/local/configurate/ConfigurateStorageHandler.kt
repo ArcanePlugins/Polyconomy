@@ -17,6 +17,8 @@ import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_SHARED_ACCOUNTS
 import io.github.arcaneplugins.polyconomy.plugin.core.util.KeyStore.VU_NAMESPACE_FOR_STANDARD_ACCOUNTS
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.spongepowered.configurate.ScopedConfigurationNode
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
 import java.math.BigDecimal
@@ -805,6 +807,34 @@ abstract class ConfigurateStorageHandler(
         }
 
         write()
+    }
+
+    override suspend fun baltop(
+        page: Int,
+        pageSize: Int,
+        currency: Currency,
+    ): Map<String, BigDecimal> {
+        return withContext(Dispatchers.IO) {
+            val playerBalanceMap = sortedMapOf<String, BigDecimal>()
+
+            for (uuid in getPlayerAccountIds()) {
+                val playerAcc = getOrCreatePlayerAccount(uuid, name = null)
+                val name = playerAcc.getName()
+                val balance = playerAcc.getBalance(currency)
+
+                if (name == null) {
+                    continue // just skip accounts that have oddities e.g. no name or something
+                }
+
+                playerBalanceMap[name] = balance
+            }
+
+            return@withContext playerBalanceMap
+                .entries
+                .drop((page - 1) * pageSize)
+                .take(pageSize)
+                .associate { it.toPair() }
+        }
     }
 
 }

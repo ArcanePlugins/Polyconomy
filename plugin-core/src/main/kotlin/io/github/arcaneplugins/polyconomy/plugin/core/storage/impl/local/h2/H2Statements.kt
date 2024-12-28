@@ -505,6 +505,22 @@ object H2Statements {
         ) AND member_id = ?;
     """.trimIndent()
 
+    /*
+    This intentionally omits non-cached usernames through an inner join to PlayerUsernameCache.
+    If the username isn't in there, don't bother listing the account.
+     */
+    val getBaltop = """
+        SELECT PlayerUsernameCache.username, AccountBalance.balance
+        FROM AccountBalance
+        INNER JOIN PlayerAccount ON AccountBalance.account_id = PlayerAccount.id
+        INNER JOIN Currency ON AccountBalance.currency_id = Currency.id
+        INNER JOIN PlayerUsernameCache ON PlayerUsernameCache.uuid = PlayerAccount.player_uuid
+        WHERE Currency.name = ?
+        ORDER BY AccountBalance.balance DESC
+        LIMIT ?
+        OFFSET ?;
+    """.trimIndent()
+
     fun purgeOldTransactionsStatement(): String {
         val currentTimestamp = Instant.now().epochSecond
         val minTimestampLow = currentTimestamp - StorageHandler.baseTransactionAgePeriod
