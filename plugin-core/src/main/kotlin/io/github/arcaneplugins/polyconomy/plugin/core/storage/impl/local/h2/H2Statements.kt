@@ -294,31 +294,37 @@ object H2Statements {
     """.trimIndent()
 
     val getNameOfPlayerAccount = """
-        SELECT name
+        SELECT Account.name
         FROM Account
         INNER JOIN PlayerAccount ON Account.id = PlayerAccount.id
-        WHERE player_uuid = ?;
+        WHERE PlayerAccount.player_uuid = ?;
     """.trimIndent()
 
     val getNameOfNonPlayerAccount = """
-        SELECT name
+        SELECT Account.name
         FROM Account
         INNER JOIN NonPlayerAccount ON Account.id = NonPlayerAccount.id
-        WHERE namespaced_key = ?;
+        WHERE NonPlayerAccount.namespaced_key = ?;
     """.trimIndent()
 
     val setNameOfPlayerAccount = """
         UPDATE Account
-        SET name = ?
-        INNER JOIN PlayerAccount ON Account.id = PlayerAccount.id
-        WHERE player_uuid = ?;
+        SET Account.name = ?
+        WHERE Account.id = (
+            SELECT PlayerAccount.id
+            FROM PlayerAccount
+            WHERE PlayerAccount.player_uuid = ?
+        );
     """.trimIndent()
 
     val setNameOfNonPlayerAccount = """
         UPDATE Account
-        SET name = ?
-        INNER JOIN NonPlayerAccount ON Account.id = NonPlayerAccount.id
-        WHERE namespaced_key = ?;
+        SET Account.name = ?
+        WHERE Account.id = (
+            SELECT NonPlayerAccount.id
+            FROM NonPlayerAccount
+            WHERE NonPlayerAccount.namespaced_key = ?
+        );
     """.trimIndent()
 
     val getBalanceOfPlayerAccount = """
