@@ -43,7 +43,7 @@ object BalancetopCommand : InternalCmd {
                     }
 
                     sender.spigot().sendMessage(
-                        ComponentBuilder("Retrieving request...")
+                        ComponentBuilder("Processing request...")
                             .color(ChatColor.GREEN)
                             .build()
                     )
@@ -56,24 +56,28 @@ object BalancetopCommand : InternalCmd {
                         activeRequests.remove(sender.name)
                     }
 
-                    val compBldr = ComponentBuilder("+-----+ Balance Top (Page ${page} - ${currency.name}) +-----+")
-                        .color(ChatColor.GREEN)
-                        .bold(true)
-
                     val locale = plugin.settings.defaultLocale()
+                    val currencyName = runBlocking {
+                        currency.getDisplayName(true, locale)
+                    }
+                    val compBldr = ComponentBuilder("******* Balance Top (Page ${page} - ${currencyName}) *******")
+                        .color(ChatColor.GREEN)
+                        .underlined(true)
+                        .append("\n")
+                        .underlined(false)
 
                     if (baltop.isEmpty()) {
                         compBldr
                             .append("\nNo results to display on this page.")
                             .color(ChatColor.GRAY)
                             .italic(true)
-                            .bold(false)
                     } else {
                         baltop.forEach { (username, balance) ->
-                            compBldr.append("\n -> ")
+                            compBldr.append("\n \u2022 ")
                                 .color(ChatColor.DARK_GRAY)
-                                .bold(false)
-                                .append("${username}: ${runBlocking { currency.format(balance, locale) }}")
+                                .append(username)
+                                .color(ChatColor.WHITE)
+                                .append(": ${runBlocking { currency.format(balance, locale) }}")
                                 .color(ChatColor.GRAY)
                         }
                     }
