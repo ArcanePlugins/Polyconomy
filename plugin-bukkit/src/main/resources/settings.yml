@@ -19,10 +19,6 @@ storage:
       run: true
       period: 60 # minutes
 
-
-advanced:
-  minimum-balance: 0.0
-
 metadata:
   file-version: 1
   original:
