@@ -19,6 +19,7 @@ class H2Currency(
     override suspend fun getSymbol(): String {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getSymbolForCurrency).use { statement ->
+                statement.setString(1, name)
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
                     rs.getString(1)
@@ -32,7 +33,8 @@ class H2Currency(
     override suspend fun getDecimal(locale: Locale): String {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getDecimalForCurrencyWithLocale).use { statement ->
-                statement.setString(1, locale.toLanguageTag())
+                statement.setString(1, name)
+                statement.setString(2, locale.toLanguageTag())
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
                     rs.getString(1)
@@ -64,10 +66,11 @@ class H2Currency(
 
     override suspend fun getDisplayName(plural: Boolean, locale: Locale): String {
         return withContext(Dispatchers.IO) {
-            var dn: String? = handler.connection.prepareStatement(
+            val dn: String? = handler.connection.prepareStatement(
                 H2Statements.getDisplayNamesForCurrencyWithLocale
             ).use { statement ->
-                statement.setString(1, locale.toLanguageTag())
+                statement.setString(1, name)
+                statement.setString(2, locale.toLanguageTag())
                 val rs = statement.executeQuery()
                 return@use if (rs.next()) {
                     rs.getString(

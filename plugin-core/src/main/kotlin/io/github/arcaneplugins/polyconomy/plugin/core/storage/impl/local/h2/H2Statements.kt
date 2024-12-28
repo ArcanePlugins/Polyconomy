@@ -252,7 +252,7 @@ object H2Statements {
         SELECT decimal
         FROM CurrencyLocale
         INNER JOIN Currency ON Currency.id = CurrencyLocale.id
-        WHERE Currency.name = ?;
+        WHERE Currency.name = ? AND CurrencyLocale.locale = ?;
     """.trimIndent()
 
     val getLocaleDecimalPairsForCurrency = """
@@ -266,7 +266,7 @@ object H2Statements {
         SELECT display_name_singular, display_name_plural
         FROM CurrencyLocale
         INNER JOIN Currency ON Currency.id = CurrencyLocale.id
-        WHERE Currency.name = ?;
+        WHERE Currency.name = ? AND CurrencyLocale.locale = ?;
     """.trimIndent()
 
     val getDisplayNamesForCurrency = """
