@@ -2,7 +2,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtAccountAccessor
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.PtCurrency
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TrCurrencyWrapper
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyFromTreasury
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper.TreasuryUtil.convertNamespacedKeyToTreasury
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
@@ -15,9 +15,7 @@ import me.lokka30.treasury.api.economy.account.accessor.AccountAccessor
 import me.lokka30.treasury.api.economy.currency.Currency
 import java.math.BigDecimal
 import java.util.*
-import java.util.Locale.getDefault
 import java.util.concurrent.CompletableFuture
-import kotlin.streams.toList
 
 class TreasuryEconomyProvider(
     val plugin: Polyconomy,
@@ -71,7 +69,8 @@ class TreasuryEconomyProvider(
     }
 
     override fun getPrimaryCurrency(): Currency {
-        return PtCurrency(
+        return TrCurrencyWrapper(
+            plugin = plugin,
             currency = runBlocking {
                 storageHandler().getPrimaryCurrency()
             }
@@ -86,7 +85,7 @@ class TreasuryEconomyProvider(
         return if (currency == null) {
             Optional.empty()
         } else {
-            Optional.of(PtCurrency(currency = currency))
+            Optional.of(TrCurrencyWrapper(plugin, currency))
         }
     }
 
@@ -94,7 +93,7 @@ class TreasuryEconomyProvider(
         return runBlocking {
             return@runBlocking storageHandler()
                 .getCurrencies()
-                .map { PtCurrency(currency = it) }
+                .map { TrCurrencyWrapper(plugin, it) }
                 .toSet()
         }
     }
@@ -107,21 +106,23 @@ class TreasuryEconomyProvider(
                     return@runBlocking TriState.UNSPECIFIED
                 }
 
+                val defaultLocale = plugin.settings.defaultLocale()
+
                 storageHandler().registerCurrency(
                     name = currency.identifier,
                     amountFormat = "#,##0.00",
                     conversionRate = currency.conversionRate,
                     decimalLocaleMap = currency.localeDecimalMap.mapValues { it.value.toString() }.toMap(),
                     displayNamePluralLocaleMap = mapOf(
-                        getDefault() to currency.getDisplayName(
+                        defaultLocale to currency.getDisplayName(
                             BigDecimal.TEN,
-                            getDefault()
+                            defaultLocale
                         )
                     ),
                     displayNameSingularLocaleMap = mapOf(
-                        getDefault() to currency.getDisplayName(
+                        defaultLocale to currency.getDisplayName(
                             BigDecimal.ONE,
-                            getDefault()
+                            defaultLocale
                         )
                     ),
                     presentationFormat = "%symbol%%amount%",

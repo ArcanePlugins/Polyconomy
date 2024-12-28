@@ -43,7 +43,7 @@ class DebugManager(
         }
 
         if (!enabledCategories.isEmpty()) {
-            plugin.logger.warning("${enabledCategories.size} debug categories are enabled. These will spam your logs - remove them when you're done.")
+            plugin.nativeLogger.warning("${enabledCategories.size} debug categories are enabled. These will spam your logs - remove them when you're done.")
         }
 
         plugin.debugLog(DEBUG_MANAGER) { "Loaded debug manager." }

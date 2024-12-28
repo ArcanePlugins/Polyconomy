@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury.wrapper
 
 import io.github.arcaneplugins.polyconomy.api.Economy
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import kotlinx.coroutines.runBlocking
 import me.lokka30.treasury.api.common.response.TreasuryException
 import me.lokka30.treasury.api.economy.account.Account
@@ -9,7 +10,8 @@ import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-class PtCurrency(
+class TrCurrencyWrapper(
+    val plugin: Polyconomy,
     val currency: io.github.arcaneplugins.polyconomy.api.currency.Currency,
 ) : Currency {
 
@@ -26,7 +28,7 @@ class PtCurrency(
     override fun getDecimal(locale: Locale?): Char {
         return runBlocking {
             return@runBlocking currency.getDecimal(
-                locale = locale ?: Locale.getDefault()
+                locale = locale ?: plugin.settings.defaultLocale()
             ).first()
         }
     }
@@ -43,7 +45,7 @@ class PtCurrency(
         return runBlocking {
             return@runBlocking currency.getDisplayName(
                 plural = value.compareTo(BigDecimal.ONE) != 0,
-                locale = locale ?: Locale.getDefault()
+                locale = locale ?: plugin.settings.defaultLocale()
             )
         }
     }
@@ -79,7 +81,7 @@ class PtCurrency(
 
     override fun format(amount: BigDecimal, locale: Locale?): String {
         return runBlocking {
-            return@runBlocking currency.format(amount, locale ?: Locale.getDefault())
+            return@runBlocking currency.format(amount, locale ?: plugin.settings.defaultLocale())
         }
     }
 

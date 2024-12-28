@@ -368,7 +368,7 @@ class H2StorageHandler(
             return map.getOrDefault(
                 locale,
                 map.getOrDefault(
-                    Locale.getDefault(),
+                    manager.plugin.settings.defaultLocale(),
                     map.entries.first().value
                 )
             )

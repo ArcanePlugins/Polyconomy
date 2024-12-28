@@ -17,7 +17,6 @@ import net.milkbowl.vault.economy.EconomyResponse
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import java.math.BigDecimal
-import java.util.*
 
 open class VaultLegacyEconomyProvider(
     val plugin: Polyconomy,
@@ -77,19 +76,19 @@ open class VaultLegacyEconomyProvider(
 
     override fun format(p0: Double): String {
         return runBlocking {
-            primaryCurrency().format(BigDecimal.valueOf(p0), Locale.getDefault())
+            primaryCurrency().format(BigDecimal.valueOf(p0), plugin.settings.defaultLocale())
         }
     }
 
     override fun currencyNamePlural(): String {
         return runBlocking {
-            primaryCurrency().getDisplayName(true, Locale.getDefault())
+            primaryCurrency().getDisplayName(true, plugin.settings.defaultLocale())
         }
     }
 
     override fun currencyNameSingular(): String {
         return runBlocking {
-            primaryCurrency().getDisplayName(false, Locale.getDefault())
+            primaryCurrency().getDisplayName(false, plugin.settings.defaultLocale())
         }
     }
 

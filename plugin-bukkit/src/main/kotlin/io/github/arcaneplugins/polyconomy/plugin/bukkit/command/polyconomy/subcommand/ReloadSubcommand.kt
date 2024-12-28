@@ -30,7 +30,7 @@ object ReloadSubcommand: InternalCmd {
                         "An error occurred! Check console for more details. Message: ${ex.message}"
                     ).color(ChatColor.RED).build())
                     if (ex !is DescribedThrowable) {
-                        plugin.logger.severe("An error occurred whilst reloading Polyconomy via the `reload` subcommand. Stack trace:")
+                        plugin.nativeLogger.severe("An error occurred whilst reloading Polyconomy via the `reload` subcommand. Stack trace:")
                         ex.printStackTrace()
                     }
                 }

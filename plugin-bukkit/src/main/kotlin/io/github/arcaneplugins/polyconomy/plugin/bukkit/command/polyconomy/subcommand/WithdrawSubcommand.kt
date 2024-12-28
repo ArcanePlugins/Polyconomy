@@ -16,7 +16,6 @@ import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object WithdrawSubcommand : InternalCmd {
@@ -57,7 +56,7 @@ object WithdrawSubcommand : InternalCmd {
                 val amountBd = amount.toBigDecimal()
 
                 val amountFormatted = runBlocking {
-                    currency.format(amountBd, Locale.getDefault())
+                    currency.format(amountBd, plugin.settings.defaultLocale())
                 }
 
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()

@@ -1,5 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.core.storage
 
+import io.github.arcaneplugins.polyconomy.plugin.core.Platform
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.impl.JsonStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.impl.YamlStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2.H2StorageHandler
@@ -8,6 +9,7 @@ import java.math.BigDecimal
 import kotlin.io.path.Path
 
 class StorageManager(
+    val plugin: Platform,
     val dataFolder: File,
     val primaryCurrencyId: String,
     val minimumBalance: BigDecimal,

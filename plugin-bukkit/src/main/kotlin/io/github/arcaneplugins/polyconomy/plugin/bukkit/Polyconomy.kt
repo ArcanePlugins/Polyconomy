@@ -42,7 +42,7 @@ class Polyconomy : JavaPlugin(), Platform {
         settings,
         messages,
     )
-    override val logger: Logger
+    override val nativeLogger: Logger
         get() = super.getLogger()
 
     /**
@@ -78,11 +78,12 @@ class Polyconomy : JavaPlugin(), Platform {
         try {
             loadConfigs()
             storageManager = StorageManager(
+                plugin = this,
                 dataFolder = dataFolder,
-                minimumBalance = settings.getMinimumBalance(),
-                primaryCurrencyId = settings.getPrimaryCurrencyId()
+                minimumBalance = settings.minimumBalance(),
+                primaryCurrencyId = settings.primaryCurrencyId()
             )
-            storageManager.startup(settings.getStorageImplementation())
+            storageManager.startup(settings.storageImplementation())
             listenerManager.load()
             hookManager.registerAll()
             commandManager.load()
@@ -139,7 +140,7 @@ class Polyconomy : JavaPlugin(), Platform {
      */
     @Suppress("unused")
     fun softReload() {
-        logger.info("Reloading Polyconomy v${description.version}")
+        nativeLogger.info("Reloading Polyconomy v${description.version}")
         try {
             /* soft-disabling */
             taskManager.stop()
@@ -148,7 +149,7 @@ class Polyconomy : JavaPlugin(), Platform {
 
             /* re-loading */
             loadConfigs()
-            storageManager.startup(settings.getStorageImplementation())
+            storageManager.startup(settings.storageImplementation())
             hookManager.registerAll()
             taskManager.start()
         } catch (ex: Exception) {
@@ -160,7 +161,7 @@ class Polyconomy : JavaPlugin(), Platform {
             )
         }
 
-        logger.info("Plugin reloaded successfully.")
+        nativeLogger.info("Plugin reloaded successfully.")
     }
 
     fun loadConfigs() {

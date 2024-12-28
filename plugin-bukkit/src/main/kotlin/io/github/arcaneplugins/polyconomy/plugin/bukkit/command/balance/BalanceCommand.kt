@@ -14,7 +14,6 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
-import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object BalanceCommand: InternalCmd {
@@ -47,7 +46,7 @@ object BalanceCommand: InternalCmd {
                 }
 
                 val balanceFmt = runBlocking {
-                    currency.format(balance, Locale.getDefault())
+                    currency.format(balance, plugin.settings.defaultLocale())
                 }
 
                 sender.spigot().sendMessage(ComponentBuilder(

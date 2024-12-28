@@ -16,7 +16,6 @@ import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object DepositSubcommand : InternalCmd {
@@ -65,7 +64,7 @@ object DepositSubcommand : InternalCmd {
                 }
 
                 val amountFormatted = runBlocking {
-                    currency.format(amount.toBigDecimal(), Locale.getDefault())
+                    currency.format(amount.toBigDecimal(), plugin.settings.defaultLocale())
                 }
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 

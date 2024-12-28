@@ -23,7 +23,7 @@ object ThrowableUtil {
         throwable.printStackTrace(printWriter)
         val stackTrace = stringWriter.toString()
 
-        plugin.logger.severe(
+        plugin.nativeLogger.severe(
             """
                 
                 ${bigDivider} <readme>

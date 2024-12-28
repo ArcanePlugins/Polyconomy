@@ -16,7 +16,6 @@ import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 object PayCommand: InternalCmd {
@@ -95,11 +94,11 @@ object PayCommand: InternalCmd {
                 }
 
                 val amountFmt = runBlocking {
-                    currency.format(amount.toBigDecimal(), Locale.getDefault())
+                    currency.format(amount.toBigDecimal(), plugin.settings.defaultLocale())
                 }
 
                 val newBalance = runBlocking {
-                    currency.format(senderAccount.getBalance(currency), Locale.getDefault())
+                    currency.format(senderAccount.getBalance(currency), plugin.settings.defaultLocale())
                 }
 
                 sender.spigot().sendMessage(ComponentBuilder(

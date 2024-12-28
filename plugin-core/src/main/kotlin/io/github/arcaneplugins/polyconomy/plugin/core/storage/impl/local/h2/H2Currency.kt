@@ -88,8 +88,8 @@ class H2Currency(
             }
 
             // fallback to system default locale
-            if (locale != Locale.getDefault()) {
-                return@withContext getDisplayName(plural, Locale.getDefault())
+            if (locale != handler.manager.plugin.settings.defaultLocale()) {
+                return@withContext getDisplayName(plural, handler.manager.plugin.settings.defaultLocale())
             }
 
             // finally, fallback on whatever's the first entry that pops up from DB

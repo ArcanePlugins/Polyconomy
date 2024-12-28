@@ -17,7 +17,7 @@ interface Platform {
     val configs: LinkedHashSet<Config>
     val debugManager: DebugManager
     var storageManager: StorageManager
-    val logger: Logger
+    val nativeLogger: Logger
 
     fun dataFolder(): Path
 
@@ -38,7 +38,7 @@ interface Platform {
 
         val output = "[DEBUG: ${cat}] ${msg.get()}"
 
-        logger.info(output)
+        nativeLogger.info(output)
     }
 
 }

@@ -3,7 +3,7 @@
 # |  (_) | \/ (_ (_) | | (_) | | | \/
 #          /                       /
 
-primary-locale: "en_US" # TODO: Actually use this setting for something :)
+primary-locale: "en_US"
 primary-currency: "dollar"
 
 storage:
