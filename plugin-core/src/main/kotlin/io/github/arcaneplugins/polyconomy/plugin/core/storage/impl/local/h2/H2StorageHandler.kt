@@ -117,41 +117,49 @@ class H2StorageHandler(
     }
 
     override suspend fun playerCacheGetName(uuid: UUID): String? {
-        return connection.prepareStatement(H2Statements.getUsernameByUuid).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            val rs = statement.executeQuery()
-            return@use if (rs.next()) {
-                rs.getString("username")
-            } else {
-                null
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getUsernameByUuid).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                val rs = statement.executeQuery()
+                return@use if (rs.next()) {
+                    rs.getString("username")
+                } else {
+                    null
+                }
             }
         }
     }
 
     override suspend fun playerCacheSetName(uuid: UUID, name: String) {
-        return connection.prepareStatement(H2Statements.setUsernameForUuid).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            statement.setString(2, name)
-            statement.setLong(3, Instant.now().epochSecond)
-            statement.executeUpdate()
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.setUsernameForUuid).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                statement.setString(2, name)
+                statement.setLong(3, Instant.now().epochSecond)
+                statement.executeUpdate()
+            }
         }
     }
 
     override suspend fun playerCacheIsPlayer(uuid: UUID): Boolean {
-        return connection.prepareStatement(H2Statements.isPlayerCached).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            val rs = statement.executeQuery()
-            return@use if (rs.next()) {
-                rs.getInt(1) > 0
-            } else {
-                false
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.isPlayerCached).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                val rs = statement.executeQuery()
+                return@use if (rs.next()) {
+                    rs.getInt(1) > 0
+                } else {
+                    false
+                }
             }
         }
     }
 
     override suspend fun purgeOldTransactions() {
-        return connection.prepareStatement(H2Statements.purgeOldTransactionsStatement()).use { statement ->
-            statement.executeUpdate()
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.purgeOldTransactionsStatement()).use { statement ->
+                statement.executeUpdate()
+            }
         }
     }
 
@@ -177,141 +185,151 @@ class H2StorageHandler(
     }
 
     override suspend fun getOrCreatePlayerAccount(uuid: UUID, name: String?): PlayerAccount {
-        val account = H2PlayerAccount(uuid, this)
+        return withContext(Dispatchers.IO) {
+            val account = H2PlayerAccount(uuid, this@H2StorageHandler)
 
-        val existingAccount: PlayerAccount? =
-            connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
-                statement.setBytes(1, uuidToBytes(uuid))
-                val rs = statement.executeQuery()
+            val existingAccount: PlayerAccount? =
+                connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
+                    statement.setBytes(1, uuidToBytes(uuid))
+                    val rs = statement.executeQuery()
 
-                return@use if (rs.next()) {
-                    account
+                    return@use if (rs.next()) {
+                        account
+                    } else {
+                        null
+                    }
+                }
+
+            if (existingAccount != null) {
+                return@withContext existingAccount
+            }
+
+            val accountId: Long = connection.prepareStatement(
+                H2Statements.createAccount,
+                Statement.RETURN_GENERATED_KEYS,
+            ).use { statement ->
+                if (name == null) {
+                    statement.setNull(1, Types.VARCHAR)
                 } else {
-                    null
+                    statement.setString(1, name)
+                }
+                val rows = statement.executeUpdate()
+                if (rows == 0) {
+                    throw IllegalStateException("Unable to insert account with uuid=${uuid}, name=${name}")
+                }
+
+                val rs = statement.generatedKeys
+                if (rs.next()) {
+                    return@use rs.getLong(1)
+                } else {
+                    throw IllegalStateException("Unable to get inserted account ID for uuid=${uuid}, name=${name}")
                 }
             }
 
-        if (existingAccount != null) {
-            return existingAccount
+            connection.prepareStatement(H2Statements.createPlayerAccount).use { statement ->
+                statement.setLong(1, accountId)
+                statement.setBytes(2, uuidToBytes(uuid))
+                val rows = statement.executeUpdate()
+                if (rows == 0) {
+                    throw IllegalStateException("Unable to insert player account with uuid=${uuid}, name=${name}")
+                }
+            }
+
+            return@withContext account
         }
-
-        val accountId: Long = connection.prepareStatement(
-            H2Statements.createAccount,
-            Statement.RETURN_GENERATED_KEYS,
-        ).use { statement ->
-            if (name == null) {
-                statement.setNull(1, Types.VARCHAR)
-            } else {
-                statement.setString(1, name)
-            }
-            val rows = statement.executeUpdate()
-            if (rows == 0) {
-                throw IllegalStateException("Unable to insert account with uuid=${uuid}, name=${name}")
-            }
-
-            val rs = statement.generatedKeys
-            if (rs.next()) {
-                return@use rs.getLong(1)
-            } else {
-                throw IllegalStateException("Unable to get inserted account ID for uuid=${uuid}, name=${name}")
-            }
-        }
-
-        connection.prepareStatement(H2Statements.createPlayerAccount).use { statement ->
-            statement.setLong(1, accountId)
-            statement.setBytes(2, uuidToBytes(uuid))
-            val rows = statement.executeUpdate()
-            if (rows == 0) {
-                throw IllegalStateException("Unable to insert player account with uuid=${uuid}, name=${name}")
-            }
-        }
-
-        return account
     }
 
     override suspend fun getOrCreateNonPlayerAccount(namespacedKey: NamespacedKey, name: String?): NonPlayerAccount {
-        val account = H2NonPlayerAccount(namespacedKey, this)
+        return withContext(Dispatchers.IO) {
+            val account = H2NonPlayerAccount(namespacedKey, this@H2StorageHandler)
 
-        val existingAccount: NonPlayerAccount? =
-            connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
-                statement.setString(1, namespacedKey.toString())
-                val rs = statement.executeQuery()
+            val existingAccount: NonPlayerAccount? =
+                connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
+                    statement.setString(1, namespacedKey.toString())
+                    val rs = statement.executeQuery()
 
-                return@use if (rs.next()) {
-                    account
+                    return@use if (rs.next()) {
+                        account
+                    } else {
+                        null
+                    }
+                }
+
+            if (existingAccount != null) {
+                return@withContext existingAccount
+            }
+
+            val accountId: Long = connection.prepareStatement(
+                H2Statements.createAccount,
+                Statement.RETURN_GENERATED_KEYS,
+            ).use { statement ->
+                statement.setString(1, name)
+                val rows = statement.executeUpdate()
+                if (rows == 0) {
+                    throw IllegalStateException("Unable to insert account with namespacedKey=${namespacedKey}, name=${name}")
+                }
+
+                val rs = statement.generatedKeys
+                if (rs.next()) {
+                    return@use rs.getLong(1)
                 } else {
-                    null
+                    throw IllegalStateException("Unable to get inserted account ID for namespacedKey=${namespacedKey}, name=${name}")
                 }
             }
 
-        if (existingAccount != null) {
-            return existingAccount
-        }
-
-        val accountId: Long = connection.prepareStatement(
-            H2Statements.createAccount,
-            Statement.RETURN_GENERATED_KEYS,
-        ).use { statement ->
-            statement.setString(1, name)
-            val rows = statement.executeUpdate()
-            if (rows == 0) {
-                throw IllegalStateException("Unable to insert account with namespacedKey=${namespacedKey}, name=${name}")
+            connection.prepareStatement(H2Statements.createNonPlayerAccount).use { statement ->
+                statement.setLong(1, accountId)
+                statement.setString(2, namespacedKey.toString())
+                val rows = statement.executeUpdate()
+                if (rows == 0) {
+                    throw IllegalStateException("Unable to insert nonplayeraccount with namespacedKey=${namespacedKey}, name=${name}")
+                }
             }
 
-            val rs = statement.generatedKeys
-            if (rs.next()) {
-                return@use rs.getLong(1)
-            } else {
-                throw IllegalStateException("Unable to get inserted account ID for namespacedKey=${namespacedKey}, name=${name}")
-            }
+            account.setName(name)
+
+            return@withContext account
         }
-
-        connection.prepareStatement(H2Statements.createNonPlayerAccount).use { statement ->
-            statement.setLong(1, accountId)
-            statement.setString(2, namespacedKey.toString())
-            val rows = statement.executeUpdate()
-            if (rows == 0) {
-                throw IllegalStateException("Unable to insert nonplayeraccount with namespacedKey=${namespacedKey}, name=${name}")
-            }
-        }
-
-        account.setName(name)
-
-        return account
     }
 
     override suspend fun getPlayerAccountIds(): Collection<UUID> {
-        return connection.prepareStatement(H2Statements.getPlayerAccountIds).use { statement ->
-            val rs = statement.executeQuery()
-            val uuids = mutableSetOf<UUID>()
-            while (rs.next()) {
-                uuids.add(bytesToUuid(rs.getBytes(1)))
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getPlayerAccountIds).use { statement ->
+                val rs = statement.executeQuery()
+                val uuids = mutableSetOf<UUID>()
+                while (rs.next()) {
+                    uuids.add(bytesToUuid(rs.getBytes(1)))
+                }
+                return@use uuids.toSet() // makes it immutable
             }
-            return@use uuids.toSet() // makes it immutable
         }
     }
 
     override suspend fun getNonPlayerAccountIds(): Collection<NamespacedKey> {
-        return connection.prepareStatement(H2Statements.getNonPlayerAccountIds).use { statement ->
-            val rs = statement.executeQuery()
-            val nsKeys = mutableSetOf<NamespacedKey>()
-            while (rs.next()) {
-                nsKeys.add(NamespacedKey.fromString(rs.getString(1)))
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getNonPlayerAccountIds).use { statement ->
+                val rs = statement.executeQuery()
+                val nsKeys = mutableSetOf<NamespacedKey>()
+                while (rs.next()) {
+                    nsKeys.add(NamespacedKey.fromString(rs.getString(1)))
+                }
+                return@use nsKeys.toSet() // makes it immutable
             }
-            return@use nsKeys.toSet() // makes it immutable
         }
     }
 
     override suspend fun getNonPlayerAccountsPlayerIsMemberOf(uuid: UUID): Collection<NonPlayerAccount> {
-        return connection.prepareStatement(H2Statements.getNonPlayerAccountsPlayerIsMemberOf).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            val rs = statement.executeQuery()
-            val accounts = mutableSetOf<NonPlayerAccount>()
-            while (rs.next()) {
-                val nsKey = NamespacedKey.fromString(rs.getString(1))
-                accounts.add(getOrCreateNonPlayerAccount(nsKey, name = null))
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getNonPlayerAccountsPlayerIsMemberOf).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                val rs = statement.executeQuery()
+                val accounts = mutableSetOf<NonPlayerAccount>()
+                while (rs.next()) {
+                    val nsKey = NamespacedKey.fromString(rs.getString(1))
+                    accounts.add(getOrCreateNonPlayerAccount(nsKey, name = null))
+                }
+                return@use accounts.toSet() // makes it immutable
             }
-            return@use accounts.toSet() // makes it immutable
         }
     }
 
@@ -321,24 +339,28 @@ class H2StorageHandler(
     }
 
     override suspend fun getCurrency(name: String): Currency? {
-        return connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
-            statement.setString(1, name)
-            return@use if (statement.executeQuery().next()) {
-                H2Currency(name, this)
-            } else {
-                null
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
+                statement.setString(1, name)
+                return@use if (statement.executeQuery().next()) {
+                    H2Currency(name, this@H2StorageHandler)
+                } else {
+                    null
+                }
             }
         }
     }
 
     override suspend fun getCurrencies(): Collection<Currency> {
-        return connection.prepareStatement(H2Statements.getCurrencyNames).use { statement ->
-            val rs = statement.executeQuery()
-            val currencies = mutableSetOf<Currency>()
-            while (rs.next()) {
-                currencies.add(H2Currency(name = rs.getString(1), this))
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getCurrencyNames).use { statement ->
+                val rs = statement.executeQuery()
+                val currencies = mutableSetOf<Currency>()
+                while (rs.next()) {
+                    currencies.add(H2Currency(name = rs.getString(1), this@H2StorageHandler))
+                }
+                return@use currencies.toSet()
             }
-            return@use currencies.toSet()
         }
     }
 
@@ -353,120 +375,134 @@ class H2StorageHandler(
         displayNamePluralLocaleMap: Map<Locale, String>,
         decimalLocaleMap: Map<Locale, String>,
     ): Currency {
-        if (hasCurrency(name)) {
-            return H2Currency(name, this)
-        }
-
-        val id: Long = connection.prepareStatement(
-            H2Statements.insertCurrency,
-            Statement.RETURN_GENERATED_KEYS,
-        ).use { statement ->
-            statement.setString(1, name)
-            statement.setBigDecimal(2, startingBalance)
-            statement.setString(3, symbol)
-            statement.setString(4, amountFormat)
-            statement.setString(5, presentationFormat)
-            statement.setBigDecimal(6, conversionRate)
-            statement.executeUpdate()
-
-            val rs = statement.generatedKeys
-
-            if (rs.next()) {
-                return@use rs.getLong(1)
-            } else {
-                throw IllegalStateException("Expected non-empty generated keys result set whilst inserting currency ${name} into the database")
+        return withContext(Dispatchers.IO) {
+            if (hasCurrency(name)) {
+                return@withContext H2Currency(name, this@H2StorageHandler)
             }
-        }
 
-        val locales: Set<Locale> = displayNameSingularLocaleMap.keys
-            .plus(displayNamePluralLocaleMap.keys)
-            .plus(decimalLocaleMap.keys)
-
-        fun getStrValueInLocaleMap(
-            locale: Locale,
-            map: Map<Locale, String>,
-        ): String {
-            return map.getOrDefault(
-                locale,
-                map.getOrDefault(
-                    manager.plugin.settings.defaultLocale(),
-                    map.entries.first().value
-                )
-            )
-        }
-
-        locales.forEach { locale ->
-            connection.prepareStatement(H2Statements.insertCurrencyLocale).use { statement ->
-                statement.setLong(1, id)
-                statement.setString(2, locale.toLanguageTag())
-                statement.setString(3, getStrValueInLocaleMap(locale, displayNameSingularLocaleMap))
-                statement.setString(4, getStrValueInLocaleMap(locale, displayNamePluralLocaleMap))
-                statement.setString(5, getStrValueInLocaleMap(locale, decimalLocaleMap))
+            val id: Long = connection.prepareStatement(
+                H2Statements.insertCurrency,
+                Statement.RETURN_GENERATED_KEYS,
+            ).use { statement ->
+                statement.setString(1, name)
+                statement.setBigDecimal(2, startingBalance)
+                statement.setString(3, symbol)
+                statement.setString(4, amountFormat)
+                statement.setString(5, presentationFormat)
+                statement.setBigDecimal(6, conversionRate)
                 statement.executeUpdate()
-            }
-        }
 
-        return H2Currency(name, this)
+                val rs = statement.generatedKeys
+
+                if (rs.next()) {
+                    return@use rs.getLong(1)
+                } else {
+                    throw IllegalStateException("Expected non-empty generated keys result set whilst inserting currency ${name} into the database")
+                }
+            }
+
+            val locales: Set<Locale> = displayNameSingularLocaleMap.keys
+                .plus(displayNamePluralLocaleMap.keys)
+                .plus(decimalLocaleMap.keys)
+
+            fun getStrValueInLocaleMap(
+                locale: Locale,
+                map: Map<Locale, String>,
+            ): String {
+                return map.getOrDefault(
+                    locale,
+                    map.getOrDefault(
+                        manager.plugin.settings.defaultLocale(),
+                        map.entries.first().value
+                    )
+                )
+            }
+
+            locales.forEach { locale ->
+                connection.prepareStatement(H2Statements.insertCurrencyLocale).use { statement ->
+                    statement.setLong(1, id)
+                    statement.setString(2, locale.toLanguageTag())
+                    statement.setString(3, getStrValueInLocaleMap(locale, displayNameSingularLocaleMap))
+                    statement.setString(4, getStrValueInLocaleMap(locale, displayNamePluralLocaleMap))
+                    statement.setString(5, getStrValueInLocaleMap(locale, decimalLocaleMap))
+                    statement.executeUpdate()
+                }
+            }
+
+            return@withContext H2Currency(name, this@H2StorageHandler)
+        }
     }
 
     override suspend fun unregisterCurrency(currency: Currency) {
-        connection.prepareStatement(H2Statements.deleteCurrency).use { statement ->
-            statement.setString(1, currency.name)
-            statement.executeUpdate()
+        withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.deleteCurrency).use { statement ->
+                statement.setString(1, currency.name)
+                statement.executeUpdate()
+            }
         }
     }
 
     override suspend fun hasCurrency(name: String): Boolean {
-        return connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
-            statement.setString(1, name)
-            return@use statement.executeQuery().next()
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getCurrencyByName).use { statement ->
+                statement.setString(1, name)
+                return@use statement.executeQuery().next()
+            }
         }
     }
 
     override suspend fun hasPlayerAccount(uuid: UUID): Boolean {
-        return connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
-            statement.setBytes(1, uuidToBytes(uuid))
-            return@use statement.executeQuery().next()
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getPlayerAccountName).use { statement ->
+                statement.setBytes(1, uuidToBytes(uuid))
+                return@use statement.executeQuery().next()
+            }
         }
     }
 
     override suspend fun hasNonPlayerAccount(nsKey: NamespacedKey): Boolean {
-        return connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
-            statement.setString(1, nsKey.toString())
-            return@use statement.executeQuery().next()
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getNonPlayerAccountName).use { statement ->
+                statement.setString(1, nsKey.toString())
+                return@use statement.executeQuery().next()
+            }
         }
     }
 
     override suspend fun getVaultBankAccountIds(): Collection<NamespacedKey> {
-        return connection.prepareStatement(H2Statements.getVaultBankAccountIds).use { statement ->
-            val rs = statement.executeQuery()
-            val nsKeys = mutableSetOf<NamespacedKey>()
-            while (rs.next()) {
-                nsKeys.add(NamespacedKey.fromString(rs.getString(1)))
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getVaultBankAccountIds).use { statement ->
+                val rs = statement.executeQuery()
+                val nsKeys = mutableSetOf<NamespacedKey>()
+                while (rs.next()) {
+                    nsKeys.add(NamespacedKey.fromString(rs.getString(1)))
+                }
+                return@use nsKeys.toSet()
             }
-            return@use nsKeys.toSet()
         }
     }
 
     override suspend fun getVaultUnlockedUuidNameMap(): Map<UUID, String> {
-        return connection.prepareStatement(H2Statements.getPlayerAccountUuidAndNames).use { statement ->
-            val rs = statement.executeQuery()
-            val map = mutableMapOf<UUID, String>()
-            while (rs.next()) {
-                val uuid = bytesToUuid(rs.getBytes(1))
-                val name = rs.getString(2)
-                map[uuid] = name
-            }
-            return@use map
-        }.plus(connection.prepareStatement(H2Statements.getVaultUnlockedNonPlayerAccounts).use { statement ->
-            val rs = statement.executeQuery()
-            val map = mutableMapOf<UUID, String>()
-            while (rs.next()) {
-                val uuid = UUID.fromString(rs.getString(1).split(":")[1])
-                val name = rs.getString(2)
-                map[uuid] = name
-            }
-            return@use map
-        })
+        return withContext(Dispatchers.IO) {
+            connection.prepareStatement(H2Statements.getPlayerAccountUuidAndNames).use { statement ->
+                val rs = statement.executeQuery()
+                val map = mutableMapOf<UUID, String>()
+                while (rs.next()) {
+                    val uuid = bytesToUuid(rs.getBytes(1))
+                    val name = rs.getString(2)
+                    map[uuid] = name
+                }
+                return@use map
+            }.plus(connection.prepareStatement(H2Statements.getVaultUnlockedNonPlayerAccounts).use { statement ->
+                val rs = statement.executeQuery()
+                val map = mutableMapOf<UUID, String>()
+                while (rs.next()) {
+                    val uuid = UUID.fromString(rs.getString(1).split(":")[1])
+                    val name = rs.getString(2)
+                    map[uuid] = name
+                }
+                return@use map
+            })
+        }
     }
 }
