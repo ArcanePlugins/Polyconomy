@@ -77,21 +77,21 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Configs & Files - Configurate JSON -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-gson</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Configs & Files - Configurate Kotlin Extras -->
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-extra-kotlin</artifactId>
             <version>${configurate.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <!-- Economy API - Treasury -->
