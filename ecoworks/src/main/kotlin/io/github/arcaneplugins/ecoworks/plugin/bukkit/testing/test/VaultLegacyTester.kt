@@ -24,6 +24,11 @@ class VaultLegacyTester(val plugin: Ecoworks) : Tester {
             return false
         }
 
+        if (Bukkit.getOnlinePlayers().size < 2) {
+            plugin.logger.severe("This test requires at least 2 online players!")
+            return false
+        }
+
         val rsp = Bukkit.getServicesManager().getRegistration(Economy::class.java)
 
         if (rsp == null) {
