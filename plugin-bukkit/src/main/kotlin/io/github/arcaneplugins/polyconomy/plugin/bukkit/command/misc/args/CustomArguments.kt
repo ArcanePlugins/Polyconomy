@@ -53,7 +53,7 @@ object CustomArguments {
     }
 
     fun identityStringArgument(
-        nodeName: String
+        nodeName: String,
     ): Argument<String> {
         return CustomArgument(StringArgument(nodeName)) { info ->
             val valid = info.input.all {
