@@ -31,6 +31,11 @@ class TestSubcommand(val plugin: Ecoworks) {
         sender.spigot().sendMessage(
             ComponentBuilder("=== ${type.name} STARTING TEST ===")
                 .color(ChatColor.GREEN)
+                .bold(true)
+                .append("\nHover over the test context for a description of the test.")
+                .italic(true)
+                .bold(false)
+                .color(ChatColor.GRAY)
                 .build()
         )
 
@@ -66,19 +71,21 @@ class TestSubcommand(val plugin: Ecoworks) {
             sender.spigot().sendMessage(
                 ComponentBuilder("=== ${type.name} TEST FAILED ===")
                     .color(ChatColor.RED)
+                    .bold(true)
                     .build()
             )
         } else {
             sender.spigot().sendMessage(
                 ComponentBuilder("=== ${type.name} TEST SUCCESS ===")
                     .color(ChatColor.GREEN)
+                    .bold(true)
                     .build()
             )
         }
 
         results.forEach { (status, results) ->
             sender.spigot().sendMessage(
-                ComponentBuilder(" \u00bb ")
+                ComponentBuilder(" \u2022 ")
                     .color(ChatColor.DARK_GRAY)
                     .append(status.name)
                     .color(status.color)
