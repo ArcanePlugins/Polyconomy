@@ -11,7 +11,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.ServerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -28,7 +28,7 @@ object SetSubcommand : InternalCmd {
             .withOptionalArguments(
                 CustomArguments.currencyArgument(plugin, "currency")
             )
-            .withPermission(PolyPermission.COMMAND_POLYCONOMY_DEPOSIT.toString())
+            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_DEPOSIT.toString())
             .executes(CommandExecutor { sender, args ->
                 // TODO Translatable Messages
 

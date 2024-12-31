@@ -11,7 +11,7 @@ import io.github.arcaneplugins.polyconomy.api.util.cause.PlayerCause
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -22,7 +22,7 @@ object PayCommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("pay")
-            .withPermission(PolyPermission.COMMAND_PAY.toString())
+            .withPermission(PolyconomyPerm.COMMAND_PAY.toString())
             .withArguments(
                 OfflinePlayerArgument("player"),
                 DoubleArgument("amount"),

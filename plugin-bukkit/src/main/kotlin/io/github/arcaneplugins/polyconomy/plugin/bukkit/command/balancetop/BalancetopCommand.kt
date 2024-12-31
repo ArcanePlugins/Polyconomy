@@ -8,7 +8,7 @@ import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
 import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
@@ -23,7 +23,7 @@ object BalancetopCommand : InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("balancetop")
             .withAliases("baltop")
-            .withPermission(PolyPermission.COMMAND_BALANCETOP.toString())
+            .withPermission(PolyconomyPerm.COMMAND_BALANCETOP.toString())
             .withOptionalArguments(
                 IntegerArgument("page"),
                 CustomArguments.currencyArgument(plugin, "currency")

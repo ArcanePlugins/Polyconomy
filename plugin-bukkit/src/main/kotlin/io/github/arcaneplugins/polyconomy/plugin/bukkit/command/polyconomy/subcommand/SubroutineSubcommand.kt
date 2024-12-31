@@ -8,13 +8,13 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subco
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.ListAccountsSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.SupportDigestSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine.SupportZipSubcommand
-import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 
 object SubroutineSubcommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("subroutine")
-            .withPermission(PolyPermission.COMMAND_POLYCONOMY_SUBROUTINE.toString())
+            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_SUBROUTINE.toString())
             .withSubcommands(
                 DbCleanupSubcommand.build(plugin),
                 H2ServerSubcommand.build(plugin),
