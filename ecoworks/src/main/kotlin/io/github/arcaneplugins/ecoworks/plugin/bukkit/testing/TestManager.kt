@@ -6,13 +6,17 @@ import java.util.function.Consumer
 
 class TestManager(val plugin: Ecoworks) {
 
+    companion object {
+        const val DESCRIPTION_FAILED_INIT = "Failed init checks, please check console logs."
+    }
+
     fun testVaultLegacy(
         resultConsumer: Consumer<TestResult>
     ) {
         val tester = VaultLegacyTester(plugin)
         val canTest = tester.checkAndInit()
         if (!canTest) {
-            resultConsumer.accept(TestResult(TestResult.Companion.Status.OBSERVATION, "checkAndInit", "Failed init checks"))
+            resultConsumer.accept(TestResult(TestResult.Companion.Status.OBSERVATION, "checkAndInit", DESCRIPTION_FAILED_INIT))
         }
         tester.runTests(resultConsumer)
     }
