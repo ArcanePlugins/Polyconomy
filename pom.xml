@@ -10,6 +10,7 @@
         <module>plugin-bukkit</module>
         <module>api</module>
         <module>plugin-core</module>
+        <module>ecoworks</module>
     </modules>
     <groupId>io.github.arcaneplugins.polyconomy</groupId>
     <version>0.2.1</version>

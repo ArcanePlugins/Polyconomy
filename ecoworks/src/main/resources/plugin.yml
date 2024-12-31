@@ -1,0 +1,10 @@
+name: Ecoworks
+version: ${project.version}
+main: io.github.arcaneplugins.ecoworks.plugin.bukkit.Ecoworks
+api-version: 1.13
+authors:
+  - ArcanePlugins
+  - lokka30
+softdepend:
+  - Vault
+  - Treasury
