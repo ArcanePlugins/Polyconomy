@@ -29,7 +29,9 @@ object SupportDigestSubcommand : InternalCmd {
                         .color(ChatColor.GRAY)
                         .append("\nTreasury Lib: ")
                         .color(ChatColor.GREEN)
-                        .append(plugin.server.pluginManager.getPlugin("Treasury")?.description?.version ?: "Not Installed")
+                        .append(
+                            plugin.server.pluginManager.getPlugin("Treasury")?.description?.version ?: "Not Installed"
+                        )
                         .color(ChatColor.GRAY)
                         .append("\nStorage Implementation: ")
                         .color(ChatColor.GREEN)

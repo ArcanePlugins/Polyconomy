@@ -18,7 +18,7 @@ import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
 import kotlin.jvm.optionals.getOrNull
 
-object PayCommand: InternalCmd {
+object PayCommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("pay")
@@ -101,9 +101,11 @@ object PayCommand: InternalCmd {
                     currency.format(senderAccount.getBalance(currency), plugin.settings.defaultLocale())
                 }
 
-                sender.spigot().sendMessage(ComponentBuilder(
-                    "Paid '${amountFmt}' to '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' (currency: '${currency.name}'). Your new balance is '${newBalance}'."
-                ).color(ChatColor.GREEN).build())
+                sender.spigot().sendMessage(
+                    ComponentBuilder(
+                        "Paid '${amountFmt}' to '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' (currency: '${currency.name}'). Your new balance is '${newBalance}'."
+                    ).color(ChatColor.GREEN).build()
+                )
             })
     }
 

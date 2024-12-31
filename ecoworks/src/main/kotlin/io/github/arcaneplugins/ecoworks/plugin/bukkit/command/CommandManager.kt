@@ -5,7 +5,7 @@ import dev.jorel.commandapi.CommandAPIBukkitConfig
 import io.github.arcaneplugins.ecoworks.plugin.bukkit.Ecoworks
 
 class CommandManager(
-    val plugin: Ecoworks
+    val plugin: Ecoworks,
 ) {
 
     fun init() {

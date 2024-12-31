@@ -69,7 +69,12 @@ class VaultLegacyTester(val plugin: Ecoworks) : Tester {
             if (digits > 0) {
                 TestResult(SUCCESS, "fractionalDigits", "Value", digits.toString())
             } else {
-                TestResult(FAILURE, "fractionalDigits", "Value", "Fractional digits must be greater than zero, got ${digits}")
+                TestResult(
+                    FAILURE,
+                    "fractionalDigits",
+                    "Value",
+                    "Fractional digits must be greater than zero, got ${digits}"
+                )
             }
         },
         Supplier {

@@ -1,9 +1,9 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.impl.treasury
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
-import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory.HOOK_TREASURY
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.Hook
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookType
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory.HOOK_TREASURY
 import me.lokka30.treasury.api.common.service.Service
 import me.lokka30.treasury.api.common.service.ServicePriority
 import me.lokka30.treasury.api.common.service.ServiceRegistry

@@ -47,10 +47,12 @@ class TestSubcommand(val plugin: Ecoworks) {
                 ComponentBuilder("[${result.status.name}] ")
                     .color(result.status.color)
                     .append("[${result.context}]")
-                    .event(HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        Text(ComponentBuilder(result.description).color(ChatColor.GRAY).build())
-                    ))
+                    .event(
+                        HoverEvent(
+                            HoverEvent.Action.SHOW_TEXT,
+                            Text(ComponentBuilder(result.description).color(ChatColor.GRAY).build())
+                        )
+                    )
                     .color(ChatColor.GRAY)
                     .append(": ${result.message ?: "..."}")
                     .color(ChatColor.DARK_GRAY)

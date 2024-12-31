@@ -13,7 +13,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subco
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.WithdrawSubcommand
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyPermission
 
-object PolyconomyCommand: InternalCmd {
+object PolyconomyCommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("polyconomy")

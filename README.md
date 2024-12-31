@@ -8,9 +8,13 @@ Polyconomy is a **work in progress** economy core for your Minecraft server.
 
 It has the goal of being reliable, robust, powerful, performant, featureful, and free.
 
-Polyconomy has a single job: tie your server's economy together in an effortless and dependable manner. It will *not* offer 'bloated' features e.g. jobs, markets, shops, currency conversion, etc. The in-game commands aim to stay simple to use and understand, akin to EssentialsX's economy commands.
+Polyconomy has a single job: tie your server's economy together in an effortless and dependable manner. It will *not*
+offer 'bloated' features e.g. jobs, markets, shops, currency conversion, etc. The in-game commands aim to stay simple to
+use and understand, akin to EssentialsX's economy commands.
 
-It's designed to offer a bunch of features you don't commonly find elsewhere, such as multi-currency support, full Towny Advanced support, full Vault Legacy / Vault Unlocked / Treasury API support, async storage I/O (Treasury API only), and a range of configuration options offering a variety of database or flatfile storage mediums.
+It's designed to offer a bunch of features you don't commonly find elsewhere, such as multi-currency support, full Towny
+Advanced support, full Vault Legacy / Vault Unlocked / Treasury API support, async storage I/O (Treasury API only), and
+a range of configuration options offering a variety of database or flatfile storage mediums.
 
 We're slowly but surely building up a to-do list of what needs to be
 done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).

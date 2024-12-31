@@ -31,7 +31,8 @@ object ListAccountsSubcommand : InternalCmd {
                             }
                         }
 
-                        sender.spigot().sendMessage(compBuilder.append(strBuilder.toString()).color(ChatColor.GRAY).build())
+                        sender.spigot()
+                            .sendMessage(compBuilder.append(strBuilder.toString()).color(ChatColor.GRAY).build())
                     }
 
                     run {
@@ -47,7 +48,8 @@ object ListAccountsSubcommand : InternalCmd {
                             }
                         }
 
-                        sender.spigot().sendMessage(compBuilder.append(strBuilder.toString()).color(ChatColor.GRAY).build())
+                        sender.spigot()
+                            .sendMessage(compBuilder.append(strBuilder.toString()).color(ChatColor.GRAY).build())
                     }
 
                     sender.spigot().sendMessage(ComponentBuilder("Accounts listed.").color(ChatColor.GREEN).build())

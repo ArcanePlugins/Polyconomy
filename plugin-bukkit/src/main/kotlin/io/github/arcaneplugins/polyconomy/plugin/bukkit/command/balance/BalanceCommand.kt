@@ -16,13 +16,16 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import kotlin.jvm.optionals.getOrNull
 
-object BalanceCommand: InternalCmd {
+object BalanceCommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("balance")
             .withPermission(PolyPermission.COMMAND_BALANCE.toString())
             .withAliases("bal")
-            .withOptionalArguments(OfflinePlayerArgument("player"), CustomArguments.currencyArgument(plugin, "currency"))
+            .withOptionalArguments(
+                OfflinePlayerArgument("player"),
+                CustomArguments.currencyArgument(plugin, "currency")
+            )
             .executes(CommandExecutor { sender, args ->
                 //todo translatability
 
@@ -49,9 +52,11 @@ object BalanceCommand: InternalCmd {
                     currency.format(balance, plugin.settings.defaultLocale())
                 }
 
-                sender.spigot().sendMessage(ComponentBuilder(
-                    "Player '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' has '${balanceFmt}' (currency: '${currency.name}')."
-                ).color(ChatColor.GREEN).build())
+                sender.spigot().sendMessage(
+                    ComponentBuilder(
+                        "Player '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' has '${balanceFmt}' (currency: '${currency.name}')."
+                    ).color(ChatColor.GREEN).build()
+                )
             })
     }
 

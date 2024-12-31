@@ -762,21 +762,22 @@ abstract class ConfigurateStorageHandler(
             .node("account", "player")
             .childrenMap()
             .flatMap { (_, playerAccNode) ->
-                return@flatMap playerAccNode.node("transaction").childrenMap().filter { (transactionKey, transactionNode) ->
+                return@flatMap playerAccNode.node("transaction").childrenMap()
+                    .filter { (transactionKey, transactionNode) ->
 
-                    if (transactionKey !is Int) {
-                        return@filter false
-                    }
+                        if (transactionKey !is Int) {
+                            return@filter false
+                        }
 
-                    val importance = TransactionImportance.valueOf(transactionNode.node("importance").string!!)
-                    val timestamp = transactionNode.node("timestamp").long
+                        val importance = TransactionImportance.valueOf(transactionNode.node("importance").string!!)
+                        val timestamp = transactionNode.node("timestamp").long
 
-                    return@filter when (importance) {
-                        TransactionImportance.HIGH -> false
-                        TransactionImportance.MEDIUM -> timestamp < minTimestampMed
-                        TransactionImportance.LOW -> timestamp < minTimestampLow
-                    }
-                }.values
+                        return@filter when (importance) {
+                            TransactionImportance.HIGH -> false
+                            TransactionImportance.MEDIUM -> timestamp < minTimestampMed
+                            TransactionImportance.LOW -> timestamp < minTimestampLow
+                        }
+                    }.values
             }.iterator().forEach { node ->
                 node.parent()?.removeChild(node.key())
             }

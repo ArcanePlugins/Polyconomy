@@ -6,7 +6,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 interface InternalCmd {
 
     fun build(
-        plugin: Polyconomy
+        plugin: Polyconomy,
     ): CommandAPICommand
 
 }
