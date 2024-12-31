@@ -1,42 +1,60 @@
 <div align="center">
 
-# Polyconomy
+<h1>Polyconomy</h1>
 
-Polyconomy is a **work in progress** economy core for your Minecraft server.
+<h6>BETA</h6>
 
-**The plugin is in very early development. Although somewhat functional, you should not use it in its current state.**
-
-It has the goal of being reliable, robust, powerful, performant, featureful, and free.
-
-Polyconomy has a single job: tie your server's economy together in an effortless and dependable manner. It will *not*
-offer 'bloated' features e.g. jobs, markets, shops, currency conversion, etc. The in-game commands aim to stay simple to
-use and understand, akin to EssentialsX's economy commands.
-
-It's designed to offer a bunch of features you don't commonly find elsewhere, such as multi-currency support, full Towny
-Advanced support, full Vault Legacy / Vault Unlocked / Treasury API support, async storage I/O (Treasury API only), and
-a range of configuration options offering a variety of database or flatfile storage mediums.
-
-We're slowly but surely building up a to-do list of what needs to be
-done [here](https://github.com/orgs/ArcanePlugins/projects/10/views/1).
-
-You are **highly encouraged** to discuss and partake in Polyconomy's development: join
-the [ArcanePlugins Discord guild](https://discord.gg/HqZwdcJ). Please select 'other lokka30 plugins' role on join and
-use the channel under the same name to chat.
+**A economy system for Minecraft.** Ties your server's virtual economy together, acting as a robust 'core' for the
+economy, effortlessly handling any size server.
 
 ***
 
-<h4 id="quick-links">
+<h3>Quick Links</h3>
 
-• [Documentation](https://github.com/ArcanePlugins/Polyconomy/wiki)
-• [Discord (Support & Discussion)](https://discord.gg/HqZwdcJ)
+<h4>
+
+• [Documentation/Wiki][wiki]
+• [Discord (Support & Discussion)][discord]
 •
 
-• [To-Do List](https://github.com/orgs/ArcanePlugins/projects/10/views/1)
-• [Source Code](https://github.com/ArcanePlugins/Polyconomy)
-• [Issue Tracker](https://github.com/ArcanePlugins/Polyconomy/issues)
+• [To-Do List][todo]
+• [Source Code][repo]
+• [Issue Tracker][issues]
 •
 
 </h4>
+
+***
+
+<h3>Why use Polyconomy?</h3>
+
+</div>
+
+* Works with VaultUnlocked, Treasury, and Vault (Legacy) APIs (FULL coverage).
+* Full TownyAdvanced support.
+* Simple configuration - works out of the box.
+* Familiar commands such as `/baltop` and `/eco`.
+* Multi-currency support (Treasury only).
+* Asynchronous data I/O (Treasury only).
+* Multiple database/flatfile options - including H2, JSON, YAML, and more planned (such as MySQL).
+* Strictly against 'bloat' features - the plugin should only do what it says on the tin.
+* Documented on the [Wiki][wiki].
+* [Discord Server][discord] to chat and ask for assistance.
+* Free and Open Source Software.
+
+<div align="center">
+
+***
+
+<h3>Beta</h3>
+
+Polyconomy is currently in a beta stage of development; feel free to check the [to-do list][todo] to see what will be
+worked on in the future. **MySQL/MariaDB support, translations, Redis cache support, Velocity + BungeeCord support, and
+more!**
+
+You are highly encouraged to discuss and partake in Polyconomy's development: join
+the [ArcanePlugins Discord guild][discord]. Please select 'other lokka30 plugins' role on join and
+use the channel under the same name to chat.
 
 ***
 
@@ -44,8 +62,24 @@ use the channel under the same name to chat.
 
 Polyconomy is Libre/Free Software as per the GNU GPL v3 License.
 
-[![GNU GPL v3 Free Software](https://www.gnu.org/graphics/gplv3-88x31.png)](LICENSE.md)
+[![GNU GPL v3 Free Software](https://www.gnu.org/graphics/gplv3-88x31.png)][license]
 
-By using the software, you accept the [license](LICENSE.md).
+By using the software, you accept the [license][license].
+
+***
+
+![Australian Made](https://www.accc.gov.au/sites/www.accc.gov.au/files/CoOL%20bar%20chart.png)
 
 </div>
+
+[todo]: https://github.com/orgs/ArcanePlugins/projects/10/views/1
+
+[discord]: https://discord.gg/HqZwdcJ
+
+[issues]: https://github.com/ArcanePlugins/Polyconomy/issues
+
+[wiki]: https://github.com/ArcanePlugins/Polyconomy/wiki
+
+[repo]: https://github.com/ArcanePlugins/Polyconomy
+
+[license]: LICENSE.md
