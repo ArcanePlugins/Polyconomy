@@ -80,7 +80,7 @@
     <build>
         <defaultGoal>clean package</defaultGoal>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <finalName>ecoworks-${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <artifactId>kotlin-maven-plugin</artifactId>
