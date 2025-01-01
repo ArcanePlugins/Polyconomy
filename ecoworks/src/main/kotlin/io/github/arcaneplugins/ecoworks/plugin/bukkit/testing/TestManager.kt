@@ -23,6 +23,7 @@ class TestManager(val plugin: Ecoworks) {
                     DESCRIPTION_FAILED_INIT
                 )
             )
+            return
         }
         tester.runTests(resultConsumer)
     }
