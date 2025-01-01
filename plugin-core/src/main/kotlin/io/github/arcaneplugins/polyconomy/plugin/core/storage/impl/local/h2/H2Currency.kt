@@ -14,8 +14,6 @@ class H2Currency(
     val handler: H2StorageHandler,
 ) : Currency(name) {
 
-    // TODO Cache currencies to reduce DB operations. When a currency is added/removed, rebuild cache.
-
     override suspend fun getSymbol(): String {
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.getSymbolForCurrency).use { statement ->

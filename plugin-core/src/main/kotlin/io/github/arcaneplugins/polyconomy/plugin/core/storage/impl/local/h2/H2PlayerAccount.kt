@@ -88,7 +88,6 @@ class H2PlayerAccount(
         }
     }
 
-    // TODO Move away from using dbId and instead use inner selects to get DB ID when needed for queries
     private fun dbId(): Long {
         return handler.connection.prepareStatement(H2Statements.getPlayerAccountId).use { statement ->
             statement.setBytes(1, uuidToBytes(uuid))

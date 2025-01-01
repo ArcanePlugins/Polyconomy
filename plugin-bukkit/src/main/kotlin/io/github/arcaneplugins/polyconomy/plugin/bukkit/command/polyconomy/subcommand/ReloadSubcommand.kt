@@ -40,8 +40,6 @@ object ReloadSubcommand : InternalCmd {
                         ex.printStackTrace()
                     }
                 }
-
-                //TODO Translatable message
             })
     }
 

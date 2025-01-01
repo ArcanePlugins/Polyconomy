@@ -28,7 +28,6 @@ class H2NonPlayerAccount(
     namespacedKey
 ) {
 
-    // TODO Move away from using dbId and instead use inner selects to get DB ID when needed for queries
     private fun dbId(): Long {
         return handler.connection.prepareStatement(H2Statements.getNonPlayerAccountId).use { statement ->
             statement.setString(1, namespacedKey.toString())

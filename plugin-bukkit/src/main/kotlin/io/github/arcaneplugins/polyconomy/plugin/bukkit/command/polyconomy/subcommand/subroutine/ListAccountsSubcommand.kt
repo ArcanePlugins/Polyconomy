@@ -14,7 +14,6 @@ object ListAccountsSubcommand : InternalCmd {
         return CommandAPICommand("list-accounts")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_SUBROUTINE.toString())
             .executes(CommandExecutor { sender, _ ->
-                // TODO: Translatable Messages
                 plugin.server.scheduler.runTaskAsynchronously(plugin) { _ ->
                     sender.spigot().sendMessage(ComponentBuilder("Fetching...").color(ChatColor.GREEN).build())
 

@@ -13,7 +13,6 @@ object BackupSubcommand : InternalCmd {
         return CommandAPICommand("backup")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_BACKUP.toString())
             .executes(CommandExecutor { _, _ ->
-                // TODO: Implement
                 throw CommandAPI.failWithString("Not yet implemented!")
             })
     }

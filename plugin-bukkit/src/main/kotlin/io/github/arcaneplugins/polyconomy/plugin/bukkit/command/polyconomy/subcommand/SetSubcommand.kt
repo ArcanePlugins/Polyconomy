@@ -30,8 +30,6 @@ object SetSubcommand : InternalCmd {
             )
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_DEPOSIT.toString())
             .executes(CommandExecutor { sender, args ->
-                // TODO Translatable Messages
-
                 val targetPlayer = args.get("player") as OfflinePlayer
                 val amount = args.get("amount") as Double
 

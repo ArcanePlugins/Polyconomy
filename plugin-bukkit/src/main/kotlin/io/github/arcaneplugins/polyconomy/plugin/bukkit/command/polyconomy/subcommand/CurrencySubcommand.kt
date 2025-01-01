@@ -42,7 +42,6 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
-                        // TODO: TODO("set startingBalance")
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("symbol")
@@ -50,7 +49,6 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        // TODO: TODO("set symbol")
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("amountFormat")
@@ -58,7 +56,6 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        // TODO: TODO("set amountFormat")
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("presentationFormat")
@@ -66,7 +63,6 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        // TODO: TODO("set presentationFormat")
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("conversionRate")
@@ -74,7 +70,6 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
-                        // TODO: TODO("set conversionRate")
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("locale")
@@ -88,7 +83,6 @@ object CurrencySubcommand : InternalCmd {
                             )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
-                                // TODO: TODO("register locale")
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             }),
                         CommandAPICommand("set")
@@ -99,13 +93,11 @@ object CurrencySubcommand : InternalCmd {
                             )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
-                                // TODO: TODO("modify locale")
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             }),
                         CommandAPICommand("unregister")
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
-                                // TODO: TODO("unregister locale")
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             })
                     )

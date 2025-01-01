@@ -31,8 +31,6 @@ object PayCommand : InternalCmd {
                 CustomArguments.currencyArgument(plugin, "currency"),
             )
             .executesPlayer(PlayerCommandExecutor { sender, args ->
-                //todo translatability
-
                 val targetPlayer = args.get("player") as OfflinePlayer
 
                 if (sender.uniqueId == targetPlayer.uniqueId) {

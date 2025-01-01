@@ -21,7 +21,6 @@ object VersionSubcommand : InternalCmd {
                         "${pdf.name} v${pdf.version} by ${pdf.authors.joinToString(", ")}"
                     ).color(ChatColor.GREEN).build()
                 )
-                //TODO Translatable message
             })
     }
 

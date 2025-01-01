@@ -31,21 +31,18 @@ class TestManager(val plugin: Ecoworks) {
         resultConsumer: Consumer<TestResult>,
     ) {
         resultConsumer.accept(TestResult(TestResult.Companion.Status.FAILURE, "NOT IMPLEMENTED", "NOT IMPLEMENTED"))
-        // TODO
     }
 
     fun testTreasury(
         resultConsumer: Consumer<TestResult>,
     ) {
         resultConsumer.accept(TestResult(TestResult.Companion.Status.FAILURE, "NOT IMPLEMENTED", "NOT IMPLEMENTED"))
-        // TODO
     }
 
     fun testPolyconomy(
         resultConsumer: Consumer<TestResult>,
     ) {
         resultConsumer.accept(TestResult(TestResult.Companion.Status.FAILURE, "NOT IMPLEMENTED", "NOT IMPLEMENTED"))
-        // TODO
     }
 
 }

@@ -13,7 +13,6 @@ object SupportZipSubcommand : InternalCmd {
         return CommandAPICommand("support-zip")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_SUBROUTINE.toString())
             .executes(CommandExecutor { _, _ ->
-                // TODO: Implement
                 throw CommandAPI.failWithString("Not yet implemented!")
             })
     }

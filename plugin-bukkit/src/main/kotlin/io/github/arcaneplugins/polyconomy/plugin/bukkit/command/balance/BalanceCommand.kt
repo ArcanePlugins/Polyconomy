@@ -27,8 +27,6 @@ object BalanceCommand : InternalCmd {
                 CustomArguments.currencyArgument(plugin, "currency")
             )
             .executes(CommandExecutor { sender, args ->
-                //todo translatability
-
                 val targetPlayer = args.getOptional("player").getOrNull() as OfflinePlayer?
                     ?: if (sender is Player) {
                         sender
