@@ -30,6 +30,11 @@ object BalancetopCommand : InternalCmd {
             )
             .executes(CommandExecutor { sender, args ->
                 val page = args.getOptional("page").getOrNull() as Int? ?: 1
+
+                if (page < 1) {
+                    throw CommandAPI.failWithString("Page number must be at least 1")
+                }
+
                 val currency = args.getOptional("currency").getOrNull() as Currency?
                     ?: runBlocking { plugin.storageManager.handler.getPrimaryCurrency() }
 
