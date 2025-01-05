@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subc
 import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.arguments.DoubleArgument
-import dev.jorel.commandapi.arguments.StringArgument
+import dev.jorel.commandapi.arguments.TextArgument
 import dev.jorel.commandapi.executors.CommandExecutor
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
@@ -46,7 +46,7 @@ object CurrencySubcommand : InternalCmd {
                 CommandAPICommand("symbol")
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
-                        StringArgument("newValue"))
+                        TextArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
@@ -54,14 +54,14 @@ object CurrencySubcommand : InternalCmd {
                     }),
                 CommandAPICommand("amountFormat")
                     .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
-                        StringArgument("newValue"))
+                        TextArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("presentationFormat")
-                    .withArguments(StringArgument("newValue"))
+                    .withArguments(TextArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
@@ -81,9 +81,9 @@ object CurrencySubcommand : InternalCmd {
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument("locale"),
-                                StringArgument("dispNameSingular"),
-                                StringArgument("dispNamePlural"),
-                                StringArgument("dispDecimal"),
+                                TextArgument("dispNameSingular"),
+                                TextArgument("dispNamePlural"),
+                                TextArgument("dispDecimal"),
                             )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
@@ -93,9 +93,9 @@ object CurrencySubcommand : InternalCmd {
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument("locale"),
-                                StringArgument("dispNameSingular"),
-                                StringArgument("dispNamePlural"),
-                                StringArgument("dispDecimal"),
+                                TextArgument("dispNameSingular"),
+                                TextArgument("dispNamePlural"),
+                                TextArgument("dispDecimal"),
                             )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
@@ -120,16 +120,16 @@ object CurrencySubcommand : InternalCmd {
             .withArguments(
                 CustomArguments.identityStringArgument("name"),
                 DoubleArgument("startingBalance"),
-                StringArgument("symbol"),
+                TextArgument("symbol"),
                 DoubleArgument("conversionRate"),
                 CustomArguments.localeArgument("dispLocale"),
-                StringArgument("dispNameSingular"),
-                StringArgument("dispNamePlural"),
-                StringArgument("dispDecimal"),
+                TextArgument("dispNameSingular"),
+                TextArgument("dispNamePlural"),
+                TextArgument("dispDecimal"),
             )
             .withOptionalArguments(
-                StringArgument("presentationFormat"),
-                StringArgument("amountFormat"),
+                TextArgument("presentationFormat"),
+                TextArgument("amountFormat"),
             )
             .executes(CommandExecutor { sender, args ->
                 val name = args.get("name") as String
