@@ -6,11 +6,11 @@
     <parent>
         <groupId>io.github.arcaneplugins.polyconomy</groupId>
         <artifactId>polyconomy</artifactId>
-        <version>0.4.3</version>
+        <version>0.4.4</version>
     </parent>
 
     <artifactId>api</artifactId>
-    <version>0.4.3</version>
+    <version>0.4.4</version>
     <name>Polyconomy-API</name>
     <description>Polyconomy API</description>
 
