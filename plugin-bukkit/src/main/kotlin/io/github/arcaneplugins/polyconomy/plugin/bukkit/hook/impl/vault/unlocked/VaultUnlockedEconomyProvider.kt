@@ -178,26 +178,22 @@ class VaultUnlockedEconomyProvider(
         }
     }
 
-    override fun getDefaultCurrency(pluginName: String?): String {
-        return runBlocking {
-            primaryCurrency().name
-        }
+    override fun getDefaultCurrency(pluginName: String): String {
+        return runBlocking { primaryCurrency().name }
     }
 
-    override fun defaultCurrencyNamePlural(
-        pluginName: String?,
-    ): String {
-        return runBlocking {
-            primaryCurrency().getDisplayName(true, plugin.settings.defaultLocale())
-        }
+    override fun defaultCurrencyNamePlural(pluginName: String): String {
+        return runBlocking { primaryCurrency().getDisplayName(
+            plural = true,
+            locale = plugin.settings.defaultLocale()
+        ) }
     }
 
-    override fun defaultCurrencyNameSingular(
-        pluginName: String?,
-    ): String {
-        return runBlocking {
-            primaryCurrency().getDisplayName(false, plugin.settings.defaultLocale())
-        }
+    override fun defaultCurrencyNameSingular(pluginName: String): String {
+        return runBlocking { primaryCurrency().getDisplayName(
+            plural = false,
+            locale = plugin.settings.defaultLocale()
+        ) }
     }
 
     override fun currencies(): Collection<String> {
@@ -315,7 +311,15 @@ class VaultUnlockedEconomyProvider(
         return accountSupportsCurrency(plugin, accountID, currency)
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getBalance(
+        pluginName: String,
+        accountID: UUID,
+    ): BigDecimal {
+        return balance(pluginName, accountID)
+    }
+
+    override fun balance(
         pluginName: String,
         accountID: UUID,
     ): BigDecimal {
@@ -324,6 +328,7 @@ class VaultUnlockedEconomyProvider(
         }
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getBalance(
         pluginName: String,
         accountID: UUID,
@@ -332,7 +337,25 @@ class VaultUnlockedEconomyProvider(
         return getBalance(pluginName, accountID)
     }
 
+    override fun balance(
+        pluginName: String,
+        accountID: UUID,
+        world: String,
+    ): BigDecimal {
+        return balance(pluginName, accountID)
+    }
+
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getBalance(
+        pluginName: String,
+        accountID: UUID,
+        world: String,
+        currency: String,
+    ): BigDecimal {
+        return balance(pluginName, accountID, world, currency)
+    }
+
+    override fun balance(
         pluginName: String,
         accountID: UUID,
         world: String,
@@ -392,7 +415,7 @@ class VaultUnlockedEconomyProvider(
                 amount,
                 getBalance(pluginName, accountID),
                 EconomyResponse.ResponseType.SUCCESS,
-                null
+                ""
             )
         }
     }
@@ -426,7 +449,7 @@ class VaultUnlockedEconomyProvider(
                 amount,
                 getBalance(pluginName, accountID),
                 EconomyResponse.ResponseType.SUCCESS,
-                null
+                ""
             )
         }
     }
@@ -449,7 +472,7 @@ class VaultUnlockedEconomyProvider(
                 amount,
                 getBalance(pluginName, accountID),
                 EconomyResponse.ResponseType.SUCCESS,
-                null
+                ""
             )
         }
     }
@@ -483,7 +506,7 @@ class VaultUnlockedEconomyProvider(
                 amount,
                 getBalance(pluginName, accountID),
                 EconomyResponse.ResponseType.SUCCESS,
-                null
+                ""
             )
         }
     }
