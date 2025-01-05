@@ -18,7 +18,7 @@ class TestManager(val plugin: Ecoworks) {
         if (!canTest) {
             resultConsumer.accept(
                 TestResult(
-                    TestResult.Companion.Status.OBSERVATION,
+                    TestResult.Companion.Status.FAILURE,
                     "checkAndInit",
                     DESCRIPTION_FAILED_INIT
                 )
