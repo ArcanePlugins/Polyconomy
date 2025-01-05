@@ -38,5 +38,5 @@ jobs:
 
       - uses: AButler/upload-release-assets@v3.0
         with:
-          files: "plugin-bukkit/target/Polyconomy*.jar;api/target/Polyconomy*.jar"
+          files: "plugin-bukkit/target/Polyconomy*.jar;api/target/Polyconomy*.jar;ecoworks/target/ecoworks*.jar"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
