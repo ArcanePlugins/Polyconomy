@@ -36,4 +36,17 @@
         <mariadb.version>3.2.0</mariadb.version>
     </properties>
 
+    <licenses>
+        <license>
+            <name>GNU General Public License v3.0</name>
+        </license>
+    </licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/ArcanePlugins/Polyconomy</url>
+        </repository>
+    </distributionManagement>
+
 </project>
