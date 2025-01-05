@@ -33,26 +33,28 @@ object CurrencySubcommand : InternalCmd {
     private fun buildSetSubcommand(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("set")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
-            .withArguments(
-                CustomArguments.currencyArgument(plugin, "currency")
-            )
             .withSubcommands(
                 CommandAPICommand("startingBalance")
-                    .withArguments(DoubleArgument("newValue"))
+                    .withArguments(
+                        CustomArguments.currencyArgument(plugin, "currency"),
+                        DoubleArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("symbol")
-                    .withArguments(StringArgument("newValue"))
+                    .withArguments(
+                        CustomArguments.currencyArgument(plugin, "currency"),
+                        StringArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("amountFormat")
-                    .withArguments(StringArgument("newValue"))
+                    .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
+                        StringArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
@@ -66,17 +68,19 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("conversionRate")
-                    .withArguments(DoubleArgument("newValue"))
+                    .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
+                        DoubleArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("locale")
-                    .withArguments(CustomArguments.localeArgument("locale"))
                     .withSubcommands(
                         CommandAPICommand("register")
                             .withArguments(
+                                CustomArguments.currencyArgument(plugin, "currency"),
+                                CustomArguments.localeArgument("locale"),
                                 StringArgument("dispNameSingular"),
                                 StringArgument("dispNamePlural"),
                                 StringArgument("dispDecimal"),
@@ -87,6 +91,8 @@ object CurrencySubcommand : InternalCmd {
                             }),
                         CommandAPICommand("set")
                             .withArguments(
+                                CustomArguments.currencyArgument(plugin, "currency"),
+                                CustomArguments.localeArgument("locale"),
                                 StringArgument("dispNameSingular"),
                                 StringArgument("dispNamePlural"),
                                 StringArgument("dispDecimal"),
@@ -96,6 +102,10 @@ object CurrencySubcommand : InternalCmd {
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             }),
                         CommandAPICommand("unregister")
+                            .withArguments(
+                                CustomArguments.currencyArgument(plugin, "currency"),
+                                CustomArguments.localeArgument("locale"),
+                            )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
                                 throw CommandAPI.failWithString("Not yet implemented!")
@@ -123,7 +133,7 @@ object CurrencySubcommand : InternalCmd {
             )
             .executes(CommandExecutor { sender, args ->
                 val name = args.get("name") as String
-                val startingBalance = args.get("startingBalance") as String
+                val startingBalance = args.get("startingBalance") as Double
                 val symbol = args.get("symbol") as String
                 val conversionRate = args.get("conversionRate") as Double
                 val dispLocale = args.get("dispLocale") as Locale
