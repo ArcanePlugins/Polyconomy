@@ -11,6 +11,21 @@ object H2Statements {
 
     val createTablesStatements = listOf(
         """
+            CREATE TABLE IF NOT EXISTS DbVersion (
+                id          IDENTITY                    NOT NULL,
+                version     INT                         NOT NULL,
+                tstamp      TIMESTAMP WITH TIME ZONE    NOT NULL,
+                PRIMARY KEY (id)
+            );
+        """.trimIndent(),
+
+        """
+            INSERT INTO DbVersion (version, tstamp)
+            SELECT 1, CURRENT_TIMESTAMP
+            WHERE NOT EXISTS (SELECT * FROM DbVersion);
+        """.trimIndent(),
+
+        """
             CREATE TABLE IF NOT EXISTS Account (
                 id      IDENTITY        NOT NULL,
                 name    VARCHAR(255)    NULL,
