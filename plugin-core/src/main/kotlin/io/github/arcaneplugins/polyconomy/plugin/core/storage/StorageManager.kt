@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.core.storage
 
 import io.github.arcaneplugins.polyconomy.plugin.core.Platform
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory.STORAGE_MANAGER
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.impl.JsonStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.configurate.impl.YamlStorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.impl.local.h2.H2StorageHandler
@@ -38,11 +39,14 @@ class StorageManager(
         handler = availableHandlers.firstOrNull { it.id.equals(handlerImplId, ignoreCase = true) }
             ?: throw IllegalArgumentException("There is no available storage handler matching an ID of ${handlerImplId}. (Did you make a typo?)")
 
+        plugin.debugLog(STORAGE_MANAGER) { "Starting up handler '${handler.id}'." }
+
         handler.startup()
     }
 
     fun shutdown() {
         if (::handler.isInitialized) {
+            plugin.debugLog(STORAGE_MANAGER) { "Shutting down handler '${handler.id}'." }
             handler.shutdown()
         }
     }
