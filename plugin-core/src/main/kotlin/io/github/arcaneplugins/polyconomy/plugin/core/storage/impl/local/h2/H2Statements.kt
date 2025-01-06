@@ -272,7 +272,8 @@ object H2Statements {
     val getDisplayNamesForCurrency = """
         SELECT display_name_singular, display_name_plural
         FROM CurrencyLocale
-        INNER JOIN Currency ON Currency.id = CurrencyLocale.id;
+        INNER JOIN Currency ON Currency.id = CurrencyLocale.id
+        WHERE Currency.name = ?;
     """.trimIndent()
 
     val getStartingBalanceForCurrency = """

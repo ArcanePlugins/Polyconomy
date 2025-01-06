@@ -4,6 +4,7 @@ import io.github.arcaneplugins.polyconomy.api.account.NonPlayerAccount
 import io.github.arcaneplugins.polyconomy.api.account.PlayerAccount
 import io.github.arcaneplugins.polyconomy.api.currency.Currency
 import io.github.arcaneplugins.polyconomy.api.util.NamespacedKey
+import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
 import io.github.arcaneplugins.polyconomy.plugin.core.util.ByteUtil.bytesToUuid
@@ -426,6 +427,7 @@ class H2StorageHandler(
                     statement.setString(4, getStrValueInLocaleMap(locale, displayNamePluralLocaleMap))
                     statement.setString(5, getStrValueInLocaleMap(locale, decimalLocaleMap))
                     statement.executeUpdate()
+                    manager.plugin.debugLog(DebugCategory.STORAGE_H2) { "Inserted locale ${locale.toLanguageTag()} into DB for currency ${name} - statement#toString: $statement" }
                 }
             }
 
