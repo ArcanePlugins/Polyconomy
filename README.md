@@ -1,5 +1,7 @@
 <div align="center">
 
+[![Economy Badge](https://raw.githubusercontent.com/TheNewEconomy/VaultUnlockedAPI/refs/heads/master/.badge/economy%20badge.png)](https://github.com/TheNewEconomy/VaultUnlockedAPI)
+
 <h1>Polyconomy</h1>
 
 <h6>BETA</h6>
