@@ -7,6 +7,8 @@ import java.time.Instant
 
 object H2Statements {
 
+    const val DECIMAL_TYPE = "DECIMAL(38,3)" // iirc this means a max number of 1 unodecillion minus 0.001.
+
     val createTablesStatements = listOf(
         """
             CREATE TABLE IF NOT EXISTS Account (
@@ -75,11 +77,11 @@ object H2Statements {
                 CREATE TABLE IF NOT EXISTS Currency (
                     id                  IDENTITY        NOT NULL,
                     name                VARCHAR(255)    NOT NULL UNIQUE,
-                    starting_balance    DECIMAL(18, 4)  NOT NULL,
+                    starting_balance    ${DECIMAL_TYPE}  NOT NULL,
                     symbol              VARCHAR(32)     NOT NULL,
                     amount_format       VARCHAR(255)    NOT NULL,
                     presentation_format VARCHAR(1023)   NOT NULL,
-                    conversion_rate     DECIMAL(18, 4)  NOT NULL,
+                    conversion_rate     ${DECIMAL_TYPE}  NOT NULL,
                     PRIMARY KEY (id)
                 );
             """.trimIndent(),
@@ -100,7 +102,7 @@ object H2Statements {
             CREATE TABLE IF NOT EXISTS AccountBalance (
                 account_id              BIGINT          NOT NULL,
                 currency_id             BIGINT          NOT NULL,
-                amount                  DECIMAL(18, 4)  NOT NULL,
+                amount                  ${DECIMAL_TYPE}  NOT NULL,
                 PRIMARY KEY (account_id, currency_id),
                 FOREIGN KEY (account_id) REFERENCES Account(id) ON DELETE CASCADE,
                 FOREIGN KEY (currency_id) REFERENCES Currency(id) ON DELETE CASCADE
@@ -111,7 +113,7 @@ object H2Statements {
             CREATE TABLE IF NOT EXISTS AccountTransaction (
                 id                      IDENTITY        NOT NULL,
                 account_id              BIGINT          NOT NULL,
-                amount                  DECIMAL(18, 4)  NOT NULL,
+                amount                  ${DECIMAL_TYPE}  NOT NULL,
                 currency_id             BIGINT          NOT NULL,
                 cause                   SMALLINT        NOT NULL,
                 cause_data              VARCHAR(255)    NULL,
