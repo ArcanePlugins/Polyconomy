@@ -32,7 +32,7 @@ interface Platform {
      */
     @Suppress("unused")
     fun debugLog(cat: DebugCategory, msg: Supplier<Any>) {
-        if (debugManager.enabled(cat)) {
+        if (!debugManager.enabled(cat)) {
             return
         }
 
