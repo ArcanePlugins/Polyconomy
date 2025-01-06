@@ -10,11 +10,18 @@ enum class DebugCategory {
     HOOK_TREASURY,
 
     /**
-     * Reports activity in `YamlStorageHandler`
+     * Reports activity in `ConfigurateStorageHandler`
      *
      * @since v0.1.0
      */
     STORAGE_CONFIGURATE,
+
+    /**
+     * Reports activity in `H2StorageHandler` and related H2 implementation classes.
+     *
+     * @since v0.4.6
+     */
+    STORAGE_H2,
 
     /**
      * Reports activity in `StorageManager`
