@@ -1,5 +1,6 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.misc
 
+
 import java.util.*
 
 enum class PolyconomyPerm {
@@ -20,7 +21,7 @@ enum class PolyconomyPerm {
     COMMAND_POLYCONOMY_WITHDRAW;
 
     override fun toString(): String {
-        return name.lowercase(Locale.ROOT).replace('_', '.')
+        return "polyconomy." + name.lowercase(Locale.ROOT).replace('_', '.')
     }
 
 }
