@@ -33,7 +33,37 @@ libraries:
   - "com.h2database:h2:${h2.version}"
   - "org.mariadb.jdbc:mariadb-java-client:${mariadb.version}"
 
-  # Handled via Maven filtration.
+permissions:
+  polyconomy.command.balance:
+    default: true
+  polyconomy.command.balancetop:
+    default: true
+  polyconomy.command.pay:
+    default: true
+  polyconomy.command.polyconomy:
+    default: true
+  polyconomy.command.polyconomy.backup:
+    default: op
+  polyconomy.command.polyconomy.currency:
+    default: op
+  polyconomy.command.polyconomy.currency.set:
+    default: op
+  polyconomy.command.polyconomy.currency.register:
+    default: op
+  polyconomy.command.polyconomy.currency.unregister:
+    default: op
+  polyconomy.command.polyconomy.deposit:
+    default: op
+  polyconomy.command.polyconomy.reload:
+    default: op
+  polyconomy.command.polyconomy.subroutine:
+    default: op
+  polyconomy.command.polyconomy.version:
+    default: true
+  polyconomy.command.polyconomy.withdraw:
+    default: op
+
+# Handled via Maven filtration.
 version: "${project.version}"
 
 website: "https://github.com/ArcanePlugins/Polyconomy/"
