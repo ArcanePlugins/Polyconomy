@@ -116,7 +116,7 @@ object CurrencySubcommand : InternalCmd {
 
     private fun buildRegisterSubcommand(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("register")
-            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
+            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_REGISTER.toString())
             .withArguments(
                 CustomArguments.identityStringArgument("name"),
                 DoubleArgument("startingBalance"),
