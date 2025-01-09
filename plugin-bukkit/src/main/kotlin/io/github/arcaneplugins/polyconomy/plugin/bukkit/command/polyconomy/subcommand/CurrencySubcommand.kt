@@ -35,6 +35,7 @@ object CurrencySubcommand : InternalCmd {
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
             .withSubcommands(
                 CommandAPICommand("startingBalance")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
                         DoubleArgument("newValue"))
@@ -44,6 +45,7 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("symbol")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
                         TextArgument("newValue"))
@@ -53,6 +55,7 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("amountFormat")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
                         TextArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
@@ -61,6 +64,7 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("presentationFormat")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(TextArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
@@ -68,6 +72,7 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("conversionRate")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
                         DoubleArgument("newValue"))
                     .executes(CommandExecutor { sender, args ->
@@ -76,8 +81,10 @@ object CurrencySubcommand : InternalCmd {
                         throw CommandAPI.failWithString("Not yet implemented!")
                     }),
                 CommandAPICommand("locale")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withSubcommands(
                         CommandAPICommand("register")
+                            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument("locale"),
@@ -90,6 +97,7 @@ object CurrencySubcommand : InternalCmd {
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             }),
                         CommandAPICommand("set")
+                            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument("locale"),
@@ -102,6 +110,7 @@ object CurrencySubcommand : InternalCmd {
                                 throw CommandAPI.failWithString("Not yet implemented!")
                             }),
                         CommandAPICommand("unregister")
+                            .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument("locale"),
