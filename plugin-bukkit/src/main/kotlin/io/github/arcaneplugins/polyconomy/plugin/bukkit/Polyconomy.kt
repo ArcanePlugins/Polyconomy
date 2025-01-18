@@ -9,8 +9,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.Described
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.ThrowableUtil
 import io.github.arcaneplugins.polyconomy.plugin.core.Platform
 import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
-import io.github.arcaneplugins.polyconomy.plugin.core.config.messages.MessagesCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.config.settings.SettingsCfg
+import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.TranslationsCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager
@@ -37,10 +37,10 @@ class Polyconomy : JavaPlugin(), Platform {
     val metricsManager = MetricsManager(this)
     val taskManager = TaskManager(this)
     override val settings = SettingsCfg(this)
-    override val messages = MessagesCfg(this)
+    override val translations = TranslationsCfg(this)
     override val configs: LinkedHashSet<Config> = linkedSetOf(
         settings,
-        messages,
+        translations,
     )
     override val nativeLogger: Logger
         get() = super.getLogger()

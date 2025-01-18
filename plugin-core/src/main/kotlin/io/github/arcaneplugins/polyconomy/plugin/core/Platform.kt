@@ -1,7 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.core
 
 import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
-import io.github.arcaneplugins.polyconomy.plugin.core.config.messages.MessagesCfg
+import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.TranslationsCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.config.settings.SettingsCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugManager
@@ -13,7 +13,7 @@ import java.util.logging.Logger
 interface Platform {
 
     val settings: SettingsCfg
-    val messages: MessagesCfg
+    val translations: TranslationsCfg
     val configs: LinkedHashSet<Config>
     val debugManager: DebugManager
     var storageManager: StorageManager
