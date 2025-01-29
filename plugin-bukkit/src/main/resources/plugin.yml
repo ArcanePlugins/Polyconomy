@@ -21,6 +21,8 @@ main: "io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy"
 
 name: "Polyconomy"
 
+load: "STARTUP"
+
 softdepend:
   - "Treasury"
   - "Vault"
