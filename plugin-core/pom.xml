@@ -185,7 +185,8 @@
                             </excludes>
                         </filter>
                     </filters>
-                    <minimizeJar>true</minimizeJar>
+                    <!-- minimizeJar breaks stuff here sometimes -->
+                    <minimizeJar>false</minimizeJar>
                 </configuration>
             </plugin>
         </plugins>

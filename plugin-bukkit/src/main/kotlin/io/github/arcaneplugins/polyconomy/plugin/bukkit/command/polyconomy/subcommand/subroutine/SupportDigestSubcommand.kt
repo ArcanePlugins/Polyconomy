@@ -35,7 +35,7 @@ object SupportDigestSubcommand : InternalCmd {
                         .color(ChatColor.GRAY)
                         .append("\nStorage Implementation: ")
                         .color(ChatColor.GREEN)
-                        .append(plugin.settings.storageImplementation())
+                        .append(plugin.settingsCfg.storageImplementation())
                         .color(ChatColor.GRAY)
                         .build()
                 )

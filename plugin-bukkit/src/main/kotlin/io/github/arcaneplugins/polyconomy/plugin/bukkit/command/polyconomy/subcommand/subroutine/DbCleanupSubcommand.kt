@@ -6,8 +6,6 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit
 
 object DbCleanupSubcommand : InternalCmd {
@@ -15,12 +13,12 @@ object DbCleanupSubcommand : InternalCmd {
         return CommandAPICommand("db-cleanup")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_SUBROUTINE.toString())
             .executes(CommandExecutor { sender, _ ->
+                plugin.translations.commandPolyconomySubroutineDbCleanupStart.sendTo(sender)
                 Bukkit.getScheduler().runTaskAsynchronously(plugin) { _ ->
-                    sender.spigot().sendMessage(ComponentBuilder("Cleaning DB...").color(ChatColor.GREEN).build())
                     runBlocking {
                         plugin.storageManager.handler.cleanup()
+                        plugin.translations.commandPolyconomySubroutineDbCleanupComplete.sendTo(sender)
                     }
-                    sender.spigot().sendMessage(ComponentBuilder("DB cleaned.").color(ChatColor.GREEN).build())
                 }
             })
     }

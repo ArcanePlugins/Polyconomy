@@ -32,6 +32,16 @@
             <url>https://repo.codemc.org/repository/maven-public</url>
             <!-- required for dependencies [Treasury, VaultUnlocked] -->
         </repository>
+        <repository>
+            <id>placeholderapi</id>
+            <url>https://repo.extendedclip.com/releases/</url>
+            <!-- required for dependencies [PlaceholderAPI] -->
+        </repository>
+        <repository>
+            <id>minebench-repo</id>
+            <url>https://repo.minebench.de/</url>
+            <!-- required for dependencies [MineDown] -->
+        </repository>
     </repositories>
 
     <dependencies>
@@ -117,7 +127,25 @@
         <dependency>
             <groupId>dev.jorel</groupId>
             <artifactId>commandapi-bukkit-shade</artifactId>
-            <version>9.7.0</version>
+            <version>${commandapi.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.clip</groupId>
+            <artifactId>placeholderapi</artifactId>
+            <version>${placeholderapi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>${adventure-platform-bukkit.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.themoep</groupId>
+            <artifactId>minedown-adventure</artifactId>
+            <version>${minedown.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
@@ -214,8 +242,11 @@
                         </relocation>
                         <relocation>
                             <pattern>dev.jorel.commandapi</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.commandapi
-                            </shadedPattern>
+                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.commandapi</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>de.themoep.minedown</pattern>
+                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.minedown</shadedPattern>
                         </relocation>
                     </relocations>
                     <filters>

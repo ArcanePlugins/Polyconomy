@@ -28,7 +28,7 @@ class TrCurrencyWrapper(
     override fun getDecimal(locale: Locale?): Char {
         return runBlocking {
             return@runBlocking currency.getDecimal(
-                locale = locale ?: plugin.settings.defaultLocale()
+                locale = locale ?: plugin.settingsCfg.defaultLocale()
             ).first()
         }
     }
@@ -45,7 +45,7 @@ class TrCurrencyWrapper(
         return runBlocking {
             return@runBlocking currency.getDisplayName(
                 plural = value.compareTo(BigDecimal.ONE) != 0,
-                locale = locale ?: plugin.settings.defaultLocale()
+                locale = locale ?: plugin.settingsCfg.defaultLocale()
             )
         }
     }
@@ -81,7 +81,7 @@ class TrCurrencyWrapper(
 
     override fun format(amount: BigDecimal, locale: Locale?): String {
         return runBlocking {
-            return@runBlocking currency.format(amount, locale ?: plugin.settings.defaultLocale())
+            return@runBlocking currency.format(amount, locale ?: plugin.settingsCfg.defaultLocale())
         }
     }
 

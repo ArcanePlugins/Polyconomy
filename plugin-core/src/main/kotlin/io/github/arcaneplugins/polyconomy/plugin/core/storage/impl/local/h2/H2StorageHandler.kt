@@ -413,7 +413,7 @@ class H2StorageHandler(
                 return map.getOrDefault(
                     locale,
                     map.getOrDefault(
-                        manager.plugin.settings.defaultLocale(),
+                        manager.plugin.settingsCfg.defaultLocale(),
                         map.entries.first().value
                     )
                 )

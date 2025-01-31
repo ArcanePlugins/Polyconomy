@@ -1,6 +1,7 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit
 
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.CommandManager
+import io.github.arcaneplugins.polyconomy.plugin.bukkit.config.translations.TranslationHandlerImpl
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.hook.HookManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.listener.ListenerManager
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.MetricsManager
@@ -36,14 +37,15 @@ class Polyconomy : JavaPlugin(), Platform {
     val listenerManager = ListenerManager(this)
     val metricsManager = MetricsManager(this)
     val taskManager = TaskManager(this)
-    override val settings = SettingsCfg(this)
-    override val translations = TranslationsCfg(this)
+    override val settingsCfg = SettingsCfg(this)
+    override val translationsCfg = TranslationsCfg(this)
     override val configs: LinkedHashSet<Config> = linkedSetOf(
-        settings,
-        translations,
+        settingsCfg,
+        translationsCfg,
     )
     override val nativeLogger: Logger
         get() = super.getLogger()
+    val translations = TranslationHandlerImpl(this)
 
     /**
      * Implements [JavaPlugin.onLoad].
@@ -80,10 +82,10 @@ class Polyconomy : JavaPlugin(), Platform {
             storageManager = StorageManager(
                 plugin = this,
                 dataFolder = dataFolder,
-                minimumBalance = settings.minimumBalance(),
-                primaryCurrencyId = settings.primaryCurrencyId()
+                minimumBalance = settingsCfg.minimumBalance(),
+                primaryCurrencyId = settingsCfg.primaryCurrencyId()
             )
-            storageManager.startup(settings.storageImplementation())
+            storageManager.startup(settingsCfg.storageImplementation())
             listenerManager.load()
             hookManager.registerAll()
             commandManager.load()
@@ -149,7 +151,7 @@ class Polyconomy : JavaPlugin(), Platform {
 
             /* re-loading */
             loadConfigs()
-            storageManager.startup(settings.storageImplementation())
+            storageManager.startup(settingsCfg.storageImplementation())
             hookManager.registerAll()
             taskManager.start()
         } catch (ex: Exception) {

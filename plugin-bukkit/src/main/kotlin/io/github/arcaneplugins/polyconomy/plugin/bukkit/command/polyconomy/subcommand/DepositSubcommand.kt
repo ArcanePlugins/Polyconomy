@@ -62,7 +62,7 @@ object DepositSubcommand : InternalCmd {
                 }
 
                 val amountFormatted = runBlocking {
-                    currency.format(amount.toBigDecimal(), plugin.settings.defaultLocale())
+                    currency.format(amount.toBigDecimal(), plugin.settingsCfg.defaultLocale())
                 }
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 

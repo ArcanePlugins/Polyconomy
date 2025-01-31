@@ -26,6 +26,7 @@ load: "STARTUP"
 softdepend:
   - "Treasury"
   - "Vault"
+  - "PlaceholderAPI"
 
 libraries:
   - "org.spongepowered:configurate-yaml:${configurate.version}"
@@ -34,6 +35,7 @@ libraries:
   - "org.xerial:sqlite-jdbc:${sqlite.version}"
   - "com.h2database:h2:${h2.version}"
   - "org.mariadb.jdbc:mariadb-java-client:${mariadb.version}"
+  - "net.kyori:adventure-platform-bukkit:${adventure-platform-bukkit.version}"
 
 permissions:
   polyconomy.command.balance:

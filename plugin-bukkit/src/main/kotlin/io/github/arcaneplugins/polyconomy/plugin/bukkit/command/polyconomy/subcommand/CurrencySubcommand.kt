@@ -15,7 +15,6 @@ import net.md_5.bungee.api.ChatColor
 import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.Bukkit
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
 
 @Suppress("UNUSED_ANONYMOUS_PARAMETER", "UNUSED_VARIABLE")
 object CurrencySubcommand : InternalCmd {
@@ -87,7 +86,7 @@ object CurrencySubcommand : InternalCmd {
                             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
-                                CustomArguments.localeArgument("locale"),
+                                CustomArguments.localeArgument(plugin, "locale"),
                                 TextArgument("dispNameSingular"),
                                 TextArgument("dispNamePlural"),
                                 TextArgument("dispDecimal"),
@@ -100,7 +99,7 @@ object CurrencySubcommand : InternalCmd {
                             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
-                                CustomArguments.localeArgument("locale"),
+                                CustomArguments.localeArgument(plugin, "locale"),
                                 TextArgument("dispNameSingular"),
                                 TextArgument("dispNamePlural"),
                                 TextArgument("dispDecimal"),
@@ -113,7 +112,7 @@ object CurrencySubcommand : InternalCmd {
                             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
-                                CustomArguments.localeArgument("locale"),
+                                CustomArguments.localeArgument(plugin, "locale"),
                             )
                             .executes(CommandExecutor { sender, args ->
                                 val locale = args.get("locale") as Locale
@@ -127,11 +126,11 @@ object CurrencySubcommand : InternalCmd {
         return CommandAPICommand("register")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_REGISTER.toString())
             .withArguments(
-                CustomArguments.identityStringArgument("name"),
+                CustomArguments.identityStringArgument(plugin, "name"),
                 DoubleArgument("startingBalance"),
                 TextArgument("symbol"),
                 DoubleArgument("conversionRate"),
-                CustomArguments.localeArgument("dispLocale"),
+                CustomArguments.localeArgument(plugin, "dispLocale"),
                 TextArgument("dispNameSingular"),
                 TextArgument("dispNamePlural"),
                 TextArgument("dispDecimal"),
@@ -149,10 +148,8 @@ object CurrencySubcommand : InternalCmd {
                 val dispNameSingular = args.get("dispNameSingular") as String
                 val dispNamePlural = args.get("dispNamePlural") as String
                 val dispDecimal = args.get("dispDecimal") as String
-                val presentationFormat: String = args.getOptional("presentationFormat").getOrNull() as String?
-                    ?: Currency.DEFAULT_PRESENTATION_FORMAT
-                val amountFormat: String = args.getOptional("amountFormat").getOrNull() as String?
-                    ?: Currency.DEFAULT_AMOUNT_FORMAT
+                val presentationFormat: String = args.getOptional("presentationFormat").orElse(Currency.DEFAULT_PRESENTATION_FORMAT) as String
+                val amountFormat: String = args.getOptional("amountFormat").orElse(Currency.DEFAULT_AMOUNT_FORMAT) as String
 
                 sender.spigot().sendMessage(
                     ComponentBuilder("Registering currency...")

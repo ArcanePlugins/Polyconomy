@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.balance
 
-import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.arguments.OfflinePlayerArgument
 import dev.jorel.commandapi.executors.CommandExecutor
@@ -10,11 +9,9 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
-import kotlin.jvm.optionals.getOrNull
+import java.util.function.Supplier
 
 object BalanceCommand : InternalCmd {
 
@@ -27,17 +24,18 @@ object BalanceCommand : InternalCmd {
                 CustomArguments.currencyArgument(plugin, "currency")
             )
             .executes(CommandExecutor { sender, args ->
-                val targetPlayer = args.getOptional("player").getOrNull() as OfflinePlayer?
-                    ?: if (sender is Player) {
+                val targetPlayer = args.getOptional("player").orElseGet {
+                    if (sender is Player) {
                         sender
                     } else {
-                        throw CommandAPI.failWithString("Enter the username of the player you wish to check.")
+                        plugin.translations.commandBalanceErrorNoPlayer.sendTo(sender)
+                        throw plugin.translations.commandApiFailure()
                     }
+                } as OfflinePlayer
 
-                val currency = args.getOptional("currency").getOrNull() as Currency?
-                    ?: runBlocking {
-                        plugin.storageManager.handler.getPrimaryCurrency()
-                    }
+                val currency: Currency = args.getOptional("currency").orElseGet { runBlocking {
+                    plugin.storageManager.handler.getPrimaryCurrency()
+                } } as Currency
 
                 val balance = runBlocking {
                     plugin.storageManager.handler.getOrCreatePlayerAccount(
@@ -47,14 +45,14 @@ object BalanceCommand : InternalCmd {
                 }
 
                 val balanceFmt = runBlocking {
-                    currency.format(balance, plugin.settings.defaultLocale())
+                    currency.format(balance, plugin.settingsCfg.defaultLocale())
                 }
 
-                sender.spigot().sendMessage(
-                    ComponentBuilder(
-                        "Player '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' has '${balanceFmt}' (currency: '${currency.name}')."
-                    ).color(ChatColor.GREEN).build()
-                )
+                plugin.translations.commandBalanceView.sendTo(sender, placeholders = mapOf(
+                    "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
+                    "balance" to Supplier { balanceFmt },
+                    "currency" to Supplier { currency.name },
+                ))
             })
     }
 

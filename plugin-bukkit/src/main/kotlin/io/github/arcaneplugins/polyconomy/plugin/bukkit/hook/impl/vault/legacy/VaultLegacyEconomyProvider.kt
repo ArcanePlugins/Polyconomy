@@ -76,19 +76,19 @@ open class VaultLegacyEconomyProvider(
 
     override fun format(p0: Double): String {
         return runBlocking {
-            primaryCurrency().format(BigDecimal.valueOf(p0), plugin.settings.defaultLocale())
+            primaryCurrency().format(BigDecimal.valueOf(p0), plugin.settingsCfg.defaultLocale())
         }
     }
 
     override fun currencyNamePlural(): String {
         return runBlocking {
-            primaryCurrency().getDisplayName(true, plugin.settings.defaultLocale())
+            primaryCurrency().getDisplayName(true, plugin.settingsCfg.defaultLocale())
         }
     }
 
     override fun currencyNameSingular(): String {
         return runBlocking {
-            primaryCurrency().getDisplayName(false, plugin.settings.defaultLocale())
+            primaryCurrency().getDisplayName(false, plugin.settingsCfg.defaultLocale())
         }
     }
 

@@ -54,7 +54,7 @@ object WithdrawSubcommand : InternalCmd {
                 val amountBd = amount.toBigDecimal()
 
                 val amountFormatted = runBlocking {
-                    currency.format(amountBd, plugin.settings.defaultLocale())
+                    currency.format(amountBd, plugin.settingsCfg.defaultLocale())
                 }
 
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()

@@ -11,11 +11,11 @@ class DbCleanupTask(
     var running = false
 
     override fun start() {
-        if (running || !plugin.settings.dbShouldRunCleanupTask()) {
+        if (running || !plugin.settingsCfg.dbShouldRunCleanupTask()) {
             return
         }
 
-        runTaskTimerAsynchronously(plugin, 0L, plugin.settings.dbCleanupTaskPeriod())
+        runTaskTimerAsynchronously(plugin, 0L, plugin.settingsCfg.dbCleanupTaskPeriod())
         running = true
     }
 

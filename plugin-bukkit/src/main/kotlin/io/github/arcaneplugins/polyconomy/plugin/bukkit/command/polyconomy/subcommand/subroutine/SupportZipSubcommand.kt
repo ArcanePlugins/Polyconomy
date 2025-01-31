@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand.subroutine
 
-import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.executors.CommandExecutor
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
@@ -12,8 +11,9 @@ object SupportZipSubcommand : InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
         return CommandAPICommand("support-zip")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_SUBROUTINE.toString())
-            .executes(CommandExecutor { _, _ ->
-                throw CommandAPI.failWithString("Not yet implemented!")
+            .executes(CommandExecutor { sender, _ ->
+                plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
+                throw plugin.translations.commandApiFailure()
             })
     }
 

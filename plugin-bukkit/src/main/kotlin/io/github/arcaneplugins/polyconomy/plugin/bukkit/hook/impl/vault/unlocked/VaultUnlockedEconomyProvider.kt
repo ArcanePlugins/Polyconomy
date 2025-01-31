@@ -140,7 +140,7 @@ class VaultUnlockedEconomyProvider(
     @Suppress("OVERRIDE_DEPRECATION")
     override fun format(amount: BigDecimal): String {
         return runBlocking {
-            primaryCurrency().format(amount, plugin.settings.defaultLocale())
+            primaryCurrency().format(amount, plugin.settingsCfg.defaultLocale())
         }
     }
 
@@ -159,7 +159,7 @@ class VaultUnlockedEconomyProvider(
         return runBlocking {
             storageHandler()
                 .getCurrency(currency)
-                ?.format(amount, plugin.settings.defaultLocale())
+                ?.format(amount, plugin.settingsCfg.defaultLocale())
                 ?: throw IllegalArgumentException("No currency enabled and active named ${currency}")
         }
     }
@@ -185,14 +185,14 @@ class VaultUnlockedEconomyProvider(
     override fun defaultCurrencyNamePlural(pluginName: String): String {
         return runBlocking { primaryCurrency().getDisplayName(
             plural = true,
-            locale = plugin.settings.defaultLocale()
+            locale = plugin.settingsCfg.defaultLocale()
         ) }
     }
 
     override fun defaultCurrencyNameSingular(pluginName: String): String {
         return runBlocking { primaryCurrency().getDisplayName(
             plural = false,
-            locale = plugin.settings.defaultLocale()
+            locale = plugin.settingsCfg.defaultLocale()
         ) }
     }
 

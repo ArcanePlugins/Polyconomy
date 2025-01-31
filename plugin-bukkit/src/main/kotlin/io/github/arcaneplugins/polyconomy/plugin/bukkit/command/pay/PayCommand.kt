@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.pay
 
-import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.arguments.DoubleArgument
 import dev.jorel.commandapi.arguments.OfflinePlayerArgument
@@ -13,10 +12,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import kotlin.jvm.optionals.getOrNull
+import java.util.function.Supplier
 
 object PayCommand : InternalCmd {
 
@@ -34,20 +31,25 @@ object PayCommand : InternalCmd {
                 val targetPlayer = args.get("player") as OfflinePlayer
 
                 if (sender.uniqueId == targetPlayer.uniqueId) {
-                    throw CommandAPI.failWithString("You can't pay yourself.")
+                    plugin.translations.commandPayErrorNotYourself.sendTo(sender)
+                    throw plugin.translations.commandApiFailure()
                 }
 
                 val amount = args.get("amount") as Double
                 val amountBd = amount.toBigDecimal()
 
                 if (amount <= 0) {
-                    throw CommandAPI.failWithString("Amount must be greater than zero.")
+                    plugin.translations.commandPayErrorAmountTooLow.sendTo(sender, placeholders = mapOf(
+                        "amount" to Supplier { amount.toString() }
+                    ))
+                    throw plugin.translations.commandApiFailure()
                 }
 
-                val currency = args.getOptional("currency").getOrNull() as Currency?
-                    ?: runBlocking {
+                val currency = args.getOptional("currency").orElseGet {
+                    runBlocking {
                         plugin.storageManager.handler.getPrimaryCurrency()
                     }
+                } as Currency
 
                 val senderAccount = runBlocking {
                     plugin.storageManager.handler.getOrCreatePlayerAccount(
@@ -61,7 +63,12 @@ object PayCommand : InternalCmd {
                 }
 
                 if (!canAfford) {
-                    throw CommandAPI.failWithString("You can't afford that payment.")
+                    plugin.translations.commandPayErrorCantAfford.sendTo(sender, placeholders = mapOf(
+                        "amount" to Supplier { amount.toString() },
+                        "balance" to Supplier { runBlocking { senderAccount.getBalance(currency).toString() } },
+                        "currency" to Supplier { currency.name }
+                    ))
+                    throw plugin.translations.commandApiFailure()
                 }
 
                 val targetAccount = runBlocking {
@@ -92,18 +99,20 @@ object PayCommand : InternalCmd {
                 }
 
                 val amountFmt = runBlocking {
-                    currency.format(amount.toBigDecimal(), plugin.settings.defaultLocale())
+                    currency.format(amount.toBigDecimal(), plugin.settingsCfg.defaultLocale())
                 }
 
                 val newBalance = runBlocking {
-                    currency.format(senderAccount.getBalance(currency), plugin.settings.defaultLocale())
+                    currency.format(senderAccount.getBalance(currency), plugin.settingsCfg.defaultLocale())
                 }
 
-                sender.spigot().sendMessage(
-                    ComponentBuilder(
-                        "Paid '${amountFmt}' to '${targetPlayer.name ?: ("UUID ${targetPlayer.uniqueId}")}' (currency: '${currency.name}'). Your new balance is '${newBalance}'."
-                    ).color(ChatColor.GREEN).build()
-                )
+                plugin.translations.commandPaySuccess.sendTo(sender, placeholders = mapOf(
+                    "amount" to Supplier { amountFmt },
+                    "balance" to Supplier { newBalance },
+                    "currency" to Supplier { currency.name },
+                    "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
+                    "target-balance" to Supplier { runBlocking { targetAccount.getBalance(currency).toString() } },
+                ))
             })
     }
 

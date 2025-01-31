@@ -106,7 +106,7 @@ class TreasuryEconomyProvider(
                     return@runBlocking TriState.UNSPECIFIED
                 }
 
-                val defaultLocale = plugin.settings.defaultLocale()
+                val defaultLocale = plugin.settingsCfg.defaultLocale()
 
                 storageHandler().registerCurrency(
                     name = currency.identifier,

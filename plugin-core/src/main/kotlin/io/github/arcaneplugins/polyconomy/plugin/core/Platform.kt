@@ -12,8 +12,8 @@ import java.util.logging.Logger
 
 interface Platform {
 
-    val settings: SettingsCfg
-    val translations: TranslationsCfg
+    val settingsCfg: SettingsCfg
+    val translationsCfg: TranslationsCfg
     val configs: LinkedHashSet<Config>
     val debugManager: DebugManager
     var storageManager: StorageManager

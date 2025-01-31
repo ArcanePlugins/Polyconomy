@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.balancetop
 
-import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.arguments.IntegerArgument
 import dev.jorel.commandapi.executors.CommandExecutor
@@ -10,10 +9,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import java.util.*
-import kotlin.jvm.optionals.getOrNull
+import java.util.function.Supplier
 
 object BalancetopCommand : InternalCmd {
 
@@ -29,29 +26,30 @@ object BalancetopCommand : InternalCmd {
                 CustomArguments.currencyArgument(plugin, "currency")
             )
             .executes(CommandExecutor { sender, args ->
-                val page = args.getOptional("page").getOrNull() as Int? ?: 1
+                val page = args.getOptional("page").orElse(1) as Int
 
                 if (page < 1) {
-                    throw CommandAPI.failWithString("Page number must be at least 1")
+                    plugin.translations.commandBalancetopErrorPageTooLow.sendTo(sender, placeholders = mapOf(
+                        "%page%" to Supplier { page.toString()}
+                    ))
+                    throw plugin.translations.commandApiFailure()
                 }
 
-                val currency = args.getOptional("currency").getOrNull() as Currency?
-                    ?: runBlocking { plugin.storageManager.handler.getPrimaryCurrency() }
+                val currency = args.getOptional("currency").orElseGet {
+                    runBlocking { plugin.storageManager.handler.getPrimaryCurrency() }
+                } as Currency
 
                 plugin.server.scheduler.runTaskAsynchronously(plugin) { _ ->
                     synchronized(activeRequests) {
                         if (activeRequests.contains(sender.name)) {
-                            throw CommandAPI.failWithString("You already have an active baltop search, please wait for it to complete.")
+                            plugin.translations.commandBalancetopErrorAlreadySearching.sendTo(sender)
+                            throw plugin.translations.commandApiFailure()
                         }
 
                         activeRequests.add(sender.name)
                     }
 
-                    sender.spigot().sendMessage(
-                        ComponentBuilder("Processing request...")
-                            .color(ChatColor.GREEN)
-                            .build()
-                    )
+                    plugin.translations.commandBalancetopProcessingRequqest.sendTo(sender)
 
                     val baltop = runBlocking {
                         plugin.storageManager.handler.baltop(page, PAGE_SIZE, currency)
@@ -61,33 +59,27 @@ object BalancetopCommand : InternalCmd {
                         activeRequests.remove(sender.name)
                     }
 
-                    val locale = plugin.settings.defaultLocale()
+                    val locale = plugin.settingsCfg.defaultLocale()
                     val currencyName = runBlocking {
                         currency.getDisplayName(true, locale)
                     }
-                    val compBldr = ComponentBuilder("******* Balance Top (Page ${page} - ${currencyName}) *******")
-                        .color(ChatColor.GREEN)
-                        .underlined(true)
-                        .append("\n")
-                        .underlined(false)
+
+                    plugin.translations.commandBalancetopHeader.sendTo(sender, placeholders = mapOf(
+                        "page" to Supplier { page.toString() },
+                        "currency" to Supplier { currencyName }
+                    ))
 
                     if (baltop.isEmpty()) {
-                        compBldr
-                            .append("\nNo results to display on this page.")
-                            .color(ChatColor.GRAY)
-                            .italic(true)
+                        plugin.translations.commandBalancetopNoEntriesOnPage.sendTo(sender)
                     } else {
-                        baltop.forEach { (username, balance) ->
-                            compBldr.append("\n \u2022 ")
-                                .color(ChatColor.DARK_GRAY)
-                                .append(username)
-                                .color(ChatColor.WHITE)
-                                .append(": ${runBlocking { currency.format(balance, locale) }}")
-                                .color(ChatColor.GRAY)
+                        baltop.onEachIndexed { index, (username, balance) ->
+                            plugin.translations.commandBalancetopEntry.sendTo(sender, placeholders = mapOf(
+                                "rank" to Supplier { (((page - 1) * PAGE_SIZE) + index + 1).toString() },
+                                "target-name" to Supplier { username },
+                                "balance" to Supplier { runBlocking { currency.format(balance, locale) } }
+                            ))
                         }
                     }
-
-                    sender.spigot().sendMessage(compBldr.build())
                 }
             })
     }

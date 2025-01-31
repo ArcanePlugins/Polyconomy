@@ -3,6 +3,21 @@
 # |  (_) | \/ (_ (_) | | (_) | | | \/
 #          /                       /
 
+command:
+  generic:
+    error:
+      command-failure: "err^"
+  balance:
+    error:
+      no-player:
+        - "%prefix% &cError:&7 Enter the username of the player you wish to check."
+    view:
+      - "%prefix% Player &f%target-name%&7 has &f%balance%&7 (currency: &f%currency%&7)"
+
+list-separator: "&7, &f"
+
+prefix: "&b&lPC:&7 "
+
 metadata:
   file-version: 1
   original:

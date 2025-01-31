@@ -97,9 +97,9 @@ class H2Currency(
             plugin.debugLog(STORAGE_H2) { "Did not find display name with locale ${locale}." }
 
             // fallback to system default locale
-            if (locale != handler.manager.plugin.settings.defaultLocale()) {
+            if (locale != handler.manager.plugin.settingsCfg.defaultLocale()) {
                 plugin.debugLog(STORAGE_H2) { "Running recursive getDisplayName for default locale: ${locale}" }
-                return@withContext getDisplayName(plural, handler.manager.plugin.settings.defaultLocale())
+                return@withContext getDisplayName(plural, handler.manager.plugin.settingsCfg.defaultLocale())
             }
 
             plugin.debugLog(STORAGE_H2) { "Already tried default locale, falling back to whatever first pops up on the DB." }

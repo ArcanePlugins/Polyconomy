@@ -23,7 +23,9 @@ object CustomArguments {
             }
 
             return@CustomArgument curr ?: throw CustomArgumentException.fromMessageBuilder(
-                CustomArgument.MessageBuilder("Unknown currency: ").appendArgInput()
+                CustomArgument.MessageBuilder(
+                    plugin.translations.commandGenericUnknownCurrency.rawStr()
+                ).appendArgInput()
             )
         }.replaceSuggestions(ArgumentSuggestions.strings {
             runBlocking {
@@ -33,6 +35,7 @@ object CustomArguments {
     }
 
     fun localeArgument(
+        plugin: Polyconomy,
         nodeName: String,
     ): Argument<Locale> {
         return CustomArgument(StringArgument(nodeName)) { info ->
@@ -40,7 +43,9 @@ object CustomArguments {
                 Locale.Builder().setLanguageTag(info.input).build()
             } catch (ex: IllformedLocaleException) {
                 throw CustomArgumentException.fromMessageBuilder(
-                    CustomArgument.MessageBuilder("Illformed locale: ").appendArgInput()
+                    CustomArgument.MessageBuilder(
+                        plugin.translations.commandGenericIllformedLocale.rawStr()
+                    ).appendArgInput()
                 )
             }
         }.replaceSuggestions(ArgumentSuggestions.strings {
@@ -53,6 +58,7 @@ object CustomArguments {
     }
 
     fun identityStringArgument(
+        plugin: Polyconomy,
         nodeName: String,
     ): Argument<String> {
         return CustomArgument(StringArgument(nodeName)) { info ->
@@ -67,7 +73,9 @@ object CustomArguments {
                 return@CustomArgument info.input
             } else {
                 throw CustomArgumentException.fromMessageBuilder(
-                    CustomArgument.MessageBuilder("Illformed identifier: ").appendArgInput()
+                    CustomArgument.MessageBuilder(
+                        plugin.translations.commandGenericIllformedIdentifier.rawStr()
+                    ).appendArgInput()
                 )
             }
         }
