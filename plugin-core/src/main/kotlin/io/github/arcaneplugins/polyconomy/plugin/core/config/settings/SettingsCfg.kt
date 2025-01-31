@@ -5,8 +5,10 @@ import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
 import java.math.BigDecimal
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 
+@OptIn(ExperimentalPathApi::class)
 class SettingsCfg(
     plugin: Platform,
 ) : Config(
