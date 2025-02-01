@@ -6,8 +6,7 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.util.throwable.DescribedThrowable
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
+import java.util.function.Supplier
 
 object ReloadSubcommand : InternalCmd {
 
@@ -16,25 +15,15 @@ object ReloadSubcommand : InternalCmd {
             .withAliases("rl")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_RELOAD.toString())
             .executes(CommandExecutor { sender, _ ->
-                sender.spigot().sendMessage(
-                    ComponentBuilder(
-                        "Reloading..."
-                    ).color(ChatColor.GREEN).build()
-                )
+                plugin.translations.commandPolyconomyReloadStarted.sendTo(sender)
 
                 try {
                     plugin.softReload()
-                    sender.spigot().sendMessage(
-                        ComponentBuilder(
-                            "Reloaded successfully."
-                        ).color(ChatColor.GREEN).build()
-                    )
+                    plugin.translations.commandPolyconomyReloadSuccess.sendTo(sender)
                 } catch (ex: Throwable) {
-                    sender.spigot().sendMessage(
-                        ComponentBuilder(
-                            "An error occurred! Check console for more details. Message: ${ex.message}"
-                        ).color(ChatColor.RED).build()
-                    )
+                    plugin.translations.commandPolyconomyReloadErrorGeneric.sendTo(sender, placeholders = mapOf(
+                        "message" to Supplier { ex.message ?: ex::class.java.canonicalName },
+                    ))
                     if (ex !is DescribedThrowable) {
                         plugin.nativeLogger.severe("An error occurred whilst reloading Polyconomy via the `reload` subcommand. Stack trace:")
                         ex.printStackTrace()

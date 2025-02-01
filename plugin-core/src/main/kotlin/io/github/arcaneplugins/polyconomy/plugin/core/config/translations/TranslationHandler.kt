@@ -13,7 +13,7 @@ abstract class TranslationHandler(
     ): String
 
     abstract fun joinStrings(
-        vararg strs: String
+        strs: Collection<String>
     ): String
 
 }

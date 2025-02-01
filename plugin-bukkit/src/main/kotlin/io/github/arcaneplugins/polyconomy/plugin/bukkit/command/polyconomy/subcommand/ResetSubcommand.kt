@@ -11,10 +11,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import kotlin.jvm.optionals.getOrNull
+import java.util.function.Supplier
 
 object ResetSubcommand : InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
@@ -38,9 +36,8 @@ object ResetSubcommand : InternalCmd {
                 }
 
                 val currency = runBlocking {
-                    args.getOptional("currency").getOrNull() as Currency?
-                        ?: plugin.storageManager.handler.getPrimaryCurrency()
-                }
+                    args.getOptional("currency").orElse(plugin.storageManager.handler.getPrimaryCurrency())
+                } as Currency
 
                 runBlocking {
                     targetAccount.resetBalance(
@@ -53,11 +50,13 @@ object ResetSubcommand : InternalCmd {
 
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 
-                sender.spigot().sendMessage(
-                    ComponentBuilder("Reset ${targetName}'s balance in currency '${currency.name}'.")
-                        .color(ChatColor.GREEN)
-                        .build()
-                )
+                plugin.translations.commandPolyconomyResetCompleted.sendTo(sender, placeholders = mapOf(
+                    "target-name" to Supplier { targetName },
+                    "currency" to Supplier { currency.name },
+                    "target-balance" to Supplier { runBlocking {
+                        currency.format(targetAccount.getBalance(currency), plugin.settingsCfg.defaultLocale())
+                    } }
+                ))
             })
     }
 }

@@ -7,12 +7,39 @@ command:
   generic:
     error:
       command-failure: "err^"
+      unknown-currency: "Unknown currency: "
+      illformed-locale: "Illformed locale: "
+      illformed-identifier: "Illformed identifier: "
+      amount-zero-or-less:
+        - "%prefix% &cError:&7 Amount &f%amount%&7 is too low; it must be greater than &f0&7."
   balance:
     error:
       no-player:
         - "%prefix% &cError:&7 Enter the username of the player you wish to check."
     view:
       - "%prefix% Player &f%target-name%&7 has &f%balance%&7 (currency: &f%currency%&7)"
+  balancetop:
+    error:
+      page-too-low:
+        - "%prefix% &cError:&7 Page number &f%page%&7 is too low; it must be at least &f1&7."
+      already-searching:
+        - "%prefix% &cError:&7 You are already searching for the top balances; please wait for this search to complete."
+    processing-request:
+      - "%prefix% Processing request..."
+    header:
+      - "&8&m+-----+&b Balance Top &8(&7Page &f%page%&8 - &f%currency%&8) &m+-----+&r"
+    no-entries-on-page:
+      - "&7&iThere are no entries to display on this page."
+    entry:
+      - "&8  %rank%.&f  %target-name%&7: &f%balance%"
+  pay:
+    error:
+      not-yourself:
+        - "%prefix% &cError:&7 You can't pay yourself."
+      cant-afford:
+        - "%prefix% &cError:&7 You can't afford a payment of amount &f%amount%&7 in currency &f%currency%&7; your balance is &f%balance%&7."
+    success:
+      - "%prefix% Paid &f%amount%&7 to &f%target-name%&7 in currency &f%currency%&7. They now have &f%target-balance%&7. Your new balance is &f%balance%&7."
 
 list-separator: "&7, &f"
 

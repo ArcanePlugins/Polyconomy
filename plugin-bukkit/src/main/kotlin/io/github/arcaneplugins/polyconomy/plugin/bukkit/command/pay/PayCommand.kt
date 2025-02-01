@@ -39,7 +39,7 @@ object PayCommand : InternalCmd {
                 val amountBd = amount.toBigDecimal()
 
                 if (amount <= 0) {
-                    plugin.translations.commandPayErrorAmountTooLow.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() }
                     ))
                     throw plugin.translations.commandApiFailure()

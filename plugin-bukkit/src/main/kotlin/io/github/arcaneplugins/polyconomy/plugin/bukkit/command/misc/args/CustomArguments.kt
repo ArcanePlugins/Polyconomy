@@ -24,7 +24,7 @@ object CustomArguments {
 
             return@CustomArgument curr ?: throw CustomArgumentException.fromMessageBuilder(
                 CustomArgument.MessageBuilder(
-                    plugin.translations.commandGenericUnknownCurrency.rawStr()
+                    plugin.translations.commandGenericErrorUnknownCurrency.rawStr()
                 ).appendArgInput()
             )
         }.replaceSuggestions(ArgumentSuggestions.strings {
@@ -44,7 +44,7 @@ object CustomArguments {
             } catch (ex: IllformedLocaleException) {
                 throw CustomArgumentException.fromMessageBuilder(
                     CustomArgument.MessageBuilder(
-                        plugin.translations.commandGenericIllformedLocale.rawStr()
+                        plugin.translations.commandGenericErrorIllformedLocale.rawStr()
                     ).appendArgInput()
                 )
             }
@@ -74,7 +74,7 @@ object CustomArguments {
             } else {
                 throw CustomArgumentException.fromMessageBuilder(
                     CustomArgument.MessageBuilder(
-                        plugin.translations.commandGenericIllformedIdentifier.rawStr()
+                        plugin.translations.commandGenericErrorIllformedIdentifier.rawStr()
                     ).appendArgInput()
                 )
             }

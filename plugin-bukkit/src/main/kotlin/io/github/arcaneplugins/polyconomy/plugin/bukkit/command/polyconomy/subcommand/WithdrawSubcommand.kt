@@ -1,6 +1,5 @@
 package io.github.arcaneplugins.polyconomy.plugin.bukkit.command.polyconomy.subcommand
 
-import dev.jorel.commandapi.CommandAPI
 import dev.jorel.commandapi.CommandAPICommand
 import dev.jorel.commandapi.arguments.DoubleArgument
 import dev.jorel.commandapi.arguments.OfflinePlayerArgument
@@ -13,10 +12,8 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.InternalCmd
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.CustomArguments
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
-import net.md_5.bungee.api.ChatColor
-import net.md_5.bungee.api.chat.ComponentBuilder
 import org.bukkit.OfflinePlayer
-import kotlin.jvm.optionals.getOrNull
+import java.util.function.Supplier
 
 object WithdrawSubcommand : InternalCmd {
     override fun build(plugin: Polyconomy): CommandAPICommand {
@@ -35,7 +32,10 @@ object WithdrawSubcommand : InternalCmd {
                 val amount = args.get("amount") as Double
 
                 if (amount <= 0) {
-                    throw CommandAPI.failWithString("Amount must be greater than zero.")
+                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
+                        "amount" to Supplier { amount.toString() }
+                    ))
+                    throw plugin.translations.commandApiFailure()
                 }
 
                 val targetAccount = runBlocking {
@@ -47,8 +47,8 @@ object WithdrawSubcommand : InternalCmd {
                 }
 
                 val currency = runBlocking {
-                    args.getOptional("currency").getOrNull() as Currency?
-                        ?: plugin.storageManager.handler.getPrimaryCurrency()
+                    args.getOptional("currency")
+                        .orElse(plugin.storageManager.handler.getPrimaryCurrency()) as Currency
                 }
 
                 val amountBd = amount.toBigDecimal()
@@ -64,7 +64,12 @@ object WithdrawSubcommand : InternalCmd {
                 }
 
                 if (!canAfford) {
-                    throw CommandAPI.failWithString("Player ${targetName} can't afford ${amount} to withdraw (currency: '${currency.name}').")
+                    plugin.translations.commandPolyconomyWithdrawErrorCantAfford.sendTo(sender, placeholders = mapOf(
+                        "target-name" to Supplier { targetName },
+                        "amount" to Supplier { amountFormatted },
+                        "currency" to Supplier { currency.name },
+                    ))
+                    throw plugin.translations.commandApiFailure()
                 }
 
                 runBlocking {
@@ -77,11 +82,11 @@ object WithdrawSubcommand : InternalCmd {
                     )
                 }
 
-                sender.spigot().sendMessage(
-                    ComponentBuilder("Withdrawn ${amountFormatted} from ${targetName}'s account (currency: '${currency.name}').")
-                        .color(ChatColor.GREEN)
-                        .build()
-                )
+                plugin.translations.commandPolyconomyWithdrawCompleted.sendTo(sender, placeholders = mapOf(
+                    "target-name" to Supplier { targetName },
+                    "amount" to Supplier { amountFormatted },
+                    "currency" to Supplier { currency.name },
+                ))
             })
     }
 }
