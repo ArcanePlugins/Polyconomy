@@ -95,7 +95,7 @@ class TranslationHandlerImpl(
         listOf("&7, &f"))
     val prefix = TranslationImpl(this,
         arrayOf("prefix"),
-        listOf("&b&lPolyconomy:&7 "))
+        listOf("&b&lPolyconomy:&7"))
     private val commandGenericErrorCommandFailure = TranslationImpl(this,
         arrayOf("command", "generic", "error", "command-failure"),
         listOf("err^"))
@@ -119,7 +119,7 @@ class TranslationHandlerImpl(
         listOf("&8&m+-----+&b Balance Top &8(&7Page &f%page%&8 - &f%currency%&8) &m+-----+&r"))
     val commandBalancetopNoEntriesOnPage = TranslationImpl(this,
         arrayOf("command", "balancetop", "no-entries-on-page"),
-        listOf("&7&iThere are no entries to display on this page."))
+        listOf("&7##There are no entries to display on this page.##"))
     val commandBalancetopEntry = TranslationImpl(this,
         arrayOf("command", "balancetop", "entry"),
         listOf("&8  %rank%.&f  %target-name%&7: &f%balance%"))

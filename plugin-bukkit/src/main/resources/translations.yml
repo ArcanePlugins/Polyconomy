@@ -3,7 +3,7 @@
 # |  (_) | \/ (_ (_) | | (_) | | | \/
 #          /                       /
 
-prefix: "&b&lPC:&7 "
+prefix: "&b&lPolyconomy:&7"
 
 list-separator: "&7, &f"
 
@@ -35,7 +35,7 @@ command:
     header:
       - "&8&m+-----+&b Balance Top &8(&7Page &f%page%&8 - &f%currency%&8) &m+-----+&r"
     no-entries-on-page:
-      - "&7&iThere are no entries to display on this page."
+      - "&7##There are no entries to display on this page.##"
     entry:
       - "&8  %rank%.&f  %target-name%&7: &f%balance%"
   pay:
