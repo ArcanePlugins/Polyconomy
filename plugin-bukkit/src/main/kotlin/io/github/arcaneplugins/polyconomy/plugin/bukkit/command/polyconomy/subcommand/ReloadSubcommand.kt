@@ -19,7 +19,7 @@ object ReloadSubcommand : InternalCmd {
 
                 try {
                     plugin.softReload()
-                    plugin.translations.commandPolyconomyReloadSuccess.sendTo(sender)
+                    plugin.translations.commandPolyconomyReloadCompleted.sendTo(sender)
                 } catch (ex: Throwable) {
                     plugin.translations.commandPolyconomyReloadErrorGeneric.sendTo(sender, placeholders = mapOf(
                         "message" to Supplier { ex.message ?: ex::class.java.canonicalName },

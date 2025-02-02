@@ -220,7 +220,7 @@ object CurrencySubcommand : InternalCmd {
                     runBlocking {
                         plugin.storageManager.handler.unregisterCurrency(currency)
 
-                        plugin.translations.commandPolyconomyCurrencyUnregisterComplete.sendTo(sender, mapOf(
+                        plugin.translations.commandPolyconomyCurrencyUnregisterCompleted.sendTo(sender, mapOf(
                             "currency" to Supplier { currency.name }
                         ))
                     }

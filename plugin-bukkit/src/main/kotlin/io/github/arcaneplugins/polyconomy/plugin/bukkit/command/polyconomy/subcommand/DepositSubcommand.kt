@@ -66,7 +66,7 @@ object DepositSubcommand : InternalCmd {
                 }
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 
-                plugin.translations.commandPolyconomyDepositComplete.sendTo(sender, placeholders = mapOf(
+                plugin.translations.commandPolyconomyDepositCompleted.sendTo(sender, placeholders = mapOf(
                     "amount" to Supplier { amountFormatted },
                     "target-name" to Supplier { targetName },
                     "currency" to Supplier { currency.name },

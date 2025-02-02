@@ -17,7 +17,7 @@ object DbCleanupSubcommand : InternalCmd {
                 Bukkit.getScheduler().runTaskAsynchronously(plugin) { _ ->
                     runBlocking {
                         plugin.storageManager.handler.cleanup()
-                        plugin.translations.commandPolyconomySubroutineDbCleanupComplete.sendTo(sender)
+                        plugin.translations.commandPolyconomySubroutineDbCleanupCompleted.sendTo(sender)
                     }
                 }
             })

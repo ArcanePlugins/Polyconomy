@@ -3,6 +3,10 @@
 # |  (_) | \/ (_ (_) | | (_) | | | \/
 #          /                       /
 
+prefix: "&b&lPC:&7 "
+
+list-separator: "&7, &f"
+
 command:
   generic:
     error:
@@ -12,6 +16,8 @@ command:
       illformed-identifier: "Illformed identifier: "
       amount-zero-or-less:
         - "%prefix% &cError:&7 Amount &f%amount%&7 is too low; it must be greater than &f0&7."
+      not-yet-implemented:
+        - "%prefix% &cError:&7 Not yet implemented."
   balance:
     error:
       no-player:
@@ -40,10 +46,69 @@ command:
         - "%prefix% &cError:&7 You can't afford a payment of amount &f%amount%&7 in currency &f%currency%&7; your balance is &f%balance%&7."
     success:
       - "%prefix% Paid &f%amount%&7 to &f%target-name%&7 in currency &f%currency%&7. They now have &f%target-balance%&7. Your new balance is &f%balance%&7."
-
-list-separator: "&7, &f"
-
-prefix: "&b&lPC:&7 "
+  polyconomy:
+    currency:
+      register:
+        error:
+          already-exists:
+            - "%prefix% &cError:&7 The currency &f%currency%&7 already exists."
+        started:
+          - "%prefix% Registering currency &f%currency%&7..."
+        success:
+          - "%prefix% Currency &f%currency%&7 registered successfully."
+      unregister:
+        error:
+          is-primary:
+            - "%prefix% &cError:&7 You can't unregister currency &f%currency%&7 because it is a &fprimary currency&7."
+            - "%prefix% Consider making a different (new, if needed) currency a primary one so you can unregister &f%currency%&7."
+        started:
+          - "%prefix% Unregistering currency &f%currency%&7..."
+        completed:
+          - "%prefix% Unregistered currency &f%currency%&7 successfully."
+    deposit:
+      completed:
+        - "%prefix% Deposited &f%amount%&7 into &f%target-name%&7's account in currency &f%currency%&7."
+    reset:
+      completed:
+        - "%prefix% Reset &f%target-name%&7's balance in currency &f%currency%&7; they now have &f%target-balance%&7."
+    reload:
+      error:
+        generic:
+          - "%prefix% &cError:&7 An unexpected error occurred whilst reloading the plugin. Please check Console for more details. &fIf you have made changes to your configs, use a Online YAML Parser to check the syntax is correct.&7 Message: &8%message%"
+      started:
+        - "%prefix% Reloading..."
+      completed:
+        - "%prefix% Reloaded successfully."
+    subroutine:
+      db-cleanup:
+        start:
+          - "%prefix% Starting database cleanup..."
+        completed:
+          - "%prefix% Database cleanup complete."
+      h2-server:
+        error:
+          implementation:
+            - "%prefix% &cError:&7 You aren't running the H2 database as your storage implementation. (Do you need to reload or adjust this?)"
+          already-running:
+            - "%prefix% &cError:&7 The H2 debug webserver is already running."
+        started:
+          - "%prefix% Started H2 debug web server. To stop the server, please restart your server."
+    set:
+      completed:
+        - "%prefix% Set &f%target-name%&7's balance to &f%amount%&7 in currency &f%currency%&7."
+    version:
+      view:
+        - "&f&l%name% v%version% by ArcanePlugins"
+        - "&8  \u2022&b Authors:&7 %authors%"
+        - "&8  \u2022&b Description:&7 %description%"
+        - "&8  \u2022&b Website:&7 %website%"
+        - "&8  \u2022&b Support:&7 %support%"
+    withdraw:
+      error:
+        cant-afford:
+          - "%prefix% &f%target-name%&7 can't afford a withdrawal of &f%amount%&7 in currency &f%currency%&7."
+      completed:
+        - "%prefix% Withdrawn &f%amount%&7 from &f%target-name%&7's account in currency &f%currency%&7."
 
 metadata:
   file-version: 1
