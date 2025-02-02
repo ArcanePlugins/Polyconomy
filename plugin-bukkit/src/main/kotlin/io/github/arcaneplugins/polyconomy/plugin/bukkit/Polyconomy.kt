@@ -86,6 +86,7 @@ class Polyconomy : JavaPlugin(), Platform {
                 primaryCurrencyId = settingsCfg.primaryCurrencyId()
             )
             storageManager.startup(settingsCfg.storageImplementation())
+            translations.load()
             listenerManager.load()
             hookManager.registerAll()
             commandManager.load()

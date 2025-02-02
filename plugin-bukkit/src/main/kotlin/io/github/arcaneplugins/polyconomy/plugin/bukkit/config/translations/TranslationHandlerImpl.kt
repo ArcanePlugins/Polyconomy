@@ -5,6 +5,7 @@ import dev.jorel.commandapi.CommandAPI
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.Polyconomy
 import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.TranslationHandler
 import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.Translaton
+import io.github.arcaneplugins.polyconomy.plugin.core.util.ClassUtil
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
@@ -29,7 +30,7 @@ class TranslationHandlerImpl(
     ) {
 
         fun convertPapiPlaceholders(str: String, sender: CommandSender): String {
-            if (sender !is Player) {
+            if (sender !is Player || !ClassUtil.isValidClasspath("me.clip.placeholderapi.PlaceholderAPI")) {
                 return str
             }
 
@@ -58,6 +59,10 @@ class TranslationHandlerImpl(
 
     }
 
+    fun load() {
+        audiences = BukkitAudiences.create(plugin)
+    }
+
     override fun placeholderify(str: String, placeholders: Map<String, Supplier<String>>): String {
         var strMut = str
 
@@ -83,7 +88,7 @@ class TranslationHandlerImpl(
         )
     }
 
-    private val audiences = BukkitAudiences.create(plugin)
+    private lateinit var audiences: BukkitAudiences
 
     val listSeparator = TranslationImpl(this,
         arrayOf("list-separator"),
