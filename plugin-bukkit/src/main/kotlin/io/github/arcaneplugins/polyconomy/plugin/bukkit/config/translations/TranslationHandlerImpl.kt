@@ -199,10 +199,10 @@ class TranslationHandlerImpl(
     val commandPolyconomyVersionView = TranslationImpl(this,
         arrayOf("command", "polyconomy", "version", "view"),
         listOf("&f&l%name% v%version% by ArcanePlugins",
-            "&8  \u2022&b Authors:&7 %authors%",
+            "&8  \u2022&b Authors:&f %authors%",
             "&8  \u2022&b Description:&7 %description%",
-            "&8  \u2022&b Website:&7 %website%",
-            "&8  \u2022&b Support:&7 %support%"))
+            "&8  \u2022&b Website:&9&o %website%",
+            "&8  \u2022&b Support:&9&o %support%"))
     val commandPolyconomySetCompleted = TranslationImpl(this,
         arrayOf("command", "polyconomy", "set", "completed"),
         listOf("%prefix% Set &f%target-name%&7's balance to &f%amount%&7 in currency &f%currency%&7."))
