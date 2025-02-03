@@ -248,6 +248,7 @@ class H2Currency(
         return withContext(Dispatchers.IO) {
             handler.connection.prepareStatement(H2Statements.currencySetStartingBalance).use { statement ->
                 statement.setBigDecimal(1, new)
+                statement.setString(2, name)
                 statement.executeUpdate()
             }
         }
@@ -279,6 +280,62 @@ class H2Currency(
 
     override suspend fun setPresentationFormat(new: String) {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun registerLocale(
+        locale: Locale,
+        dispNameSingular: String,
+        dispNamePlural: String,
+        decimal: String,
+    ) {
+        withContext(Dispatchers.IO) {
+            if (hasLocale(locale)) {
+                throw IllegalStateException("Can't register locale $locale: Locale is already registered.")
+            }
+
+            handler.connection.prepareStatement(H2Statements.currencyRegisterLocale).use { statement ->
+                statement.setString(1, name)
+                statement.setString(2, locale.toLanguageTag())
+                statement.setString(3, dispNameSingular)
+                statement.setString(4, dispNamePlural)
+                statement.setString(5, decimal)
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun unregisterLocale(locale: Locale) {
+        if (!hasLocale(locale)) {
+            throw IllegalStateException("Can't unregister locale $locale: Locale is not registered.")
+        }
+
+        withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencyUnregisterLocale).use { statement ->
+                statement.setString(1, name)
+                statement.setString(2, locale.toLanguageTag())
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun hasLocale(locale: Locale): Boolean {
+        return withContext(Dispatchers.IO) {
+            return@withContext handler.connection.prepareStatement(H2Statements.currencyHasLocale).use { statement ->
+                statement.setString(1, name)
+                statement.setString(2, locale.toLanguageTag())
+                val rs = statement.executeQuery()
+
+                rs.next()
+
+                val count = rs.getInt(1)
+
+                return@use when (count) {
+                    0 -> false
+                    1 -> true
+                    else -> throw IllegalStateException("Currency ${name} has more than 1 database records for locale $locale when there should be one or none")
+                }
+            }
+        }
     }
 
     override fun equals(other: Any?): Boolean {

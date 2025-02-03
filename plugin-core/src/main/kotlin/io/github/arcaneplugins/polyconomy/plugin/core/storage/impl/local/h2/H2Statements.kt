@@ -599,6 +599,36 @@ object H2Statements {
         WHERE name = ?;
     """.trimIndent()
 
+    val currencyRegisterLocale = """
+        INSERT INTO CurrencyLocale
+            (id, locale, display_name_singular, display_name_plural, decimal)
+        VALUES
+            ((
+                SELECT id
+                FROM Currency
+                WHERE name = ?
+            ),  ?,      ?,                     ?,                   ?);
+    """.trimIndent()
+
+    val currencyUnregisterLocale = """
+        DELETE FROM CurrencyLocale
+        WHERE currency_id = (
+            SELECT id
+            FROM Currency
+            WHERE name = ?
+        ) AND locale = ?;
+    """.trimIndent()
+
+    val currencyHasLocale = """
+        SELECT COUNT(*)
+        FROM CurrencyLocale
+        WHERE id = (
+            SELECT id
+            FROM Currency
+            WHERE name = ?
+        ) AND locale = ?;
+    """.trimIndent()
+
     fun purgeOldTransactionsStatement(): String {
         val currentTimestamp = Instant.now().epochSecond
         val minTimestampLow = currentTimestamp - StorageHandler.baseTransactionAgePeriod
