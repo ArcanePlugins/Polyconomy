@@ -275,11 +275,21 @@ class H2Currency(
     }
 
     override suspend fun setAmountFormat(new: String) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetAmountFormat).use { statement ->
+                statement.setString(1, new)
+                statement.executeUpdate()
+            }
+        }
     }
 
     override suspend fun setPresentationFormat(new: String) {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetPresentationFormat).use { statement ->
+                statement.setString(1, new)
+                statement.executeUpdate()
+            }
+        }
     }
 
     override suspend fun registerLocale(
