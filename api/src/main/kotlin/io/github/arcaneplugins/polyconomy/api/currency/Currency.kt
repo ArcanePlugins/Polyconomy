@@ -60,4 +60,10 @@ abstract class Currency(
 
     abstract suspend fun setPresentationFormat(new: String)
 
+    abstract suspend fun registerLocale(locale: Locale, dispNameSingular: String, dispNamePlural: String, decimal: String)
+
+    abstract suspend fun unregisterLocale(locale: Locale)
+
+    abstract suspend fun hasLocale(locale: Locale): Boolean
+
 }

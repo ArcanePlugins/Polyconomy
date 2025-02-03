@@ -817,7 +817,7 @@ abstract class ConfigurateStorageHandler(
 
             override suspend fun setDecimal(locale: Locale, new: String) {
                 currencyNode()
-                    .node("decimal", locale.toLanguageTag())
+                    .node("locale", locale.toLanguageTag(), "decimal")
                     .set(new)
 
                 storageHandler.write()
@@ -852,6 +852,36 @@ abstract class ConfigurateStorageHandler(
 
                 // write
                 storageHandler.write()
+            }
+
+            override suspend fun registerLocale(
+                locale: Locale,
+                dispNameSingular: String,
+                dispNamePlural: String,
+                decimal: String,
+            ) {
+                if (hasLocale(locale)) {
+                    throw IllegalStateException("Locale $locale is already registered with currency $name")
+                }
+                setDisplayName(plural = false, locale, dispNameSingular)
+                setDisplayName(plural = true, locale, dispNamePlural)
+                setDecimal(locale, decimal)
+            }
+
+            override suspend fun unregisterLocale(locale: Locale) {
+                if (!hasLocale(locale)) {
+                    throw IllegalStateException("Locale $locale is not registered with currency $name")
+                }
+                currencyNode()
+                    .node("locale")
+                    .removeChild(locale.toLanguageTag())
+                storageHandler.write()
+            }
+
+            override suspend fun hasLocale(locale: Locale): Boolean {
+                return !currencyNode()
+                    .node("locale", locale.toLanguageTag())
+                    .virtual()
             }
 
         }

@@ -11,10 +11,11 @@ import io.github.arcaneplugins.polyconomy.plugin.bukkit.command.misc.args.Custom
 import io.github.arcaneplugins.polyconomy.plugin.bukkit.misc.PolyconomyPerm
 import kotlinx.coroutines.runBlocking
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.ChatColor.RED
 import java.util.*
 import java.util.function.Supplier
 
-@Suppress("UNUSED_VARIABLE")
 object CurrencySubcommand : InternalCmd {
 
     override fun build(plugin: Polyconomy): CommandAPICommand {
@@ -31,6 +32,25 @@ object CurrencySubcommand : InternalCmd {
         return CommandAPICommand("set")
             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
             .withSubcommands(
+                CommandAPICommand("name")
+                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
+                    .withArguments(
+                        CustomArguments.currencyArgument(plugin, "currency"),
+                        CustomArguments.identityStringArgument(plugin, "new"))
+                    .executes(CommandExecutor { sender, args ->
+                        val currency = args.get("currency") as Currency
+                        val new = args.get("new") as String
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.name -> ${new}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        if (runBlocking { currency.isPrimary() }) {
+                            sender.sendMessage("${RED}Error: You can't rename a primary currency.")
+                            throw plugin.translations.commandApiFailure()
+                        }
+                        runBlocking { currency.setName(new) }
+                        sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                    }),
                 CommandAPICommand("startingBalance")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
@@ -39,8 +59,17 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
-                        plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                        throw plugin.translations.commandApiFailure()
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.startingBalance -> ${newValue}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                            runBlocking {
+                                currency.setStartingBalance(newValue.toBigDecimal())
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                                sender.sendMessage("${ChatColor.LIGHT_PURPLE}WARNING: The new starting balance will only affect new economy accounts, not existing accounts, to avoid unwanted mutation to your database. You can reset balances for individual players using `/eco reset`.")
+                            }
+                        })
                     }),
                 CommandAPICommand("symbol")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
@@ -50,8 +79,16 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                        throw plugin.translations.commandApiFailure()
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.symbol -> ${newValue}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                            runBlocking {
+                                currency.setSymbol(newValue)
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                            }
+                        })
                     }),
                 CommandAPICommand("amountFormat")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
@@ -60,8 +97,16 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                        throw plugin.translations.commandApiFailure()
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.amountFormat -> ${newValue}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                            runBlocking {
+                                currency.setAmountFormat(newValue)
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                            }
+                        })
                     }),
                 CommandAPICommand("presentationFormat")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
@@ -69,8 +114,16 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
-                        plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                        throw plugin.translations.commandApiFailure()
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.presentationFormat -> ${newValue}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                            runBlocking {
+                                currency.setPresentationFormat(newValue)
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                            }
+                        })
                     }),
                 CommandAPICommand("conversionRate")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
@@ -79,8 +132,16 @@ object CurrencySubcommand : InternalCmd {
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
-                        plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                        throw plugin.translations.commandApiFailure()
+
+                        //TODO Translatable messages
+                        val operation = "${currency.name}.conversionRate -> ${newValue}"
+                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+                            runBlocking {
+                                currency.setConversionRate(newValue.toBigDecimal())
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                            }
+                        })
                     }),
                 CommandAPICommand("locale")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
@@ -90,29 +151,109 @@ object CurrencySubcommand : InternalCmd {
                             .withArguments(
                                 CustomArguments.currencyArgument(plugin, "currency"),
                                 CustomArguments.localeArgument(plugin, "locale"),
-                                TextArgument("dispNameSingular"),
-                                TextArgument("dispNamePlural"),
-                                TextArgument("dispDecimal"),
+                                TextArgument("nameSingular"),
+                                TextArgument("namePlural"),
+                                TextArgument("decimal"),
                             )
                             .executes(CommandExecutor { sender, args ->
+                                val currency = args.get("currency") as Currency
                                 val locale = args.get("locale") as Locale
-                                plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                                throw plugin.translations.commandApiFailure()
+                                val dispNameSingular = args.get("nameSingular") as String
+                                val dispNamePlural = args.get("namePlural") as String
+                                val decimal = args.get("decimal") as String
+
+                                //TODO Translatable messages
+                                val operation = "${currency.name}.locale.${locale}.register"
+                                sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                                runBlocking {
+                                    if (currency.hasLocale(locale)) {
+                                        sender.sendMessage("$RED${operation}: Error: This currency already has this locale defined - instead of attempting to register a new locale, you should use the `set` subcommand to adjust values on the existing currency locale data.")
+                                        throw plugin.translations.commandApiFailure()
+                                    }
+                                    currency.registerLocale(
+                                        locale = locale,
+                                        dispNameSingular = dispNameSingular,
+                                        dispNamePlural = dispNamePlural,
+                                        decimal = decimal
+                                    )
+                                }
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
                             }),
                         CommandAPICommand("set")
                             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
-                            .withArguments(
-                                CustomArguments.currencyArgument(plugin, "currency"),
-                                CustomArguments.localeArgument(plugin, "locale"),
-                                TextArgument("dispNameSingular"),
-                                TextArgument("dispNamePlural"),
-                                TextArgument("dispDecimal"),
-                            )
-                            .executes(CommandExecutor { sender, args ->
-                                val locale = args.get("locale") as Locale
-                                plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                                throw plugin.translations.commandApiFailure()
-                            }),
+                            .withSubcommands(
+                                CommandAPICommand("nameSingular")
+                                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
+                                    .withArguments(
+                                        CustomArguments.currencyArgument(plugin, "currency"),
+                                        CustomArguments.localeArgument(plugin, "locale"),
+                                        TextArgument("newValue"),
+                                    )
+                                    .executes(CommandExecutor { sender, args ->
+                                        val currency = args.get("currency") as Currency
+                                        val locale = args.get("locale") as Locale
+                                        val new = args.get("newValue") as String
+
+                                        //TODO Translatable messages
+                                        val operation = "${currency.name}.locale.${locale}.nameSingular -> ${new}"
+                                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                                        runBlocking {
+                                            currency.setDisplayName(
+                                                plural = false,
+                                                locale = locale,
+                                                new = new
+                                            )
+                                        }
+                                        sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                                    }),
+                                CommandAPICommand("namePlural")
+                                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
+                                    .withArguments(
+                                        CustomArguments.currencyArgument(plugin, "currency"),
+                                        CustomArguments.localeArgument(plugin, "locale"),
+                                        TextArgument("newValue"),
+                                    )
+                                    .executes(CommandExecutor { sender, args ->
+                                        val currency = args.get("currency") as Currency
+                                        val locale = args.get("locale") as Locale
+                                        val new = args.get("newValue") as String
+
+                                        //TODO Translatable messages
+                                        val operation = "${currency.name}.locale.${locale}.namePlural -> ${new}"
+                                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                                        runBlocking {
+                                            currency.setDisplayName(
+                                                plural = true,
+                                                locale = locale,
+                                                new = new
+                                            )
+                                        }
+                                        sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                                    }),
+                                CommandAPICommand("decimal")
+                                    .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
+                                    .withArguments(
+                                        CustomArguments.currencyArgument(plugin, "currency"),
+                                        CustomArguments.localeArgument(plugin, "locale"),
+                                        TextArgument("newValue"),
+                                    )
+                                    .executes(CommandExecutor { sender, args ->
+                                        val currency = args.get("currency") as Currency
+                                        val locale = args.get("locale") as Locale
+                                        val new = args.get("newValue") as String
+
+                                        //TODO Translatable messages
+                                        val operation = "${currency.name}.locale.${locale}.decimal -> ${new}"
+                                        sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+                                        runBlocking {
+                                            currency.setDecimal(
+                                                locale = locale,
+                                                new = new
+                                            )
+                                        }
+                                        sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
+                                    }),
+                            ),
                         CommandAPICommand("unregister")
                             .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                             .withArguments(
@@ -120,9 +261,25 @@ object CurrencySubcommand : InternalCmd {
                                 CustomArguments.localeArgument(plugin, "locale"),
                             )
                             .executes(CommandExecutor { sender, args ->
+                                val currency = args.get("currency") as Currency
                                 val locale = args.get("locale") as Locale
-                                plugin.translations.commandGenericNotYetImplemented.sendTo(sender)
-                                throw plugin.translations.commandApiFailure()
+
+                                //TODO Translatable messages
+                                val operation = "${currency.name}.locale.${locale}.unregister"
+                                sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
+
+                                // if they are trying to unregister the last locale left, stop
+                                if (runBlocking { currency.getLocaleDecimalMap().size < 2}) {
+                                    // todo translatable message
+                                    sender.sendMessage("${RED}${operation} Error: There must be 2 or more locales in this currency so the currency has another locale to fallback one. Try creating the new locale first with `register`, or adjust the values of this existing one with `set`.")
+                                    throw plugin.translations.commandApiFailure()
+                                }
+
+                                // Unregister the locale
+                                runBlocking { currency.unregisterLocale(locale) }
+
+                                // todo translatable message
+                                sender.sendMessage("${ChatColor.GREEN}${operation}: Ok.")
                             })
                     )
             )
