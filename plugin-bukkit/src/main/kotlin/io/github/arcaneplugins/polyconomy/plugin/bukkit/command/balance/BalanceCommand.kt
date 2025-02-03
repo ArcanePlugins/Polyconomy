@@ -38,9 +38,11 @@ object BalanceCommand : InternalCmd {
                     throw plugin.translations.commandApiFailure()
                 }
 
-                val currency: Currency = args.getOptional("currency").orElseGet { runBlocking {
-                    plugin.storageManager.handler.getPrimaryCurrency()
-                } } as Currency
+                val currency: Currency = args.getOptional("currency").orElseGet {
+                    runBlocking {
+                        plugin.storageManager.handler.getPrimaryCurrency()
+                    }
+                } as Currency
 
                 val balance = runBlocking {
                     plugin.storageManager.handler.getOrCreatePlayerAccount(
@@ -53,11 +55,13 @@ object BalanceCommand : InternalCmd {
                     currency.format(balance, plugin.settingsCfg.defaultLocale())
                 }
 
-                plugin.translations.commandBalanceView.sendTo(sender, placeholders = mapOf(
-                    "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
-                    "balance" to Supplier { balanceFmt },
-                    "currency" to Supplier { currency.name },
-                ))
+                plugin.translations.commandBalanceView.sendTo(
+                    sender, placeholders = mapOf(
+                        "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
+                        "balance" to Supplier { balanceFmt },
+                        "currency" to Supplier { currency.name },
+                    )
+                )
             })
     }
 

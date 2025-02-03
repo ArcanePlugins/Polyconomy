@@ -1,8 +1,8 @@
 package io.github.arcaneplugins.polyconomy.plugin.core
 
 import io.github.arcaneplugins.polyconomy.plugin.core.config.Config
-import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.TranslationsCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.config.settings.SettingsCfg
+import io.github.arcaneplugins.polyconomy.plugin.core.config.translations.TranslationsCfg
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugCategory
 import io.github.arcaneplugins.polyconomy.plugin.core.debug.DebugManager
 import io.github.arcaneplugins.polyconomy.plugin.core.storage.StorageManager

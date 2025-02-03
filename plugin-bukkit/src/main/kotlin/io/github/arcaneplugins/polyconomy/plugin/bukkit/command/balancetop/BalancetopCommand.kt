@@ -29,8 +29,9 @@ object BalancetopCommand : InternalCmd {
                 val page = args.getOptional("page").orElse(1) as Int
 
                 if (page < 1) {
-                    plugin.translations.commandBalancetopErrorPageTooLow.sendTo(sender, placeholders = mapOf(
-                        "%page%" to Supplier { page.toString()}
+                    plugin.translations.commandBalancetopErrorPageTooLow.sendTo(
+                        sender, placeholders = mapOf(
+                        "%page%" to Supplier { page.toString() }
                     ))
                     throw plugin.translations.commandApiFailure()
                 }
@@ -64,7 +65,8 @@ object BalancetopCommand : InternalCmd {
                         currency.getDisplayName(true, locale)
                     }
 
-                    plugin.translations.commandBalancetopHeader.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandBalancetopHeader.sendTo(
+                        sender, placeholders = mapOf(
                         "page" to Supplier { page.toString() },
                         "currency" to Supplier { currencyName }
                     ))
@@ -73,7 +75,8 @@ object BalancetopCommand : InternalCmd {
                         plugin.translations.commandBalancetopNoEntriesOnPage.sendTo(sender)
                     } else {
                         baltop.onEachIndexed { index, (username, balance) ->
-                            plugin.translations.commandBalancetopEntry.sendTo(sender, placeholders = mapOf(
+                            plugin.translations.commandBalancetopEntry.sendTo(
+                                sender, placeholders = mapOf(
                                 "rank" to Supplier { (((page - 1) * PAGE_SIZE) + index + 1).toString() },
                                 "target-name" to Supplier { username },
                                 "balance" to Supplier { runBlocking { currency.format(balance, locale) } }

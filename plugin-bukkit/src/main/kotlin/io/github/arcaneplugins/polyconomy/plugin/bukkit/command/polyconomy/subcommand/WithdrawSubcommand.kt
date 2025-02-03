@@ -37,7 +37,8 @@ object WithdrawSubcommand : InternalCmd {
                 }
 
                 if (amount <= 0) {
-                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(
+                        sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() }
                     ))
                     throw plugin.translations.commandApiFailure()
@@ -69,11 +70,13 @@ object WithdrawSubcommand : InternalCmd {
                 }
 
                 if (!canAfford) {
-                    plugin.translations.commandPolyconomyWithdrawErrorCantAfford.sendTo(sender, placeholders = mapOf(
-                        "target-name" to Supplier { targetName },
-                        "amount" to Supplier { amountFormatted },
-                        "currency" to Supplier { currency.name },
-                    ))
+                    plugin.translations.commandPolyconomyWithdrawErrorCantAfford.sendTo(
+                        sender, placeholders = mapOf(
+                            "target-name" to Supplier { targetName },
+                            "amount" to Supplier { amountFormatted },
+                            "currency" to Supplier { currency.name },
+                        )
+                    )
                     throw plugin.translations.commandApiFailure()
                 }
 
@@ -87,11 +90,13 @@ object WithdrawSubcommand : InternalCmd {
                     )
                 }
 
-                plugin.translations.commandPolyconomyWithdrawCompleted.sendTo(sender, placeholders = mapOf(
-                    "target-name" to Supplier { targetName },
-                    "amount" to Supplier { amountFormatted },
-                    "currency" to Supplier { currency.name },
-                ))
+                plugin.translations.commandPolyconomyWithdrawCompleted.sendTo(
+                    sender, placeholders = mapOf(
+                        "target-name" to Supplier { targetName },
+                        "amount" to Supplier { amountFormatted },
+                        "currency" to Supplier { currency.name },
+                    )
+                )
             })
     }
 }

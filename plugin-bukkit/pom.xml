@@ -242,7 +242,8 @@
                         </relocation>
                         <relocation>
                             <pattern>dev.jorel.commandapi</pattern>
-                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.commandapi</shadedPattern>
+                            <shadedPattern>io.github.arcaneplugins.polyconomy.plugin.bukkit.lib.commandapi
+                            </shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>de.themoep.minedown</pattern>

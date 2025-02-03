@@ -3,7 +3,7 @@ package io.github.arcaneplugins.polyconomy.plugin.core.config.translations
 import io.github.arcaneplugins.polyconomy.plugin.core.Platform
 import org.spongepowered.configurate.CommentedConfigurationNode
 
-public abstract class Translaton(
+abstract class Translaton(
     val platform: Platform,
     val cfgPath: Array<String>,
     val defaultVal: List<String>,

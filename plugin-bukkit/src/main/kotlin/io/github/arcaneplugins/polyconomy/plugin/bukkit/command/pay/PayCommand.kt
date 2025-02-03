@@ -44,7 +44,8 @@ object PayCommand : InternalCmd {
                 val amountBd = amount.toBigDecimal()
 
                 if (amount <= 0) {
-                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(
+                        sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() }
                     ))
                     throw plugin.translations.commandApiFailure()
@@ -68,7 +69,8 @@ object PayCommand : InternalCmd {
                 }
 
                 if (!canAfford) {
-                    plugin.translations.commandPayErrorCantAfford.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandPayErrorCantAfford.sendTo(
+                        sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() },
                         "balance" to Supplier { runBlocking { senderAccount.getBalance(currency).toString() } },
                         "currency" to Supplier { currency.name }
@@ -111,13 +113,15 @@ object PayCommand : InternalCmd {
                     currency.format(senderAccount.getBalance(currency), plugin.settingsCfg.defaultLocale())
                 }
 
-                plugin.translations.commandPaySuccess.sendTo(sender, placeholders = mapOf(
-                    "amount" to Supplier { amountFmt },
-                    "balance" to Supplier { newBalance },
-                    "currency" to Supplier { currency.name },
-                    "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
-                    "target-balance" to Supplier { runBlocking { targetAccount.getBalance(currency).toString() } },
-                ))
+                plugin.translations.commandPaySuccess.sendTo(
+                    sender, placeholders = mapOf(
+                        "amount" to Supplier { amountFmt },
+                        "balance" to Supplier { newBalance },
+                        "currency" to Supplier { currency.name },
+                        "target-name" to Supplier { targetPlayer.name ?: targetPlayer.uniqueId.toString() },
+                        "target-balance" to Supplier { runBlocking { targetAccount.getBalance(currency).toString() } },
+                    )
+                )
             })
     }
 
