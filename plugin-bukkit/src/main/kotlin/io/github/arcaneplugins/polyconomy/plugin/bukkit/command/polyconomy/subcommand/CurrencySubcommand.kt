@@ -36,7 +36,8 @@ object CurrencySubcommand : InternalCmd {
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
-                        CustomArguments.identityStringArgument(plugin, "new"))
+                        CustomArguments.identityStringArgument(plugin, "new")
+                    )
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val new = args.get("new") as String
@@ -55,7 +56,8 @@ object CurrencySubcommand : InternalCmd {
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
-                        DoubleArgument("newValue"))
+                        DoubleArgument("newValue")
+                    )
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
@@ -75,7 +77,8 @@ object CurrencySubcommand : InternalCmd {
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
                     .withArguments(
                         CustomArguments.currencyArgument(plugin, "currency"),
-                        TextArgument("newValue"))
+                        TextArgument("newValue")
+                    )
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
@@ -92,8 +95,10 @@ object CurrencySubcommand : InternalCmd {
                     }),
                 CommandAPICommand("amountFormat")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
-                    .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
-                        TextArgument("newValue"))
+                    .withArguments(
+                        CustomArguments.currencyArgument(plugin, "currency"),
+                        TextArgument("newValue")
+                    )
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as String
@@ -127,8 +132,10 @@ object CurrencySubcommand : InternalCmd {
                     }),
                 CommandAPICommand("conversionRate")
                     .withPermission(PolyconomyPerm.COMMAND_POLYCONOMY_CURRENCY_SET.toString())
-                    .withArguments(CustomArguments.currencyArgument(plugin, "currency"),
-                        DoubleArgument("newValue"))
+                    .withArguments(
+                        CustomArguments.currencyArgument(plugin, "currency"),
+                        DoubleArgument("newValue")
+                    )
                     .executes(CommandExecutor { sender, args ->
                         val currency = args.get("currency") as Currency
                         val newValue = args.get("newValue") as Double
@@ -269,7 +276,7 @@ object CurrencySubcommand : InternalCmd {
                                 sender.sendMessage("${ChatColor.YELLOW}${operation}: Processing...")
 
                                 // if they are trying to unregister the last locale left, stop
-                                if (runBlocking { currency.getLocaleDecimalMap().size < 2}) {
+                                if (runBlocking { currency.getLocaleDecimalMap().size < 2 }) {
                                     // todo translatable message
                                     sender.sendMessage("${RED}${operation} Error: There must be 2 or more locales in this currency so the currency has another locale to fallback one. Try creating the new locale first with `register`, or adjust the values of this existing one with `set`.")
                                     throw plugin.translations.commandApiFailure()
@@ -311,23 +318,28 @@ object CurrencySubcommand : InternalCmd {
                 val dispNameSingular = args.get("dispNameSingular") as String
                 val dispNamePlural = args.get("dispNamePlural") as String
                 val dispDecimal = args.get("dispDecimal") as String
-                val presentationFormat: String = args.getOptional("presentationFormat").orElse(Currency.DEFAULT_PRESENTATION_FORMAT) as String
-                val amountFormat: String = args.getOptional("amountFormat").orElse(Currency.DEFAULT_AMOUNT_FORMAT) as String
+                val presentationFormat: String =
+                    args.getOptional("presentationFormat").orElse(Currency.DEFAULT_PRESENTATION_FORMAT) as String
+                val amountFormat: String =
+                    args.getOptional("amountFormat").orElse(Currency.DEFAULT_AMOUNT_FORMAT) as String
 
                 val currencyAlreadyExists = runBlocking {
                     plugin.storageManager.handler.hasCurrency(name)
                 }
 
                 if (currencyAlreadyExists) {
-                    plugin.translations.commandPolyconomyCurrencyRegisterErrorAlreadyExists.sendTo(sender, mapOf(
+                    plugin.translations.commandPolyconomyCurrencyRegisterErrorAlreadyExists.sendTo(
+                        sender, mapOf(
                         "currency" to Supplier { name }
                     ))
                     throw plugin.translations.commandApiFailure()
                 }
 
-                plugin.translations.commandPolyconomyCurrencyRegisterStarted.sendTo(sender, placeholders = mapOf(
-                    "currency" to Supplier { name },
-                ))
+                plugin.translations.commandPolyconomyCurrencyRegisterStarted.sendTo(
+                    sender, placeholders = mapOf(
+                        "currency" to Supplier { name },
+                    )
+                )
 
                 Bukkit.getServer().scheduler.runTaskAsynchronously(plugin) { ->
                     runBlocking {
@@ -344,7 +356,8 @@ object CurrencySubcommand : InternalCmd {
                         )
                     }
 
-                    plugin.translations.commandPolyconomyCurrencyRegisterSuccess.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandPolyconomyCurrencyRegisterSuccess.sendTo(
+                        sender, placeholders = mapOf(
                         "currency" to Supplier { name }
                     ))
                 }
@@ -360,13 +373,15 @@ object CurrencySubcommand : InternalCmd {
             .executes(CommandExecutor { sender, args ->
                 val currency = args.get("currency") as Currency
 
-                plugin.translations.commandPolyconomyCurrencyUnregisterStarted.sendTo(sender, mapOf(
+                plugin.translations.commandPolyconomyCurrencyUnregisterStarted.sendTo(
+                    sender, mapOf(
                     "currency" to Supplier { currency.name }
                 ))
 
                 runBlocking {
                     if (currency.isPrimary()) {
-                        plugin.translations.commandPolyconomyCurrencyUnregisterErrorIsPrimary.sendTo(sender, mapOf(
+                        plugin.translations.commandPolyconomyCurrencyUnregisterErrorIsPrimary.sendTo(
+                            sender, mapOf(
                             "currency" to Supplier { currency.name }
                         ))
                         throw plugin.translations.commandApiFailure()
@@ -377,7 +392,8 @@ object CurrencySubcommand : InternalCmd {
                     runBlocking {
                         plugin.storageManager.handler.unregisterCurrency(currency)
 
-                        plugin.translations.commandPolyconomyCurrencyUnregisterCompleted.sendTo(sender, mapOf(
+                        plugin.translations.commandPolyconomyCurrencyUnregisterCompleted.sendTo(
+                            sender, mapOf(
                             "currency" to Supplier { currency.name }
                         ))
                     }

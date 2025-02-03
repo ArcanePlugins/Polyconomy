@@ -799,7 +799,14 @@ abstract class ConfigurateStorageHandler(
                 storageHandler.write()
 
                 if (getDisplayName(plural, locale) != new) {
-                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getDisplayName(plural, locale)} != ${new}")
+                    throw IllegalStateException(
+                        "Operation unsuccessful; values do not match: ${
+                            getDisplayName(
+                                plural,
+                                locale
+                            )
+                        } != ${new}"
+                    )
                 }
             }
 

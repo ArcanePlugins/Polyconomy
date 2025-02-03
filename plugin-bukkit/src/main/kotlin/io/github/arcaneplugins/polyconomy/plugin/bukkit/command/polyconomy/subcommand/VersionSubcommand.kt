@@ -16,7 +16,8 @@ object VersionSubcommand : InternalCmd {
             .executes(CommandExecutor { sender, _ ->
                 val pdf = plugin.description
 
-                plugin.translations.commandPolyconomyVersionView.sendTo(sender, placeholders = mapOf(
+                plugin.translations.commandPolyconomyVersionView.sendTo(
+                    sender, placeholders = mapOf(
                     "name" to Supplier { pdf.name },
                     "version" to Supplier { pdf.version },
                     "authors" to Supplier { plugin.translations.joinStrings(pdf.authors) },

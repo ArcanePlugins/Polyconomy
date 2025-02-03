@@ -183,17 +183,21 @@ class VaultUnlockedEconomyProvider(
     }
 
     override fun defaultCurrencyNamePlural(pluginName: String): String {
-        return runBlocking { primaryCurrency().getDisplayName(
-            plural = true,
-            locale = plugin.settingsCfg.defaultLocale()
-        ) }
+        return runBlocking {
+            primaryCurrency().getDisplayName(
+                plural = true,
+                locale = plugin.settingsCfg.defaultLocale()
+            )
+        }
     }
 
     override fun defaultCurrencyNameSingular(pluginName: String): String {
-        return runBlocking { primaryCurrency().getDisplayName(
-            plural = false,
-            locale = plugin.settingsCfg.defaultLocale()
-        ) }
+        return runBlocking {
+            primaryCurrency().getDisplayName(
+                plural = false,
+                locale = plugin.settingsCfg.defaultLocale()
+            )
+        }
     }
 
     override fun currencies(): Collection<String> {

@@ -55,12 +55,15 @@ object ResetSubcommand : InternalCmd {
 
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 
-                plugin.translations.commandPolyconomyResetCompleted.sendTo(sender, placeholders = mapOf(
+                plugin.translations.commandPolyconomyResetCompleted.sendTo(
+                    sender, placeholders = mapOf(
                     "target-name" to Supplier { targetName },
                     "currency" to Supplier { currency.name },
-                    "target-balance" to Supplier { runBlocking {
-                        currency.format(targetAccount.getBalance(currency), plugin.settingsCfg.defaultLocale())
-                    } }
+                    "target-balance" to Supplier {
+                        runBlocking {
+                            currency.format(targetAccount.getBalance(currency), plugin.settingsCfg.defaultLocale())
+                        }
+                    }
                 ))
             })
     }

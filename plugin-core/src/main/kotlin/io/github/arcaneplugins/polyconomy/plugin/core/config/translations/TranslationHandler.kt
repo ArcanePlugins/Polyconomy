@@ -7,13 +7,13 @@ abstract class TranslationHandler(
     val platform: Platform,
 ) {
 
-     abstract fun placeholderify(
+    abstract fun placeholderify(
         str: String,
         placeholders: Map<String, Supplier<String>>,
     ): String
 
     abstract fun joinStrings(
-        strs: Collection<String>
+        strs: Collection<String>,
     ): String
 
 }

@@ -3,7 +3,8 @@
  */
 CREATE TABLE IF NOT EXISTS arceco_player_usernames
 (
-    uuid CHAR
+    uuid
+    CHAR
 (
     36
 ) NOT NULL PRIMARY KEY,

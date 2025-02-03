@@ -21,9 +21,11 @@ object ReloadSubcommand : InternalCmd {
                     plugin.softReload()
                     plugin.translations.commandPolyconomyReloadCompleted.sendTo(sender)
                 } catch (ex: Throwable) {
-                    plugin.translations.commandPolyconomyReloadErrorGeneric.sendTo(sender, placeholders = mapOf(
-                        "message" to Supplier { ex.message ?: ex::class.java.canonicalName },
-                    ))
+                    plugin.translations.commandPolyconomyReloadErrorGeneric.sendTo(
+                        sender, placeholders = mapOf(
+                            "message" to Supplier { ex.message ?: ex::class.java.canonicalName },
+                        )
+                    )
                     if (ex !is DescribedThrowable) {
                         plugin.nativeLogger.severe("An error occurred whilst reloading Polyconomy via the `reload` subcommand. Stack trace:")
                         ex.printStackTrace()

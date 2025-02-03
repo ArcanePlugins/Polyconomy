@@ -36,7 +36,8 @@ object SetSubcommand : InternalCmd {
                 }
 
                 if (amount <= 0) {
-                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
+                    plugin.translations.commandGenericAmountZeroOrLess.sendTo(
+                        sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() }
                     ))
                     throw plugin.translations.commandApiFailure()
@@ -70,11 +71,13 @@ object SetSubcommand : InternalCmd {
                 }
                 val targetName = targetPlayer.name ?: targetPlayer.uniqueId.toString()
 
-                plugin.translations.commandPolyconomySetCompleted.sendTo(sender, placeholders = mapOf(
-                    "target-name" to Supplier { targetName },
-                    "amount" to Supplier { amountFormatted },
-                    "currency" to Supplier { currency.name },
-                ))
+                plugin.translations.commandPolyconomySetCompleted.sendTo(
+                    sender, placeholders = mapOf(
+                        "target-name" to Supplier { targetName },
+                        "amount" to Supplier { amountFormatted },
+                        "currency" to Supplier { currency.name },
+                    )
+                )
             })
     }
 }

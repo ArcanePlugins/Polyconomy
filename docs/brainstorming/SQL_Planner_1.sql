@@ -23,7 +23,8 @@ Every time a player joins, it updates their username here.
 CREATE TABLE IF NOT EXISTS ArcEco_PlayerCache
 (
     /* PlayerUUID, PlayerUsername, Timestamp */
-    player_uuid VARCHAR
+    player_uuid
+    VARCHAR
 (
     32
 ) PRIMARY KEY,
@@ -216,7 +217,8 @@ CREATE TABLE IF NOT EXISTS ArcEco_NonPlayerAccountTransactions
 CREATE TABLE IF NOT EXISTS ArcEco_CurrentIds
 (
     /* TableNamesEnum, Value */
-    table_name VARCHAR
+    table_name
+    VARCHAR
 (
     64
 ) PRIMARY KEY,
