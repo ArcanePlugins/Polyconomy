@@ -33,6 +33,11 @@ object BalanceCommand : InternalCmd {
                     }
                 } as OfflinePlayer
 
+                if (!targetPlayer.hasPlayedBefore()) {
+                    plugin.translations.commandGenericErrorNotPlayedBefore.sendTo(sender)
+                    throw plugin.translations.commandApiFailure()
+                }
+
                 val currency: Currency = args.getOptional("currency").orElseGet { runBlocking {
                     plugin.storageManager.handler.getPrimaryCurrency()
                 } } as Currency

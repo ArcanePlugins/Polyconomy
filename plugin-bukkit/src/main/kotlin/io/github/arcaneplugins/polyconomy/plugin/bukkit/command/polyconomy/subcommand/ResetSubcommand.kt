@@ -27,6 +27,11 @@ object ResetSubcommand : InternalCmd {
             .executes(CommandExecutor { sender, args ->
                 val targetPlayer = args.get("player") as OfflinePlayer
 
+                if (!targetPlayer.hasPlayedBefore()) {
+                    plugin.translations.commandGenericErrorNotPlayedBefore.sendTo(sender)
+                    throw plugin.translations.commandApiFailure()
+                }
+
                 val targetAccount = runBlocking {
                     plugin.storageManager.handler
                         .getOrCreatePlayerAccount(

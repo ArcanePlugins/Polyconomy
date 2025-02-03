@@ -30,6 +30,11 @@ object PayCommand : InternalCmd {
             .executesPlayer(PlayerCommandExecutor { sender, args ->
                 val targetPlayer = args.get("player") as OfflinePlayer
 
+                if (!targetPlayer.hasPlayedBefore()) {
+                    plugin.translations.commandGenericErrorNotPlayedBefore.sendTo(sender)
+                    throw plugin.translations.commandApiFailure()
+                }
+
                 if (sender.uniqueId == targetPlayer.uniqueId) {
                     plugin.translations.commandPayErrorNotYourself.sendTo(sender)
                     throw plugin.translations.commandApiFailure()
