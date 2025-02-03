@@ -629,6 +629,18 @@ object H2Statements {
         ) AND locale = ?;
     """.trimIndent()
 
+    val currencySetAmountFormat = """
+        UPDATE Currency
+        SET amount_format = ?
+        WHERE name = ?;
+    """.trimIndent()
+
+    val currencySetPresentationFormat = """
+        UPDATE Currency
+        SET presentation_format = ?
+        WHERE name = ?;
+    """.trimIndent()
+
     fun purgeOldTransactionsStatement(): String {
         val currentTimestamp = Instant.now().epochSecond
         val minTimestampLow = currentTimestamp - StorageHandler.baseTransactionAgePeriod
