@@ -4,8 +4,11 @@ import java.math.BigDecimal
 import java.util.*
 
 abstract class Currency(
-    val name: String,
+    name: String,
 ) {
+
+    var name = name
+        protected set
 
     companion object {
         const val DEFAULT_NAME = "dollar"
@@ -40,5 +43,21 @@ abstract class Currency(
         amount: BigDecimal,
         locale: Locale,
     ): String
+
+    abstract suspend fun setName(new: String)
+
+    abstract suspend fun setSymbol(new: String)
+
+    abstract suspend fun setDisplayName(plural: Boolean, locale: Locale, new: String)
+
+    abstract suspend fun setStartingBalance(new: BigDecimal)
+
+    abstract suspend fun setDecimal(locale: Locale, new: String)
+
+    abstract suspend fun setConversionRate(new: BigDecimal)
+
+    abstract suspend fun setAmountFormat(new: String)
+
+    abstract suspend fun setPresentationFormat(new: String)
 
 }

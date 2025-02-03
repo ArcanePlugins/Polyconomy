@@ -545,6 +545,60 @@ object H2Statements {
         OFFSET ?;
     """.trimIndent()
 
+    val currencySetName = """
+        UPDATE Currency
+        SET name = ?
+        WHERE name = ?;
+    """.trimIndent()
+
+    val currencySetSymbol = """
+        UPDATE Currency
+        SET symbol = ?
+        WHERE name = ?;
+    """.trimIndent()
+
+    val currencySetDisplayNameSingular = """
+        UPDATE CurrencyLocale
+        SET display_name_singular = ?
+        WHERE id = (
+            SELECT id
+            FROM Currency
+            WHERE name = ?
+        ) AND locale = ?;
+    """.trimIndent()
+
+    val currencySetDisplayNamePlural = """
+        UPDATE CurrencyLocale
+        SET display_name_plural = ?
+        WHERE id = (
+            SELECT id
+            FROM Currency
+            WHERE name = ?
+        ) AND locale = ?;
+    """.trimIndent()
+
+    val currencySetStartingBalance = """
+        UPDATE Currency
+        SET starting_balance = ?
+        WHERE name = ?;
+    """.trimIndent()
+
+    val currencySetDecimal = """
+        UPDATE CurrencyLocale
+        SET decimal = ?
+        WHERE id = (
+            SELECT id
+            FROM Currency
+            WHERE name = ?
+        ) AND locale = ?;
+    """.trimIndent()
+
+    val currencySetConversionRate = """
+        UPDATE Currency
+        SET converison_rate = ?
+        WHERE name = ?;
+    """.trimIndent()
+
     fun purgeOldTransactionsStatement(): String {
         val currentTimestamp = Instant.now().epochSecond
         val minTimestampLow = currentTimestamp - StorageHandler.baseTransactionAgePeriod

@@ -201,6 +201,86 @@ class H2Currency(
         }
     }
 
+    override suspend fun setName(new: String) {
+        if (name == new) {
+            throw IllegalStateException("Currency name is already ${new}; can't rename to the same name")
+        }
+
+        if (isPrimary()) {
+            throw IllegalStateException("Unable to rename a primary currency. Try make another currency the primary one temporarily, then change this currency's name, then set back to primary currency. This is a safety measure.")
+        }
+
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetName).use { statement ->
+                statement.setString(1, new)
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setSymbol(new: String) {
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetSymbol).use { statement ->
+                statement.setString(1, new)
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setDisplayName(plural: Boolean, locale: Locale, new: String) {
+        return withContext(Dispatchers.IO) {
+            val statementStr: String = if (plural) {
+                H2Statements.currencySetDisplayNamePlural
+            } else {
+                H2Statements.currencySetDisplayNameSingular
+            }
+
+            handler.connection.prepareStatement(statementStr).use { statement ->
+                statement.setString(1, new)
+                statement.setString(2, name)
+                statement.setString(3, locale.toLanguageTag())
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setStartingBalance(new: BigDecimal) {
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetStartingBalance).use { statement ->
+                statement.setBigDecimal(1, new)
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setDecimal(locale: Locale, new: String) {
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetDecimal).use { statement ->
+                statement.setString(1, new)
+                statement.setString(2, name)
+                statement.setString(3, locale.toLanguageTag())
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setConversionRate(new: BigDecimal) {
+        return withContext(Dispatchers.IO) {
+            handler.connection.prepareStatement(H2Statements.currencySetConversionRate).use { statement ->
+                statement.setBigDecimal(1, new)
+                statement.executeUpdate()
+            }
+        }
+    }
+
+    override suspend fun setAmountFormat(new: String) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setPresentationFormat(new: String) {
+        TODO("Not yet implemented")
+    }
+
     override fun equals(other: Any?): Boolean {
         return if (other is H2Currency) {
             other.name == name
