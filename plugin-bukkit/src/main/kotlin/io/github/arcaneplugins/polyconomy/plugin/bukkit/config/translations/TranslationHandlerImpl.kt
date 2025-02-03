@@ -212,6 +212,9 @@ class TranslationHandlerImpl(
     val commandPolyconomyWithdrawCompleted = TranslationImpl(this,
         arrayOf("command", "polyconomy", "withdraw", "completed"),
         listOf("%prefix% Withdrawn &f%amount%&7 from &f%target-name%&7's account in currency &f%currency%&7."))
+    val commandGenericErrorNotPlayedBefore = TranslationImpl(this,
+        arrayOf("command", "generic", "error", "not-played-before"),
+        listOf("%prefix% &cError:&7 A player by that name has not played before."))
 
     fun commandApiFailure(): Exception {
         return CommandAPI.failWithString(commandGenericErrorCommandFailure.rawStr())

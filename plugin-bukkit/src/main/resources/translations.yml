@@ -18,6 +18,8 @@ command:
         - "%prefix% &cError:&7 Amount &f%amount%&7 is too low; it must be greater than &f0&7."
       not-yet-implemented:
         - "%prefix% &cError:&7 Not yet implemented."
+      not-played-before:
+        - "%prefix% &cError:&7 A player by that name has not played before."
   balance:
     error:
       no-player:

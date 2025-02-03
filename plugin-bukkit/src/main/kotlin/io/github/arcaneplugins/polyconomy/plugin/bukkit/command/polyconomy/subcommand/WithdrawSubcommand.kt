@@ -31,6 +31,11 @@ object WithdrawSubcommand : InternalCmd {
                 val targetPlayer = args.get("player") as OfflinePlayer
                 val amount = args.get("amount") as Double
 
+                if (!targetPlayer.hasPlayedBefore()) {
+                    plugin.translations.commandGenericErrorNotPlayedBefore.sendTo(sender)
+                    throw plugin.translations.commandApiFailure()
+                }
+
                 if (amount <= 0) {
                     plugin.translations.commandGenericAmountZeroOrLess.sendTo(sender, placeholders = mapOf(
                         "amount" to Supplier { amount.toString() }
