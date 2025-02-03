@@ -21,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.spongepowered.configurate.ScopedConfigurationNode
 import org.spongepowered.configurate.loader.AbstractConfigurationLoader
+import org.spongepowered.configurate.transformation.ConfigurationTransformation
+import org.spongepowered.configurate.transformation.TransformAction
 import java.math.BigDecimal
 import java.nio.file.Path
 import java.text.DecimalFormat
@@ -745,6 +747,111 @@ abstract class ConfigurateStorageHandler(
                     .replace("%symbol%", getSymbol())
                     .replace("%amount%", DecimalFormat(amountFormat).format(amount))
                     .replace("%display-name%", getDisplayName(amount.compareTo(BigDecimal.ONE) == 0, locale))
+            }
+
+            override suspend fun setName(new: String) {
+                val oldName = name
+
+                if (new == oldName) {
+                    throw IllegalStateException("Currency already has the name ${new}; can't set to same value")
+                }
+
+                if (isPrimary()) {
+                    throw IllegalStateException("Unable to set name of primary currency")
+                }
+
+                val transform = ConfigurationTransformation
+                    .builder()
+                    .addAction(currencyNode().path(), TransformAction.rename(new))
+                    .build()
+                transform.apply(currencyNode())
+                name = new
+                storageHandler.write()
+
+                if (currencyNode().virtual()) {
+                    throw IllegalStateException("Operation unsuccessful; new currency node is virtual/non-existant: ${currencyNode().path()}")
+                }
+            }
+
+            override suspend fun setSymbol(new: String) {
+                currencyNode()
+                    .node("symbol")
+                    .set(new)
+
+                storageHandler.write()
+
+                if (getSymbol() != new) {
+                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getSymbol()} != ${new}")
+                }
+            }
+
+            override suspend fun setDisplayName(plural: Boolean, locale: Locale, new: String) {
+                val singularOrPlural = if (plural) {
+                    "plural"
+                } else {
+                    "singular"
+                }
+
+                currencyNode()
+                    .node("locale", locale.toLanguageTag(), "display-name", singularOrPlural)
+                    .set(new)
+
+                storageHandler.write()
+
+                if (getDisplayName(plural, locale) != new) {
+                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getDisplayName(plural, locale)} != ${new}")
+                }
+            }
+
+            override suspend fun setStartingBalance(new: BigDecimal) {
+                currencyNode()
+                    .node("starting-balance")
+                    .set(new.toDouble())
+
+                storageHandler.write()
+
+                if (getStartingBalance().toDouble() != new.toDouble()) {
+                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getStartingBalance()} != ${new}")
+                }
+            }
+
+            override suspend fun setDecimal(locale: Locale, new: String) {
+                currencyNode()
+                    .node("decimal", locale.toLanguageTag())
+                    .set(new)
+
+                storageHandler.write()
+
+                if (getDecimal(locale) != new) {
+                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getDecimal(locale)} != ${new}")
+                }
+            }
+
+            override suspend fun setConversionRate(new: BigDecimal) {
+                currencyNode()
+                    .node("conversion-rate")
+                    .set(new.toDouble())
+                storageHandler.write()
+
+                if (getConversionRate().toDouble() != new.toDouble()) {
+                    throw IllegalStateException("Operation unsuccessful; values do not match: ${getConversionRate()} != ${new}")
+                }
+            }
+
+            override suspend fun setAmountFormat(new: String) {
+                currencyNode()
+                    .node("amount-format")
+                    .set(new)
+                storageHandler.write()
+            }
+
+            override suspend fun setPresentationFormat(new: String) {
+                currencyNode()
+                    .node("presentation-format")
+                    .set(new)
+
+                // write
+                storageHandler.write()
             }
 
         }
