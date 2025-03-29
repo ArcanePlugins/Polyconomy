@@ -65,7 +65,7 @@ class VaultUnlockedEconomyProvider(
 
         return if (try {
                 Bukkit.getOfflinePlayer(accountId).hasPlayedBefore()
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 false
             }
         ) {
@@ -634,6 +634,49 @@ class VaultUnlockedEconomyProvider(
                 .getOrCreateNonPlayerAccount(vuNskForSharedAccount(accountID), accountID.toString())
                 .setPermissions(uuid, mapOf(polyAccountPermFromVu(permission) to value))
             true
+        }
+    }
+
+    override fun set(
+        pluginName: String,
+        accountID: UUID,
+        amount: BigDecimal,
+    ): EconomyResponse? {
+        return set(pluginName, accountID, "", getDefaultCurrency(pluginName), amount)
+    }
+
+    override fun set(
+        pluginName: String,
+        accountID: UUID,
+        worldName: String,
+        amount: BigDecimal,
+    ): EconomyResponse? {
+        return set(pluginName, accountID, worldName, getDefaultCurrency(pluginName), amount)
+    }
+
+    override fun set(
+        pluginName: String,
+        accountID: UUID,
+        worldName: String,
+        currency: String,
+        amount: BigDecimal
+    ): EconomyResponse? {
+        return runBlocking {
+            getAccountByUuid(null, accountID).setBalance(
+                amount,
+                storageHandler().getCurrency(currency)
+                    ?: throw IllegalArgumentException("Currency does not exist: '$currency'"),
+                vaultUnlockedCause,
+                TransactionImportance.MEDIUM,
+                null
+            )
+
+            EconomyResponse(
+                amount,
+                getBalance(pluginName, accountID, worldName, currency),
+                EconomyResponse.ResponseType.SUCCESS,
+                ""
+            )
         }
     }
 
