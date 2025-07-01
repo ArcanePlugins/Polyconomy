@@ -16,3 +16,6 @@ target/
 .DS_Store
 ._.git
 Thumbs.db
+
+# VS Code
+.vscode/
