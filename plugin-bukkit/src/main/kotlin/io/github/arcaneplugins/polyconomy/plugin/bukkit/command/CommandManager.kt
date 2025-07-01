@@ -17,7 +17,7 @@ class CommandManager(
             CommandAPIBukkitConfig(plugin)
                 .silentLogs(true)
                 .verboseOutput(false)
-                .usePluginNamespace()
+                .beLenientForMinorVersions(true)
         )
     }
 
