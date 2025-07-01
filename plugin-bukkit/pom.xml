@@ -6,11 +6,11 @@
     <parent>
         <groupId>io.github.arcaneplugins.polyconomy</groupId>
         <artifactId>polyconomy</artifactId>
-        <version>0.7.1</version>
+        <version>0.7.2</version>
     </parent>
 
     <artifactId>plugin-bukkit</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
 
     <name>Polyconomy Plugin for Bukkit</name>
 
