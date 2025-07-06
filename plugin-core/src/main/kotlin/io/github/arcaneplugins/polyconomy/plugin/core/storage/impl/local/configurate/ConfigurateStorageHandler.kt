@@ -113,7 +113,7 @@ abstract class ConfigurateStorageHandler(
             throw java.lang.IllegalStateException("You have no currencies configured!")
         }
 
-        val primaryCurrencyId = manager.primaryCurrencyId
+        val primaryCurrencyId = manager.primaryCurrencyId()
         primaryCurrency = currencyCache.find { it.name == primaryCurrencyId }
             ?: throw IllegalArgumentException("The primary currency ID you have specified (${primaryCurrencyId}) does not match any valid and enabled currency (${currencyCache.size} candidates)")
 
@@ -338,7 +338,7 @@ abstract class ConfigurateStorageHandler(
                 val oldBalance: BigDecimal = getBalance(transaction.currency)
                 val newBalance: BigDecimal = let {
                     val value = transaction.resultingBalance(oldBalance)
-                    val minBal = storageHandler.manager.minimumBalance
+                    val minBal = storageHandler.manager.minimumBalance()
 
                     return@let if (value < minBal) {
                         throw IllegalArgumentException(

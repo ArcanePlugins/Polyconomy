@@ -11,31 +11,38 @@ import kotlin.io.path.Path
 
 class StorageManager(
     val plugin: Platform,
-    val dataFolder: File,
-    val primaryCurrencyId: String,
-    val minimumBalance: BigDecimal,
 ) {
+
+    val dataFolderAbsPath: String = plugin.dataFolder().toAbsolutePath().toString()
 
     val availableHandlers = mutableSetOf(
         JsonStorageHandler(
-            absolutePath = Path(dataFolder.absolutePath, "data", "data.json"),
+            absolutePath = Path(dataFolderAbsPath, "data", "data.json"),
             manager = this,
         ),
         YamlStorageHandler(
-            absolutePath = Path(dataFolder.absolutePath, "data", "data.yml"),
+            absolutePath = Path(dataFolderAbsPath, "data", "data.yml"),
             manager = this,
         ),
         H2StorageHandler(
-            absolutePath = Path(dataFolder.absolutePath, "data", "h2.db"),
+            absolutePath = Path(dataFolderAbsPath, "data", "h2.db"),
             manager = this,
         )
     )
 
     lateinit var handler: StorageHandler
 
-    fun startup(
-        handlerImplId: String,
-    ) {
+    fun primaryCurrencyId(): String {
+        return plugin.settingsCfg.primaryCurrencyId()
+    }
+
+    fun minimumBalance(): BigDecimal {
+        return plugin.settingsCfg.minimumBalance()
+    }
+
+    fun startup() {
+        val handlerImplId: String = plugin.settingsCfg.storageImplementation()
+
         handler = availableHandlers.firstOrNull { it.id.equals(handlerImplId, ignoreCase = true) }
             ?: throw IllegalArgumentException("There is no available storage handler matching an ID of ${handlerImplId}. (Did you make a typo?)")
 

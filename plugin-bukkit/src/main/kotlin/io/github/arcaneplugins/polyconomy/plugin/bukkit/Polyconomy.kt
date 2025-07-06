@@ -79,13 +79,8 @@ class Polyconomy : JavaPlugin(), Platform {
     override fun onEnable() {
         try {
             loadConfigs()
-            storageManager = StorageManager(
-                plugin = this,
-                dataFolder = dataFolder,
-                minimumBalance = settingsCfg.minimumBalance(),
-                primaryCurrencyId = settingsCfg.primaryCurrencyId()
-            )
-            storageManager.startup(settingsCfg.storageImplementation())
+            storageManager = StorageManager(this)
+            storageManager.startup()
             translations.load()
             listenerManager.load()
             hookManager.registerAll()
@@ -152,7 +147,7 @@ class Polyconomy : JavaPlugin(), Platform {
 
             /* re-loading */
             loadConfigs()
-            storageManager.startup(settingsCfg.storageImplementation())
+            storageManager.startup()
             hookManager.registerAll()
             taskManager.start()
         } catch (ex: Exception) {

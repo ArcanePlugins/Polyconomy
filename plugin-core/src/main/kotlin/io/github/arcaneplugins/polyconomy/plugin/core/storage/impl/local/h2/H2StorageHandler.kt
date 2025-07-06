@@ -335,8 +335,9 @@ class H2StorageHandler(
     }
 
     override suspend fun getPrimaryCurrency(): Currency {
-        return getCurrency(manager.primaryCurrencyId)
-            ?: throw IllegalArgumentException("Unable to get primary currency by ID of '${manager.primaryCurrencyId}': currency does not exist in the database (is there a typo, or was the currency created at all?)")
+        val primaryCurrencyId: String = manager.primaryCurrencyId()
+        return getCurrency(primaryCurrencyId)
+            ?: throw IllegalArgumentException("Unable to get primary currency by ID of '${primaryCurrencyId}': currency does not exist in the database (is there a typo, or was the currency created at all?)")
     }
 
     override suspend fun getCurrency(name: String): Currency? {
